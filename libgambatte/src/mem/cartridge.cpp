@@ -695,6 +695,7 @@ void Cartridge::loadSavedata() {
 }
 
 void Cartridge::saveSavedata() {
+    /*
 	std::string const &sbp = saveBasePath();
 
 	if (hasBattery(memptrs_.romdata()[0x147])) {
@@ -711,6 +712,7 @@ void Cartridge::saveSavedata() {
 		file.put(basetime >>  8 & 0xFF);
 		file.put(basetime       & 0xFF);
 	}
+    */
 }
 
 static int asHex(char c) {
