@@ -3,7 +3,7 @@
 
 namespace gambatte {
 
-enum { flag_multipak = 1, flag_header_checksum_ok = 2, };
+enum { flag_multipak = 1, flag_header_checksum_ok = 2 };
 
 static bool isHeaderChecksumOk(unsigned const char header[]) {
 	unsigned csum = 0;

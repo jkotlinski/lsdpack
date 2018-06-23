@@ -26,7 +26,7 @@ enum OamDmaSrc { oam_dma_src_rom,
                  oam_dma_src_vram,
                  oam_dma_src_wram,
                  oam_dma_src_invalid,
-                 oam_dma_src_off, };
+                 oam_dma_src_off };
 
 class MemPtrs {
 public:

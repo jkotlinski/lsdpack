@@ -1,13 +1,12 @@
 #include <cstdio>
 
-#include "rom.h"
-#include "sav.h"
+#include "libgambatte/include/gambatte.h"
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "usage: lsdpack <lsdj.gb> <lsdj.sav>");
+    if (argc != 2) {
+        fprintf(stderr, "usage: lsdpack <lsdj.gb>");
         return 1;
     }
-    load_rom(argv[1]);
-    load_sav(argv[2]);
+    gambatte::GB gameboy;
+    gameboy.load(argv[1]);
 }
