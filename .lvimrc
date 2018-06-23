@@ -1,1 +1,1 @@
-map <F4> :make<CR>:!./lsdpack.exe ../lsdj/lsdj.gb ../lsdj/lsdj.sav<CR>
+map <F4> :wall!<CR>:make<CR>:!./lsdpack.exe ../lsdj/lsdj.gb ../lsdj/lsdj.sav<CR>
