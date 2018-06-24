@@ -110,6 +110,18 @@ public:
     void setWriteHandler(void(*writeHandler)(char, char)) { writeHandler_ = writeHandler; }
     void setLcdHandler(void(*lcdHandler)(void)) { lcdHandler_ = lcdHandler; }
 	void updateInput();
+    bool isSongEmpty() {
+        write(0, 0xa, 0); // enable SRAM
+        write(0x4000, 0, 0); // select SRAM bank
+        // check all notes
+        for (unsigned i = 0xa000; i < 0xaff0; ++i) {
+            int val = read(i, 0);
+            if (val) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 private:
 	Cartridge cart_;

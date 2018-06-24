@@ -1,9 +1,12 @@
 #include <cstdio>
+#include <cstdlib>
 
 #include "gambatte.h"
 
 #include "input.h"
 #include "writer.h"
+
+int written_songs;
 
 gambatte::GB gameboy;
 Input input;
@@ -25,20 +28,33 @@ void press(unsigned key, int seconds = 1) {
     wait(seconds);
 }
 
-void go_to_file_load() {
+void load_song(int position) {
+    press(SELECT);
     press(SELECT | UP);
-    press(DOWN);
-    press(A);
+    press(0);
+    press(DOWN, 3);
     press(0);
     press(A);
     press(0);
-}
-
-void load_first_entry() {
-    press(UP, 2); // scroll to top
+    press(A);
     press(0);
-    press(A, 10); // wait or song load
+    press(UP, 5); // scroll to top
     press(0);
+    for (int i = 0; i < position; ++i) {
+        press(DOWN);
+        run_one_frame();
+        run_one_frame();
+        press(0);
+        run_one_frame();
+        run_one_frame();
+    }
+    press(A, 10); // wait for song load
+    press(0);
+    if (gameboy.isSongEmpty()) {
+        puts("ok");
+        exit(0);
+    }
+    printf("Recording song %i...\n", ++written_songs);
 }
 
 bool sound_enabled;
@@ -87,7 +103,11 @@ int main(int argc, char* argv[]) {
     gameboy.setLcdHandler(on_lcd_interrupt);
     gameboy.load(argv[1]);
 
-    go_to_file_load();
-    load_first_entry();
-    play_song();
+    press(0, 3);
+
+    int i = 0;
+    while (true) {
+        load_song(i++);
+        play_song();
+    }
 }

@@ -72,6 +72,7 @@ public:
 	void setGameShark(std::string const &codes) { mem_.setGameShark(codes); }
     void setWriteHandler(void(*writeHandler)(char, char)) { mem_.setWriteHandler(writeHandler); }
     void setLcdHandler(void(*lcdHandler)(void)) { mem_.setLcdHandler(lcdHandler); }
+    bool isSongEmpty() { return mem_.isSongEmpty(); }
 
 private:
 	Memory mem_;

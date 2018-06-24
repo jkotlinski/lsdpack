@@ -183,6 +183,8 @@ public:
     void setWriteHandler(void(*writeHandler)(char, char));
     void setLcdHandler(void(*lcdHandler)(void));
 
+    bool isSongEmpty() const;
+
 private:
 	struct Priv;
 	Priv *const p_;

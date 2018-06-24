@@ -217,4 +217,8 @@ void GB::setLcdHandler(void(*lcdHandler)(void)) {
     p_->cpu.setLcdHandler(lcdHandler);
 }
 
+bool GB::isSongEmpty() const {
+    return p_->cpu.isSongEmpty();
+}
+
 }
