@@ -36,8 +36,39 @@ SECTION "player_code",ROM0[$150]
     ldh [$ff],a ; ie
     ei
 
-.mainloop
-    jr  .mainloop
+    ld  a,$10
+    ldh [0],a
+
+.wait_button_pressed
+    ldh a,[0]
+    and $f
+    cp  $f
+    jr  z,.wait_button_pressed
+
+    di
+    xor a
+    ldh [$26],a ; mute
+    call    .next_song
+    ei
+
+    call    .delay
+
+.wait_button_released
+    ldh a,[0]
+    and $f
+    cp  $f
+    jr  nz,.wait_button_released
+
+    call    .delay
+
+    jr  .wait_button_pressed
+
+.delay
+    xor a
+.wait
+    inc a
+    jr  nz,.wait
+    ret
 
 ; -------------
 
@@ -77,7 +108,7 @@ SECTION "player_code",ROM0[$150]
     or  a
     jr  z,.lyc_done
     cp  $ff
-    jr  z,.next_song
+    jr  z,.handle_stop
 
     ld  e,a
 
@@ -90,6 +121,10 @@ SECTION "player_code",ROM0[$150]
 
     jr  .loop
 
+.handle_stop
+    call    .next_song
+    jr  .prepare_next_lyc
+
 .next_song
     ld  hl,.song
     inc [hl]
@@ -97,6 +132,15 @@ SECTION "player_code",ROM0[$150]
     add a,a
     ld  d,0
     ld  e,a
+
+    ld  hl,SongPtr
+    add hl,de
+    ld  a,[hl+]
+    ld  [.ptr],a
+    ld  a,[hl]
+    ld  [.ptr+1],a
+    or  a
+    jr  z,.reached_last_song
 
     ld  hl,SongBank
     add hl,de
@@ -106,17 +150,9 @@ SECTION "player_code",ROM0[$150]
     ld  a,[hl]
     ld  [.bank+1],a
     ld  [$3000],a
+    ret
 
-    ld  hl,SongPtr
-    add hl,de
-    ld  a,[hl+]
-    ld  [.ptr],a
-    ld  a,[hl]
-    ld  [.ptr+1],a
-    or  a
-    jr  nz,.prepare_next_lyc
-
-    ; reached last song, start over with song 0
+.reached_last_song
     ld  a,$ff
     ld  [.song],a
     jr  .next_song
