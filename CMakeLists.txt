@@ -1,6 +1,16 @@
 cmake_minimum_required (VERSION 3.1)
 project (lsdpack)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O2")
+
+include_directories(
+    libgambatte/common
+    libgambatte/include
+    libgambatte/src
+    libgambatte/src/mem)
+
 add_executable(lsdpack
+
     lsdpack.cpp
     writer.cpp
 
@@ -32,11 +42,4 @@ add_executable(lsdpack
     libgambatte/src/video/lyc_irq.cpp
     libgambatte/src/video/next_m0_time.cpp
     libgambatte/src/video/ppu.cpp
-    libgambatte/src/video/sprite_mapper.cpp
-    )
-include_directories(
-    libgambatte/common
-    libgambatte/include
-    libgambatte/src
-    libgambatte/src/mem)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O2")
+    libgambatte/src/video/sprite_mapper.cpp)
