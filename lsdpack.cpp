@@ -49,6 +49,7 @@ void load_song(int position) {
     press(A, 10); // wait for song load
     press(0);
     if (gameboy.isSongEmpty()) {
+        write_song_positions();
         puts("ok");
         exit(0);
     }
