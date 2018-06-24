@@ -41,12 +41,10 @@ void load_song(int position) {
     press(UP, 5); // scroll to top
     press(0);
     for (int i = 0; i < position; ++i) {
-        press(DOWN);
+        input.press(DOWN);
         run_one_frame();
         run_one_frame();
         press(0);
-        run_one_frame();
-        run_one_frame();
     }
     press(A, 10); // wait for song load
     press(0);
