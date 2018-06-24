@@ -72,7 +72,9 @@ SECTION "player_code",ROM0[$150]
 
     ld  a,[hl+]
     or  a
-    jr  z,.done
+    jr  z,.lyc_done
+    cp  $ff
+    jr  z,.next_song
 
     ld  e,a
 
@@ -85,7 +87,16 @@ SECTION "player_code",ROM0[$150]
 
     jr  .loop
 
-.done
+.next_song
+    ld  hl,$4000
+    xor a
+    ld  [.bank+1],a
+    ld  [$3000],a
+    inc a
+    ld  [.bank],a
+    ld  [$2000],a
+
+.lyc_done
     ld  a,l
     ld  [.ptr],a
     ld  a,h
