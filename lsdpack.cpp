@@ -72,6 +72,9 @@ void on_ff_write(char p, char data) {
     }
 }
 
+void on_lcd_interrupt() {
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "usage: lsdpack <lsdj.gb>");
@@ -79,6 +82,7 @@ int main(int argc, char* argv[]) {
     }
     gameboy.setInputGetter(&input);
     gameboy.setWriteHandler(on_ff_write);
+    gameboy.setLcdHandler(on_lcd_interrupt);
     gameboy.load(argv[1]);
 
     go_to_file_load();

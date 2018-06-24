@@ -213,4 +213,8 @@ void GB::setWriteHandler(void(*writeHandler)(char, char)) {
     p_->cpu.setWriteHandler(writeHandler);
 }
 
+void GB::setLcdHandler(void(*lcdHandler)(void)) {
+    p_->cpu.setLcdHandler(lcdHandler);
+}
+
 }

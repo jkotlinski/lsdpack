@@ -295,6 +295,9 @@ unsigned long Memory::event(unsigned long cc) {
 				address = 0x50 + n;
 
 			intreq_.ackIrq(n);
+            if (address == 0x48) {
+                lcdHandler_();
+            }
 			cc = interrupter_.interrupt(address, cc, *this);
 		}
 

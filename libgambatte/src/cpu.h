@@ -71,6 +71,7 @@ public:
 	void setGameGenie(std::string const &codes) { mem_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { mem_.setGameShark(codes); }
     void setWriteHandler(void(*writeHandler)(char, char)) { mem_.setWriteHandler(writeHandler); }
+    void setLcdHandler(void(*lcdHandler)(void)) { mem_.setLcdHandler(lcdHandler); }
 
 private:
 	Memory mem_;

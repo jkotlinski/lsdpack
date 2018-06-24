@@ -108,6 +108,7 @@ public:
 	void setGameGenie(std::string const &codes) { cart_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { interrupter_.setGameShark(codes); }
     void setWriteHandler(void(*writeHandler)(char, char)) { writeHandler_ = writeHandler; }
+    void setLcdHandler(void(*lcdHandler)(void)) { lcdHandler_ = lcdHandler; }
 	void updateInput();
 
 private:
@@ -127,6 +128,7 @@ private:
 	unsigned char serialCnt_;
 	bool blanklcd_;
     void (*writeHandler_)(char, char);
+    void (*lcdHandler_)(void);
 
 	void decEventCycles(IntEventId eventId, unsigned long dec);
 	void oamDmaInitSetup();

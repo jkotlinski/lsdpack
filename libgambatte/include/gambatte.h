@@ -181,6 +181,7 @@ public:
 	void setGameShark(std::string const &codes);
 
     void setWriteHandler(void(*writeHandler)(char, char));
+    void setLcdHandler(void(*lcdHandler)(void));
 
 private:
 	struct Priv;
