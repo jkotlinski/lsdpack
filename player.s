@@ -11,16 +11,15 @@ SECTION "boot",ROM0[$100]
     jr  $150
 
 SECTION "player_code",ROM0[$150]
-    ; initialize bank + ptr
-    ld  hl,$3000
+    ; .bank = 1
+    ; .ptr = $4000
     xor a
     ld  [.bank+1],a
-    ld  [hl],a
+    ld  [$3000],a
     ld  [.ptr],a
-    ld  h,$20
     inc a
     ld  [.bank],a
-    ld  [hl],a
+    ld  [$2000],a
     ld  a,$40
     ld  [.ptr+1],a
 
@@ -37,8 +36,62 @@ SECTION "player_code",ROM0[$150]
 .mainloop
     jr  .mainloop
 
+; -------------
+
+.next_bank
+    ld  a,$40
+    ld  h,a
+
+    ld  a,[.bank]
+    inc a
+    ld  [.bank],a
+    ld  [$2000],a
+    ret nz
+    ld  a,[.bank+1]
+    inc a
+    ld  [.bank+1],a
+    ld  [$3000],a
+    ret
+
 .on_lcd_interrupt
-    ; prepare new lyc
+    push    af
+    push    de
+    push    hl
+
+    ld  a,[.ptr+1] ; hl = ptr
+    ld  h,a
+    ld  a,[.ptr]
+    ld  l,a
+
+    ld  d,$ff
+
+.loop
+    ld  a,h
+    cp  $80
+    call    z,.next_bank
+
+    ld  a,[hl+]
+    or  a
+    jr  z,.done
+
+    ld  e,a
+
+    ld  a,h
+    cp  $80
+    call    z,.next_bank
+
+    ld  a,[hl+]
+    ld  [de],a
+
+    jr  .loop
+
+.done
+    ld  a,l
+    ld  [.ptr],a
+    ld  a,h
+    ld  [.ptr+1],a
+
+    ; prepare next LYC
     ldh a,[$45]
     cp  a,10
     jr  z,.lcd10
@@ -53,7 +106,11 @@ SECTION "player_code",ROM0[$150]
     ld  a,10
 .write_lyc
     ldh [$45],a
+    pop hl
+    pop de
+    pop af
     reti
+
 .lcd10
     ld  a,36
     jr  .write_lyc
