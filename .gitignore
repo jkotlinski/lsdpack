@@ -3,3 +3,7 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 lsdpack.exe
+*.gb
+*.o
+music.s
+tags
