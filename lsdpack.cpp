@@ -3,6 +3,7 @@
 #include "gambatte.h"
 
 #include "input.h"
+#include "writer.h"
 
 gambatte::GB gameboy;
 Input input;
@@ -40,17 +41,15 @@ void load_first_entry() {
     press(0);
 }
 
-bool sound_has_been_enabled;
+bool sound_enabled;
 
 void play_song() {
-    sound_has_been_enabled = false;
+    sound_enabled = false;
     puts("start");
     input.press(START);
-    wait(10);
-}
-
-void stop() {
-    puts("stop");
+    do {
+        wait(1);
+    } while(sound_enabled);
 }
 
 void on_ff_write(char p, char data) {
@@ -58,21 +57,22 @@ void on_ff_write(char p, char data) {
         return; // not sound
     }
     switch (p) {
-        case 0x26: // sound enable
-            if (data) {
-                sound_has_been_enabled = true;
-            } else {
-                if (sound_has_been_enabled) {
-                    stop();
-                }
+        case 0x26:
+            if (sound_enabled && !data) {
+                record_song_stop();
+                sound_enabled = false;
+                return;
             }
+            sound_enabled = data;
             break;
-        default:
-            printf("%x=%x\n", p, data & 0xff);
     }
+    record_write(p, data);
 }
 
 void on_lcd_interrupt() {
+    if (sound_enabled) {
+        record_lcd();
+    }
 }
 
 int main(int argc, char* argv[]) {

@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.1)
 project (lsdpack)
 add_executable(lsdpack
     lsdpack.cpp
+    writer.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp
