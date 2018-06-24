@@ -4,7 +4,7 @@ Records LSDj songs to an RGBDS compatible player that can be used in stand-alone
 
 ## Building
 
-Requires CMake and a compatible C++ compiler. E.g.
+Requires CMake and a C++ compiler. E.g.
 
     cmake .
     make
@@ -16,7 +16,7 @@ All songs in the .sav must first be prepared so that they are stopped with HFF c
 Then, place your .sav and .gb file in the same directory and run e.g.
 
     ./lsdjpack.exe lsdj.gb
-    
+
 This will produce the file music.s, which contains the recorded sound data. The Gameboy player ROM can now be built by:
 
     rgbasm -o music.o music.s
