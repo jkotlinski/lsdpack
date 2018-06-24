@@ -180,6 +180,8 @@ public:
 	  */
 	void setGameShark(std::string const &codes);
 
+    void setWriteHandler(void(*writeHandler)(char, char));
+
 private:
 	struct Priv;
 	Priv *const p_;

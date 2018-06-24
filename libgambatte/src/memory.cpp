@@ -590,6 +590,8 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 	if (lastOamDmaUpdate_ != disabled_time)
 		updateOamDma(cc);
 
+    writeHandler_(p, data);
+
 	switch (p & 0xFF) {
 	case 0x00:
 		if ((data ^ ioamhram_[0x100]) & 0x30) {

@@ -209,4 +209,8 @@ void GB::setGameShark(std::string const &codes) {
 	p_->cpu.setGameShark(codes);
 }
 
+void GB::setWriteHandler(void(*writeHandler)(char, char)) {
+    p_->cpu.setWriteHandler(writeHandler);
+}
+
 }

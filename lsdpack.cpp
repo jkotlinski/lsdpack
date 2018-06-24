@@ -40,8 +40,36 @@ void load_first_entry() {
     press(0);
 }
 
+bool sound_has_been_enabled;
+
 void play_song() {
+    sound_has_been_enabled = false;
+    puts("start");
     input.press(START);
+    wait(10);
+}
+
+void stop() {
+    puts("stop");
+}
+
+void on_ff_write(char p, char data) {
+    if (p < 0x10 || p >= 0x40) {
+        return; // not sound
+    }
+    switch (p) {
+        case 0x26: // sound enable
+            if (data) {
+                sound_has_been_enabled = true;
+            } else {
+                if (sound_has_been_enabled) {
+                    stop();
+                }
+            }
+            break;
+        default:
+            printf("%x=%x\n", p, data & 0xff);
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -50,6 +78,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     gameboy.setInputGetter(&input);
+    gameboy.setWriteHandler(on_ff_write);
     gameboy.load(argv[1]);
 
     go_to_file_load();
