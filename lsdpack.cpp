@@ -45,8 +45,8 @@ bool sound_enabled;
 
 void play_song() {
     sound_enabled = false;
-    puts("start");
     input.press(START);
+    record_song_start();
     do {
         wait(1);
     } while(sound_enabled);
@@ -66,7 +66,9 @@ void on_ff_write(char p, char data) {
             sound_enabled = data;
             break;
     }
-    record_write(p, data);
+    if (sound_enabled) {
+        record_write(p, data);
+    }
 }
 
 void on_lcd_interrupt() {
