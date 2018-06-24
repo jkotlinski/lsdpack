@@ -1,6 +1,7 @@
 #include "writer.h"
 
 #include <cstdio>
+#include <cstdlib>
 
 FILE* f;
 int bank;
@@ -11,6 +12,10 @@ int written;
 
 static void new_bank() {
     ++bank;
+    if (bank == 0x200) {
+        fputs("ROM full!", stderr);
+        exit(1);
+    }
     fprintf(f, "SECTION \"MUSIC_%i\",ROMX,BANK[%i]\n", bank, bank);
     written = 0;
 }
