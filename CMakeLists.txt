@@ -39,4 +39,4 @@ include_directories(
     libgambatte/include
     libgambatte/src
     libgambatte/src/mem)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -O2")
