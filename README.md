@@ -17,3 +17,5 @@ All songs in the .sav must first be prepared so that they are eventually stopped
     rgbasm -o player.o player.s
     rgblink -o player.gb player.o music.o
     rgbfix -v -m 0x19 -p 0 player.gb
+
+The player allows song skip by button press.
