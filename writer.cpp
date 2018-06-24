@@ -55,6 +55,7 @@ void record_lcd() {
 
 void write_song_positions() {
     fputs("SECTION \"SONG_POSITIONS\",ROM0\n", f);
+    fputs("EXPORT SongBank,SongPtr\n", f);
     fputs("SongBank\n", f);
     for (size_t i = 0; i < song_bank.size(); ++i) {
         fprintf(f, "dw %i\n", song_bank[i]);

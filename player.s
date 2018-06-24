@@ -6,6 +6,8 @@ SECTION "player_ram",WRAM0
     ds  2
 .ptr
     ds  2
+.song
+    ds  1
 
 SECTION "boot",ROM0[$100]
     jr  $150
@@ -14,6 +16,7 @@ SECTION "player_code",ROM0[$150]
     ; .bank = 1
     ; .ptr = $4000
     xor a
+    ld  [.song],a
     ld  [.bank+1],a
     ld  [$3000],a
     ld  [.ptr],a
@@ -88,13 +91,35 @@ SECTION "player_code",ROM0[$150]
     jr  .loop
 
 .next_song
-    ld  hl,$4000
-    xor a
-    ld  [.bank+1],a
-    ld  [$3000],a
-    inc a
+    ld  hl,.song
+    inc [hl]
+    ld  a,[hl]
+    add a,a
+    ld  d,0
+    ld  e,a
+
+    ld  hl,SongBank
+    add hl,de
+    ld  a,[hl+]
     ld  [.bank],a
     ld  [$2000],a
+    ld  a,[hl]
+    ld  [.bank+1],a
+    ld  [$3000],a
+
+    ld  hl,SongPtr
+    add hl,de
+    ld  a,[hl+]
+    ld  [.ptr],a
+    ld  a,[hl]
+    ld  [.ptr+1],a
+    or  a
+    jr  nz,.prepare_next_lyc
+
+    ; reached last song, start over with song 0
+    ld  a,$ff
+    ld  [.song],a
+    jr  .next_song
 
 .lyc_done
     ld  a,l
@@ -102,7 +127,7 @@ SECTION "player_code",ROM0[$150]
     ld  a,h
     ld  [.ptr+1],a
 
-    ; prepare next LYC
+.prepare_next_lyc
     ldh a,[$45]
     cp  a,10
     jr  z,.lcd10
