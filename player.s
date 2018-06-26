@@ -13,18 +13,19 @@ SECTION "boot",ROM0[$100]
     jr  $150
 
 SECTION "player_code",ROM0[$150]
-    ; .bank = 1
-    ; .ptr = $4000
-    xor a
-    ld  [.song],a
-    ld  [.bank+1],a
-    ld  [$3000],a
-    ld  [.ptr],a
-    inc a
+    ld  a,[SongBank]
     ld  [.bank],a
     ld  [$2000],a
-    ld  a,$40
+    ld  a,[SongBank+1]
+    ld  [.bank+1],a
+    ld  [$3000],a
+    ld  a,[SongPtr]
+    ld  [.ptr],a
+    ld  a,[SongPtr+1]
     ld  [.ptr+1],a
+
+    xor a
+    ld  [.song],a
 
     ; setup lyc interrupt
     ldh a,[$41]
