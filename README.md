@@ -1,6 +1,6 @@
 # lsdpack
 
-Records LSDj songs for use in stand-alone Game Boy ROMs. (e.g. your own games, demos, ...)
+Records LSDj songs for use in stand-alone Game Boy ROMs. (e.g. your own games, demos, music albums...)
 
 ## Building
 
