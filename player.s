@@ -73,6 +73,13 @@ SECTION "player_code",ROM0[$150]
 
 ; -------------
 
+GetByte: MACRO
+    ld  a,h
+    cp  $80
+    call    z,.next_bank
+    ld  a,[hl+]
+    ENDM
+
 .next_bank
     ld  a,$40
     ld  h,a
@@ -101,28 +108,28 @@ SECTION "player_code",ROM0[$150]
     ld  d,$ff
 
 .loop
-    ld  a,h
-    cp  $80
-    call    z,.next_bank
+    GetByte
 
-    ld  a,[hl+]
     or  a
     jr  z,.lyc_done
     cp  $ff
     jr  z,.handle_stop
+    cp  $fe
+    jr  nz,.write_byte_to_papu
+    call    .handle_sample
+    jr  .loop
 
+.write_byte_to_papu
     ld  e,a
 
-    ld  a,h
-    cp  $80
-    call    z,.next_bank
+    GetByte
 
-    ld  a,[hl+]
     ld  [de],a
 
     jr  .loop
 
 .handle_stop
+    jp  .handle_stop
     call    .next_song
     jr  .prepare_next_lyc
 
@@ -199,6 +206,86 @@ SECTION "player_code",ROM0[$150]
 .lcd113
     ld  a,138
     jr  .write_lyc
+
+.handle_sample
+    push    bc
+    push    de
+
+    GetByte
+    ld  b,a     ; b = sample bank
+    GetByte
+    ld  e,a
+    GetByte
+    ld  d,a     ; de = sample ptr
+
+    push    hl
+    ; switch bank
+    xor a
+    ld  [$3000],a
+    ld  a,b
+    ld  [$2000],a
+
+    ld  h,d
+    ld  l,e
+
+    ; disable wave channel output
+    ldh a,[$25]
+    ld  e,a
+    and a,~$44
+    ldh [$25],a
+
+    xor a
+    ldh [$1a],a ; mute channel
+
+    ld  a,[hl+]
+    ldh [$30],a
+    ld  a,[hl+]
+    ldh [$31],a
+    ld  a,[hl+]
+    ldh [$32],a
+    ld  a,[hl+]
+    ldh [$33],a
+    ld  a,[hl+]
+    ldh [$34],a
+    ld  a,[hl+]
+    ldh [$35],a
+    ld  a,[hl+]
+    ldh [$36],a
+    ld  a,[hl+]
+    ldh [$37],a
+    ld  a,[hl+]
+    ldh [$38],a
+    ld  a,[hl+]
+    ldh [$39],a
+    ld  a,[hl+]
+    ldh [$3a],a
+    ld  a,[hl+]
+    ldh [$3b],a
+    ld  a,[hl+]
+    ldh [$3c],a
+    ld  a,[hl+]
+    ldh [$3d],a
+    ld  a,[hl+]
+    ldh [$3e],a
+    ld  a,[hl+]
+    ldh [$3f],a
+
+    ld  a,$80 ; unmute
+    ldh [$1a],a
+
+    pop     hl
+
+    GetByte
+    ldh [$1e],a
+    GetByte
+    ldh [$1d],a
+
+    ld  a,e
+    ldh [$25],a
+
+    pop de
+    pop bc
+    ret
 
 SECTION "lcd_handler",ROM0[$48]
     jp  .on_lcd_interrupt
