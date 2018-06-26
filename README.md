@@ -4,10 +4,7 @@ Records LSDj songs for use in stand-alone Game Boy ROMs. (e.g. your own games, d
 
 ## Building
 
-Requires CMake and a C++ compiler. E.g.
-
-    cmake .
-    make
+Requires CMake and a C++ compiler. Exact build steps are platform dependent - see [Running CMake](https://cmake.org/runningcmake/)
 
 ## Usage
 
