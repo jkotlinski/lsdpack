@@ -129,7 +129,6 @@ GetByte: MACRO
     jr  .loop
 
 .handle_stop
-    jp  .handle_stop
     call    .next_song
     jr  .prepare_next_lyc
 
