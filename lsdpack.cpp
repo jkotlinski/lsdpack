@@ -17,13 +17,13 @@ void run_one_frame() {
     gameboy.runFor(0, 0, &audioBuffer[0], samples);
 }
 
-void wait(int seconds) {
-    for (int i = 0; i < 60 * seconds; ++i) {
+void wait(float seconds) {
+    for (float i = 0.f; i < 60.f * seconds; ++i) {
         run_one_frame();
     }
 }
 
-void press(unsigned key, int seconds = 1) {
+void press(unsigned key, float seconds = 0.1f) {
     input.press(key);
     wait(seconds);
 }
@@ -41,13 +41,18 @@ void load_song(int position) {
     press(UP, 5); // scroll to top
     press(0);
     for (int i = 0; i < position; ++i) {
-        input.press(DOWN);
-        run_one_frame();
-        run_one_frame();
+        press(DOWN);
         press(0);
     }
+    // press song name
     press(A);
-    press(0, 5); // wait until song is loaded
+    press(0);
+    // discard changes
+    press(LEFT);
+    press(0);
+    press(A);
+    // wait until song is loaded
+    press(0, 5);
     if (gameboy.isSongEmpty()) {
         write_song_positions();
         puts("ok");
