@@ -95,7 +95,6 @@ static void write_sample_buffer() {
     if (sample_locations.find(sample_contents) == sample_locations.end()) {
         sample_locations[sample_contents] = write_location;
         sample_location = write_location;
-        fprintf(f, "; sample\n");
         for (size_t i = 0; i < sample_contents.size(); ++i) {
             write_byte(sample_contents[i]);
         }
