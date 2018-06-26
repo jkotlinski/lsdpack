@@ -275,6 +275,11 @@ GetByte: MACRO
 
     pop     hl
 
+    ld  a,[.bank]
+    ld  [$2000],a
+    ld  a,[.bank+1]
+    ld  [$3000],a
+
     GetByte
     ldh [$1e],a
     GetByte
