@@ -45,3 +45,5 @@ add_executable(lsdpack
     libgambatte/src/video/next_m0_time.cpp
     libgambatte/src/video/ppu.cpp
     libgambatte/src/video/sprite_mapper.cpp)
+
+set_property(TARGET lsdpack PROPERTY CXX_STANDARD 98)
