@@ -54,7 +54,7 @@ void load_song(int position) {
     // wait until song is loaded
     press(0, 5);
     if (gameboy.isSongEmpty()) {
-        write_song_positions();
+        record_complete();
         puts("ok");
         exit(0);
     }
