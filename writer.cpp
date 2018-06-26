@@ -91,21 +91,18 @@ static void write_sample_buffer() {
     for (int i = 5; i < 5 + 32; i += 2) {
         sample_contents.push_back(sample_buffer[i]);
     }
-    Location sample_location;
-    if (sample_locations.find(sample_contents) == sample_locations.end()) {
-        sample_locations[sample_contents] = write_location;
-        sample_location = write_location;
+    SampleLocations::iterator sample_location = sample_locations.find(sample_contents);
+    if (sample_location == sample_locations.end()) {
+        sample_location = sample_locations.insert(std::make_pair(sample_contents, write_location)).first;
         for (size_t i = 0; i < sample_contents.size(); ++i) {
             write_byte(sample_contents[i]);
         }
-    } else {
-        sample_location = sample_locations[sample_contents];
     }
     music_stream.push_back(SAMPLE);
-    assert(sample_location.bank < 0x100);
-    music_stream.push_back(sample_location.bank);
-    music_stream.push_back(sample_location.ptr & 0xff);
-    music_stream.push_back(sample_location.ptr >> 8);
+    assert(sample_location->second.bank < 0x100);
+    music_stream.push_back(sample_location->second.bank);
+    music_stream.push_back(sample_location->second.ptr & 0xff);
+    music_stream.push_back(sample_location->second.ptr >> 8);
     music_stream.push_back(sample_buffer[39]); // freq
     music_stream.push_back(sample_buffer[41]); // freq
     sample_buffer.clear();
