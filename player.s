@@ -14,7 +14,7 @@ SECTION "player_code",ROM0
 ;
 ; IN: a = song number
 ; OUT: -
-; SIDE EFFECTS: trashes de and hl
+; SIDE EFFECTS: trashes de, hl
 ;
 LsdjPlaySong::
     ld  [Song],a
