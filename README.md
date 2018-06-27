@@ -16,7 +16,7 @@ All songs in the .sav must first be prepared so that they are eventually stopped
     rgblink -o player.gb boot.o player.o lsdj.o
     rgbfix -v -m 0x19 -p 0 player.gb
 
-## How to use from your own code
+## Using from your own code
 
 ### boot.s
 
@@ -27,20 +27,20 @@ your own game, music selector or whatever you feel like :)
 
 Contains the player code. Following functions are exported:
 
+    ; IN: a = song number
+    ; OUT: -
+    ; SIDE EFFECTS: changes ROM bank, trashes de and hl
+    ;
+    ; Starts playing a song. If a song is already playing,
+    ; make sure interrupts are disabled when calling this.
+    ;
     LsdjPlaySong::
 
-    IN: a = song number
-    OUT: -
-    SIDE EFFECTS: changes ROM bank, trashes de and hl
-
-    Starts playing a song. If a song is already playing,
-    make sure interrupts are disabled when calling this.
-
+    ; IN: -
+    ; OUT: -
+    ; SIDE EFFECTS: changes ROM bank
+    ;
+    ; Call this six times per screen update,
+    ; evenly spread out over the screen.
+    ;
     LsdjTick::
-
-    IN: -
-    OUT: -
-    SIDE EFFECTS: changes ROM bank
-
-    Call this six times per screen update,
-    evenly spread out over the screen.
