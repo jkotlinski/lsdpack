@@ -31,7 +31,7 @@ Contains the player code. Following functions are exported:
 
     ; IN: a = song number
     ; OUT: -
-    ; SIDE EFFECTS: changes ROM bank, trashes de and hl
+    ; SIDE EFFECTS: trashes de and hl
     ;
     ; Starts playing a song. If a song is already playing,
     ; make sure interrupts are disabled when calling this.

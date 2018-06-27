@@ -14,7 +14,7 @@ SECTION "player_code",ROM0
 ;
 ; IN: a = song number
 ; OUT: -
-; SIDE EFFECTS: changes ROM bank, trashes de and hl
+; SIDE EFFECTS: trashes de and hl
 ;
 LsdjPlaySong::
     ld  [Song],a
@@ -28,10 +28,8 @@ LsdjPlaySong::
 
     ld  a,[hl+]
     ld  [CurrentBank],a
-    ld  [$2000],a
     ld  a,[hl+]
     ld  [CurrentBank+1],a
-    ld  [$3000],a
     ld  a,[hl+]
     ld  [CurrentPtr],a
     ld  a,[hl]
@@ -58,6 +56,10 @@ LsdjTick::
     push    hl
 
 .tick
+    ld  a,[CurrentBank+1]
+    ld  [$3000],a
+    ld  a,[CurrentBank]
+    ld  [$2000],a
     ld  a,[CurrentPtr+1] ; hl = ptr
     ld  h,a
     ld  a,[CurrentPtr]
