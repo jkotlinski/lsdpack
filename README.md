@@ -10,8 +10,6 @@ Requires CMake and a C++ compiler. Exact build steps are platform dependent - se
 
 All songs in the .sav must first be prepared so that they are eventually stopped with the HFF command. Then, place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`.
 
-lsdpack captures direct sound chip registry writes. This method is space inefficient, but has the advantage of being very accurate and fast.
-
 ## Playing Songs from Your Own Code
 
 An example Game Boy player ROM can be built using RGBDS:
