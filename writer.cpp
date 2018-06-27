@@ -149,17 +149,15 @@ void record_lcd() {
 }
 
 static void write_song_locations() {
-    fputs("SECTION \"SONG_POSITIONS\",ROM0\n", f);
-    fputs("EXPORT SongBank,SongPtr\n", f);
-    fputs("SongBank\n", f);
+    fputs("SECTION \"SONG_LOCATIONS\",ROM0\n", f);
+    fputs("EXPORT SongLocations\n", f);
+    fputs("SongLocations\n", f);
     for (size_t i = 0; i < song_locations.size(); ++i) {
-        fprintf(f, "dw %i\n", song_locations[i].bank);
+        fprintf(f,
+                "dw %i, $%x\n",
+                song_locations[i].bank,
+                song_locations[i].ptr);
     }
-    fputs("SongPtr\n", f);
-    for (size_t i = 0; i < song_locations.size(); ++i) {
-        fprintf(f, "dw $%x\n", song_locations[i].ptr);
-    }
-    fputs("dw 0", f);
 }
 
 void record_complete() {
