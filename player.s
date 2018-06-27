@@ -9,10 +9,13 @@ CurrentPtr
 
 SECTION "player_code",ROM0
 
-; Starts playing a song.
+; Starts playing a song. If a song is already playing,
+; make sure interrupts are disabled when calling this.
+;
 ; IN: a = song number
 ; OUT: -
 ; SIDE EFFECTS: changes ROM bank, trashes de and hl
+;
 LsdjPlaySong::
     ld  [Song],a
     ld  d,0
@@ -23,7 +26,6 @@ LsdjPlaySong::
     ld  hl,SongLocations
     add hl,de
 
-    di
     ld  a,[hl+]
     ld  [CurrentBank],a
     ld  [$2000],a
@@ -34,7 +36,7 @@ LsdjPlaySong::
     ld  [CurrentPtr],a
     ld  a,[hl]
     ld  [CurrentPtr+1],a
-    reti
+    ret
 
 GetByte: MACRO
     ld  a,h
@@ -45,14 +47,17 @@ GetByte: MACRO
 
 ; Call this six times per screen update,
 ; evenly spread out over the screen.
+;
 ; IN: -
 ; OUT: -
 ; SIDE EFFECTS: changes ROM bank
+;
 LsdjTick::
     push    af
     push    de
     push    hl
 
+.tick
     ld  a,[CurrentPtr+1] ; hl = ptr
     ld  h,a
     ld  a,[CurrentPtr]
@@ -97,7 +102,7 @@ LsdjTick::
 .handle_stop
     ld  a,[Song]
     call    LsdjPlaySong
-    jr  LsdjTick
+    jr  .tick
 
 .done
     ld  a,l
