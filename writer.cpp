@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-FILE* f;
+static FILE* f;
 
 struct Location {
     int bank;
@@ -127,9 +127,9 @@ static void record_byte(unsigned char byte) {
 
 // -----
 
-void record_song_start() {
+void record_song_start(const char* out_path) {
     if (f == 0) {
-        f = fopen("music.s", "w");
+        f = fopen(out_path, "w");
         new_bank();
     }
     music_stream.push_back(START);

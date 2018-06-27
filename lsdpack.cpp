@@ -7,9 +7,9 @@
 #include "writer.h"
 
 int written_songs;
-
 gambatte::GB gameboy;
 Input input;
+std::string out_path;
 
 void run_one_frame() {
     size_t samples = 35112;
@@ -55,10 +55,10 @@ void load_song(int position) {
     press(0, 5);
     if (gameboy.isSongEmpty()) {
         record_complete();
-        puts("ok");
+        puts("OK");
         exit(0);
     }
-    printf("Recording song %i...\n", ++written_songs);
+    printf("Song %i...\n", ++written_songs);
 }
 
 bool sound_enabled;
@@ -66,7 +66,7 @@ bool sound_enabled;
 void play_song() {
     sound_enabled = false;
     input.press(START);
-    record_song_start();
+    record_song_start(out_path.c_str());
     do {
         wait(1);
     } while(sound_enabled);
@@ -97,6 +97,15 @@ void on_lcd_interrupt() {
     }
 }
 
+void make_out_path(const char* in_path) {
+    out_path = in_path;
+    // .gb => .s
+    out_path.replace(out_path.end() - 2, out_path.end(), "s");
+    out_path.replace(out_path.begin(), out_path.begin() + out_path.rfind('/') + 1, "");
+    out_path.replace(out_path.begin(), out_path.begin() + out_path.rfind('\\') + 1, "");
+    printf("Recording to '%s'\n", out_path.c_str());
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "usage: lsdpack <lsdj.gb>");
@@ -106,6 +115,8 @@ int main(int argc, char* argv[]) {
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
     gameboy.load(argv[1]);
+
+    make_out_path(argv[1]);
 
     press(0, 3);
 
