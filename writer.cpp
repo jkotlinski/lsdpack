@@ -15,8 +15,8 @@ struct Location {
 };
 static Location write_location;
 
-#define SAMPLE 0xfe
-#define STOP 0xff
+#define SAMPLE 1
+#define STOP 2
 #define LCD 0
 
 #define START 0x100

@@ -72,9 +72,9 @@ LsdjTick::
 
     or  a
     jr  z,.done
-    cp  $ff
+    cp  2
     jr  z,.handle_stop
-    cp  $fe
+    cp  1
     jr  nz,.write_byte_to_papu
     call    .handle_sample
     jr  .loop
