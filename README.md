@@ -4,7 +4,7 @@ Records LSDj songs for use in stand-alone Game Boy ROMs. (E.g. your own games, d
 
 ## How Does It Work?
 
-lsdpack plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. Those recordings can then be played back from another ROM. This player is very fast and can easily play back songs that would normally choke a Game Boy Classic. The drawback with this approach is that recordings grow big - a song can easily take a megabyte or more.
+lsdpack plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. Those recordings can then be played back from another ROM. This player is very fast and can easily play back songs that would normally choke a Game Boy Classic. The drawback is that recordings get big - a song can take a megabyte.
 
 ## Building
 
