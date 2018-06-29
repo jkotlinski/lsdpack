@@ -52,6 +52,7 @@ GetByte: MACRO
 ;
 LsdjTick::
     push    af
+    push    bc
     push    de
     push    hl
 
@@ -75,7 +76,7 @@ LsdjTick::
     cp  2
     jr  z,.handle_stop
     cp  1
-    jr  nz,.write_byte_to_papu
+    jr  nz,.write_sound_register
     call    .handle_sample
     jr  .loop
 
@@ -94,17 +95,15 @@ LsdjTick::
     ld  [$3000],a
     ret
 
-.write_byte_to_papu
+.write_sound_register
+    ld  b,a
+    and $7f
     ld  e,a
     GetByte
     ld  [de],a
-
-    jr  .loop
-
-.handle_stop
-    ld  a,[Song]
-    call    LsdjPlaySong
-    jr  .tick
+    ld  a,b
+    bit 7,a
+    jr  z,.loop
 
 .done
     ld  a,l
@@ -114,11 +113,16 @@ LsdjTick::
 
     pop hl
     pop de
+    pop bc
     pop af
     ret
 
+.handle_stop
+    ld  a,[Song]
+    call    LsdjPlaySong
+    jr  .tick
+
 .handle_sample
-    push    bc
     push    de
 
     GetByte
@@ -199,5 +203,4 @@ LsdjTick::
     ldh [$25],a
 
     pop de
-    pop bc
     ret

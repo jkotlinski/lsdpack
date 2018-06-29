@@ -2,6 +2,6 @@
 
 void record_song_start(const char* out_path);
 void record_song_stop();
-void record_write(char addr, char data);
+void record_write(unsigned char addr, unsigned char data);
 void record_lcd();
 void record_complete();
