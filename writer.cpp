@@ -144,6 +144,7 @@ void record_song_start(const char* out_path) {
 }
 
 void record_song_stop() {
+    flush_sample_buffer();
     music_stream.push_back(STOP);
 }
 
@@ -185,7 +186,6 @@ static void log_written_bytes() {
 }
 
 void record_complete() {
-    flush_sample_buffer();
     size_t i = 0;
     while (i < music_stream.size()) {
         if (music_stream[i] == START) {
