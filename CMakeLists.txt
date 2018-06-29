@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-project (lsdpack)
+project (lsdpak)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -O2")
@@ -11,9 +11,9 @@ include_directories(
     libgambatte/src
     libgambatte/src/mem)
 
-add_executable(lsdpack
+add_executable(lsdpak
 
-    lsdpack.cpp
+    lsdpak.cpp
     writer.cpp
 
     libgambatte/src/bitmap_font.cpp
@@ -46,4 +46,4 @@ add_executable(lsdpack
     libgambatte/src/video/ppu.cpp
     libgambatte/src/video/sprite_mapper.cpp)
 
-set_property(TARGET lsdpack PROPERTY CXX_STANDARD 98)
+set_property(TARGET lsdpak PROPERTY CXX_STANDARD 98)
