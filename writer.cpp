@@ -192,7 +192,7 @@ static void write_song_locations() {
     }
 }
 
-void record_complete() {
+void write_music_to_disk() {
     size_t i = 0;
     while (i < music_stream.size()) {
         if (music_stream[i] == START) {
