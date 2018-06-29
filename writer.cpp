@@ -24,6 +24,9 @@ static Location write_location;
 static std::vector<Location> song_locations;
 static std::vector<int> music_stream;
 
+static int sample_count;
+static int music_count;
+
 static void new_bank() {
     if (++write_location.bank == 0x200) {
         fputs("ROM full!", stderr);
@@ -96,6 +99,7 @@ static void write_sample_buffer() {
         sample_location = sample_locations.insert(std::make_pair(sample_contents, write_location)).first;
         for (size_t i = 0; i < sample_contents.size(); ++i) {
             write_byte(sample_contents[i]);
+            ++sample_count;
         }
     }
     music_stream.push_back(SAMPLE);
@@ -160,16 +164,29 @@ static void write_song_locations() {
     }
 }
 
+static void log_written_bytes() {
+    if (music_count == 0) {
+        return;
+    }
+    printf("wrote %i sample bytes, %i music bytes\n",
+            sample_count, music_count);
+    sample_count = 0;
+    music_count = 0;
+}
+
 void record_complete() {
     flush_sample_buffer();
     size_t i = 0;
     while (i < music_stream.size()) {
         if (music_stream[i] == START) {
+            log_written_bytes();
             song_locations.push_back(write_location);
         } else {
             write_byte(music_stream[i]);
+            ++music_count;
         }
         ++i;
     }
+    log_written_bytes();
     write_song_locations();
 }
