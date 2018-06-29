@@ -102,7 +102,7 @@ LsdjTick::
     GetByte
     ld  [de],a
     ld  a,b
-    bit 7,a
+    bit 7,a ; test LYC_END
     jr  z,.loop
 
 .done

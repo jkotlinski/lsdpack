@@ -167,6 +167,7 @@ void record_lcd() {
     if (sample_buffer.size() >= 2 &&
             (sample_buffer[sample_buffer.size() - 2] & ADDR) &&
             !(sample_buffer[sample_buffer.size() - 2] & LYC_END)) {
+        // Records LCD by setting LYC_END bit on last written address.
         sample_buffer[sample_buffer.size() - 2] |= LYC_END;
     } else {
         record_byte(LCD);
