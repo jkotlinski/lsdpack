@@ -205,7 +205,7 @@ void record_complete() {
             write_byte(music_stream[i]);
             ++music_count;
 #ifdef RECORD_WRITES
-            fwrite(&music_stream[i], 1, 1, sample_file);
+            fwrite(&music_stream[i], 1, 1, music_file);
 #endif
         }
         ++i;
