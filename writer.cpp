@@ -153,9 +153,12 @@ void record_song_start(const char* out_path) {
 }
 
 static void log_written_bytes() {
+    static int last_music_size;
     printf("wrote %i sample bytes, %i music bytes\n",
-            sample_count, (int)music_stream.size());
+            sample_count,
+            (int)music_stream.size() - last_music_size);
     sample_count = 0;
+    last_music_size = music_stream.size();
 }
 
 void record_song_stop() {
