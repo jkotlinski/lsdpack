@@ -34,7 +34,6 @@ static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
 
 static int sample_count;
-static int music_count;
 
 static void new_bank() {
     if (++write_location.bank == 0x200) {
@@ -153,9 +152,16 @@ void record_song_start(const char* out_path) {
     music_stream.push_back(START);
 }
 
+static void log_written_bytes() {
+    printf("wrote %i sample bytes, %i music bytes\n",
+            sample_count, (int)music_stream.size());
+    sample_count = 0;
+}
+
 void record_song_stop() {
     flush_sample_buffer();
     music_stream.push_back(STOP);
+    log_written_bytes();
 }
 
 void record_write(unsigned char addr, unsigned char data) {
@@ -186,31 +192,18 @@ static void write_song_locations() {
     }
 }
 
-static void log_written_bytes() {
-    if (music_count == 0) {
-        return;
-    }
-    printf("wrote %i sample bytes, %i music bytes\n",
-            sample_count, music_count);
-    sample_count = 0;
-    music_count = 0;
-}
-
 void record_complete() {
     size_t i = 0;
     while (i < music_stream.size()) {
         if (music_stream[i] == START) {
-            log_written_bytes();
             song_locations.push_back(write_location);
         } else {
             write_byte(music_stream[i]);
-            ++music_count;
 #ifdef RECORD_WRITES
             fwrite(&music_stream[i], 1, 1, music_file);
 #endif
         }
         ++i;
     }
-    log_written_bytes();
     write_song_locations();
 }
