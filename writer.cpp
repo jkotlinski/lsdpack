@@ -7,6 +7,13 @@
 #include <map>
 #include <vector>
 
+// #define RECORD_WRITES
+
+#ifdef RECORD_WRITES
+FILE* music_file = fopen("music", "wb");
+FILE* sample_file = fopen("samples", "wb");
+#endif
+
 static FILE* f;
 
 struct Location {
@@ -102,6 +109,9 @@ static void write_sample_buffer() {
         for (size_t i = 0; i < sample_contents.size(); ++i) {
             write_byte(sample_contents[i]);
             ++sample_count;
+#ifdef RECORD_WRITES
+            fwrite(&sample_contents[i], 1, 1, sample_file);
+#endif
         }
     }
     music_stream.push_back(SAMPLE);
@@ -194,6 +204,9 @@ void record_complete() {
         } else {
             write_byte(music_stream[i]);
             ++music_count;
+#ifdef RECORD_WRITES
+            fwrite(&music_stream[i], 1, 1, sample_file);
+#endif
         }
         ++i;
     }
