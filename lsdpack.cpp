@@ -108,7 +108,7 @@ void make_out_path(const char* in_path) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        fprintf(stderr, "usage: lsdpak <lsdj.gb>");
+        fprintf(stderr, "usage: lsdpack <lsdj.gb>");
         return 1;
     }
     gameboy.setInputGetter(&input);

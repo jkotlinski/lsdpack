@@ -1,4 +1,4 @@
-# lsdpak
+# lsdpack
 
 Records LSDj songs for use in stand-alone Game Boy ROMs. (E.g. your own games, demos, music albums...)
 
@@ -8,7 +8,7 @@ Requires CMake and a C++ compiler. Exact build steps are platform dependent - se
 
 ## Recording Songs
 
-All songs in the .sav must first be prepared so that they are eventually stopped with the HFF command. Then, place your .sav and .gb file in the same directory and run e.g. `./lsdpak.exe lsdj.gb` to record the songs to `lsdj.s`.
+All songs in the .sav must first be prepared so that they are eventually stopped with the HFF command. Then, place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`.
 
 ## Playing Songs from Your Own Code
 
@@ -49,6 +49,6 @@ Contains the player code. Following functions are exported:
 
 ## How Does It Work?
 
-lsdpak plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. This recording can be played back from another ROM using a custom player.
+lsdpack plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. This recording can be played back from another ROM using a custom player.
 
 The included player is very fast and can easily play songs that would choke LSDj on a Game Boy Classic. Since recordings take a lot of ROM, an MBC5 cartridge is required.
