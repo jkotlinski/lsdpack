@@ -49,6 +49,6 @@ Contains the player code. Following functions are exported:
 
 ## How Does It Work?
 
-lsdpak plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. Those recordings can then be played back from another ROM using a custom player.
+lsdpak plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. These recordings can be played back from another ROM using a custom player.
 
 The included player is very fast and can easily play back songs that would choke LSDj on a Game Boy Classic. Since recordings take a lot of ROM, an MBC5 cartridge is required.
