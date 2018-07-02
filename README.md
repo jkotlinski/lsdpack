@@ -40,7 +40,7 @@ Contains the player code. Following functions are exported:
 
     ; IN: -
     ; OUT: -
-    ; SIDE EFFECTS: changes ROM bank
+    ; SIDE EFFECTS: changes ROM bank, wastes afbdehl
     ;
     ; Call this six times per screen update,
     ; evenly spread out over the screen.

@@ -41,14 +41,9 @@ LsdjPlaySong::
 ;
 ; IN: -
 ; OUT: -
-; SIDE EFFECTS: changes ROM bank
+; SIDE EFFECTS: changes ROM bank, wastes afbdehl
 ;
 LsdjTick::
-    push    af
-    push    bc
-    push    de
-    push    hl
-
 .tick
     ld  a,[CurrentBank+1]
     ld  [$3000],a
@@ -87,11 +82,6 @@ LsdjTick::
     ld  [CurrentPtr],a
     ld  a,h
     ld  [CurrentPtr+1],a
-
-    pop hl
-    pop de
-    pop bc
-    pop af
     ret
 
 .handle_stop
@@ -100,8 +90,6 @@ LsdjTick::
     jr  .tick
 
 .handle_sample
-    push    de
-
     ld  a,[hl+]
     ld  b,a     ; b = sample bank
     ld  a,[hl+]
@@ -179,7 +167,7 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
-    pop de
+    ld  d,$ff
     jp  .loop
 
 .next_bank
