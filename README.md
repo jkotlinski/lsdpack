@@ -34,7 +34,7 @@ Contains the player code. Following symbols are exported:
 
     ; IN: a = song number
     ; OUT: -
-    ; SIDE EFFECTS: trashes de, hl
+    ; SIDE EFFECTS: trashes af, de, hl
     ;
     ; Starts playing a song. If a song is already playing,
     ; make sure interrupts are disabled when calling this.
