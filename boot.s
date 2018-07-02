@@ -29,6 +29,9 @@ SECTION "setup",ROM0[$150]
     jr  .mainloop
 
 .lcd_interrupt_handler
+    ld  a,$ff   ; black background
+    ldh [$47],a
+
     call LsdjTick
 
     ldh a,[$45]
@@ -45,6 +48,10 @@ SECTION "setup",ROM0[$150]
     ld  a,10
 .write_lyc
     ldh [$45],a
+
+    xor a   ; white background
+    ldh [$47],a
+
     reti
 
 .lcd10
