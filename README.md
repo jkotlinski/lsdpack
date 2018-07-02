@@ -43,7 +43,7 @@ Contains the player code. Following symbols are exported:
 
     ; IN: -
     ; OUT: -
-    ; SIDE EFFECTS: changes ROM bank, trashes afbdehl
+    ; SIDE EFFECTS: changes ROM bank, trashes af
     ;
     ; Call this six times per screen update,
     ; evenly spread out over the screen.

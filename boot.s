@@ -67,10 +67,6 @@ SECTION "setup",ROM0[$150]
     ld  a,$ff   ; black background
     ldh [$47],a
 
-    push    bc
-    push    de
-    push    hl
-
     call LsdjTick
 
     ldh a,[$45]
@@ -87,10 +83,6 @@ SECTION "setup",ROM0[$150]
     ld  a,10
 .write_lyc
     ldh [$45],a
-
-    pop hl
-    pop de
-    pop bc
 
     xor a   ; white background
     ldh [$47],a

@@ -41,9 +41,13 @@ LsdjPlaySong::
 ;
 ; IN: -
 ; OUT: -
-; SIDE EFFECTS: changes ROM bank, trashes afbdehl
+; SIDE EFFECTS: changes ROM bank, trashes af
 ;
 LsdjTick::
+    push    bc
+    push    de
+    push    hl
+
 .tick
     ld  a,[CurrentBank+1]
     ld  [$3000],a
@@ -82,6 +86,9 @@ LsdjTick::
     ld  [CurrentPtr],a
     ld  a,h
     ld  [CurrentPtr+1],a
+    pop hl
+    pop de
+    pop bc
     ret
 
 .handle_stop
