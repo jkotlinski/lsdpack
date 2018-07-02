@@ -64,34 +64,15 @@ LsdjTick::
 .loop
     ld  a,[hl+]
     or  a
-    jr  z,.done
+    jr  z,.lyc_done
+    cp  1
+    jr  z,.handle_sample
     cp  2
     jr  z,.handle_stop
     cp  3
-    jr  z,.next_bank
-    cp  1
-    jr  nz,.write_sound_register
-    call    .handle_sample
-    jr  .loop
+    jp  z,.next_bank
 
-.next_bank
-    ld  a,$40
-    ld  h,a
-    xor a
-    ld  l,a
-
-    ld  a,[CurrentBank]
-    inc a
-    ld  [CurrentBank],a
-    ld  [$2000],a
-    jr  nz,.loop
-    ld  a,[CurrentBank+1]
-    inc a
-    ld  [CurrentBank+1],a
-    ld  [$3000],a
-    jr  .loop
-
-.write_sound_register
+    ; write sound register
     ld  b,a
     and $7f
     ld  e,a
@@ -101,7 +82,7 @@ LsdjTick::
     bit 7,a ; test LYC_END
     jr  z,.loop
 
-.done
+.lyc_done
     ld  a,l
     ld  [CurrentPtr],a
     ld  a,h
@@ -199,4 +180,21 @@ LsdjTick::
     ldh [$25],a
 
     pop de
-    ret
+    jp  .loop
+
+.next_bank
+    ld  a,$40
+    ld  h,a
+    xor a
+    ld  l,a
+
+    ld  a,[CurrentBank]
+    inc a
+    ld  [CurrentBank],a
+    ld  [$2000],a
+    jp  nz,.loop
+    ld  a,[CurrentBank+1]
+    inc a
+    ld  [CurrentBank+1],a
+    ld  [$3000],a
+    jp  .loop
