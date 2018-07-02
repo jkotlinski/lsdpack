@@ -22,13 +22,16 @@ struct Location {
 };
 static Location write_location;
 
+#define LYC 0
 #define SAMPLE 1
 #define STOP 2
-#define LCD 0
+#define NEXT_BANK 3
 
-#define LYC_END 0x80
+#define LYC_END_MASK 0x80
+
 #define START 0x100
-#define ADDR  0x200
+#define TYPE_ADDR  0x200
+#define TYPE_LYC  0x400
 
 static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
@@ -45,11 +48,15 @@ static void new_bank() {
     write_location.ptr = 0x4000;
 }
 
-static void write_byte(unsigned char byte) {
-    fprintf(f, "DB $%x\n", byte);
-    if (++write_location.ptr == 0x8000) {
-        new_bank();
+static void write_byte(unsigned int byte) {
+    if (write_location.ptr > 0x7ff8) {
+        if ((byte & TYPE_ADDR) || (byte & TYPE_LYC) || (write_location.ptr == 0x8000)) {
+            fprintf(f, "DB 3 ; next bank\n");
+            new_bank();
+        }
     }
+    fprintf(f, "DB $%x\n", byte & 0xff);
+    ++write_location.ptr;
 }
 
 static std::deque<unsigned int> sample_buffer;
@@ -68,30 +75,30 @@ static bool sample_buffer_has_sample() {
      * $1d=?
      * $25=?  */
     return sample_buffer_full() &&
-        sample_buffer[0] == (0x25 | ADDR) &&
-        sample_buffer[2] == (0x1a | ADDR) &&
+        sample_buffer[0] == (0x25 | TYPE_ADDR) &&
+        sample_buffer[2] == (0x1a | TYPE_ADDR) &&
         sample_buffer[3] == 0 &&
-        sample_buffer[4] == (0x30 | ADDR) &&
-        sample_buffer[6] == (0x31 | ADDR) &&
-        sample_buffer[8] == (0x32 | ADDR) &&
-        sample_buffer[10] == (0x33 | ADDR) &&
-        sample_buffer[12] == (0x34 | ADDR) &&
-        sample_buffer[14] == (0x35 | ADDR) &&
-        sample_buffer[16] == (0x36 | ADDR) &&
-        sample_buffer[18] == (0x37 | ADDR) &&
-        sample_buffer[20] == (0x38 | ADDR) &&
-        sample_buffer[22] == (0x39 | ADDR) &&
-        sample_buffer[24] == (0x3a | ADDR) &&
-        sample_buffer[26] == (0x3b | ADDR) &&
-        sample_buffer[28] == (0x3c | ADDR) &&
-        sample_buffer[30] == (0x3d | ADDR) &&
-        sample_buffer[32] == (0x3e | ADDR) &&
-        sample_buffer[34] == (0x3f | ADDR) &&
-        sample_buffer[36] == (0x1a | ADDR) &&
+        sample_buffer[4] == (0x30 | TYPE_ADDR) &&
+        sample_buffer[6] == (0x31 | TYPE_ADDR) &&
+        sample_buffer[8] == (0x32 | TYPE_ADDR) &&
+        sample_buffer[10] == (0x33 | TYPE_ADDR) &&
+        sample_buffer[12] == (0x34 | TYPE_ADDR) &&
+        sample_buffer[14] == (0x35 | TYPE_ADDR) &&
+        sample_buffer[16] == (0x36 | TYPE_ADDR) &&
+        sample_buffer[18] == (0x37 | TYPE_ADDR) &&
+        sample_buffer[20] == (0x38 | TYPE_ADDR) &&
+        sample_buffer[22] == (0x39 | TYPE_ADDR) &&
+        sample_buffer[24] == (0x3a | TYPE_ADDR) &&
+        sample_buffer[26] == (0x3b | TYPE_ADDR) &&
+        sample_buffer[28] == (0x3c | TYPE_ADDR) &&
+        sample_buffer[30] == (0x3d | TYPE_ADDR) &&
+        sample_buffer[32] == (0x3e | TYPE_ADDR) &&
+        sample_buffer[34] == (0x3f | TYPE_ADDR) &&
+        sample_buffer[36] == (0x1a | TYPE_ADDR) &&
         sample_buffer[37] == 0x80 &&
-        sample_buffer[38] == (0x1e | ADDR) &&
-        sample_buffer[40] == (0x1d | ADDR) &&
-        sample_buffer[42] == (0x25 | ADDR);
+        sample_buffer[38] == (0x1e | TYPE_ADDR) &&
+        sample_buffer[40] == (0x1d | TYPE_ADDR) &&
+        sample_buffer[42] == (0x25 | TYPE_ADDR);
 }
 
 typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
@@ -168,18 +175,18 @@ void record_song_stop() {
 }
 
 void record_write(unsigned char addr, unsigned char data) {
-    record_byte(addr | ADDR);
+    record_byte(addr | TYPE_ADDR);
     record_byte(data);
 }
 
 void record_lcd() {
     if (sample_buffer.size() >= 2 &&
-            (sample_buffer[sample_buffer.size() - 2] & ADDR) &&
-            !(sample_buffer[sample_buffer.size() - 2] & LYC_END)) {
-        // Records LCD by setting LYC_END bit on last written address.
-        sample_buffer[sample_buffer.size() - 2] |= LYC_END;
+            (sample_buffer[sample_buffer.size() - 2] & TYPE_ADDR) &&
+            !(sample_buffer[sample_buffer.size() - 2] & LYC_END_MASK)) {
+        // Records LYC by setting LYC_END_MASK bit on last written address.
+        sample_buffer[sample_buffer.size() - 2] |= LYC_END_MASK;
     } else {
-        record_byte(LCD);
+        record_byte(LYC | TYPE_LYC);
     }
 }
 

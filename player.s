@@ -36,13 +36,6 @@ LsdjPlaySong::
     ld  [CurrentPtr+1],a
     ret
 
-GetByte: MACRO
-    ld  a,h
-    cp  $80
-    call    z,.next_bank
-    ld  a,[hl+]
-    ENDM
-
 ; Call this six times per screen update,
 ; evenly spread out over the screen.
 ;
@@ -69,12 +62,13 @@ LsdjTick::
     ld  d,$ff
 
 .loop
-    GetByte
-
+    ld  a,[hl+]
     or  a
     jr  z,.done
     cp  2
     jr  z,.handle_stop
+    cp  3
+    jr  z,.next_bank
     cp  1
     jr  nz,.write_sound_register
     call    .handle_sample
@@ -83,23 +77,25 @@ LsdjTick::
 .next_bank
     ld  a,$40
     ld  h,a
+    xor a
+    ld  l,a
 
     ld  a,[CurrentBank]
     inc a
     ld  [CurrentBank],a
     ld  [$2000],a
-    ret nz
+    jr  nz,.loop
     ld  a,[CurrentBank+1]
     inc a
     ld  [CurrentBank+1],a
     ld  [$3000],a
-    ret
+    jr  .loop
 
 .write_sound_register
     ld  b,a
     and $7f
     ld  e,a
-    GetByte
+    ld  a,[hl+]
     ld  [de],a
     ld  a,b
     bit 7,a ; test LYC_END
@@ -125,11 +121,11 @@ LsdjTick::
 .handle_sample
     push    de
 
-    GetByte
+    ld  a,[hl+]
     ld  b,a     ; b = sample bank
-    GetByte
+    ld  a,[hl+]
     ld  e,a
-    GetByte
+    ld  a,[hl+]
     ld  d,a     ; de = sample ptr
 
     push    hl
@@ -194,9 +190,9 @@ LsdjTick::
     ld  a,[CurrentBank+1]
     ld  [$3000],a
 
-    GetByte
+    ld  a,[hl+]
     ldh [$1e],a
-    GetByte
+    ld  a,[hl+]
     ldh [$1d],a
 
     ld  a,e
