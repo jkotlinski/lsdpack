@@ -192,14 +192,15 @@ void record_lcd() {
 
 static void write_song_locations() {
     fputs("SECTION \"SONG_LOCATIONS\",ROM0\n", f);
-    fputs("EXPORT SongLocations\n", f);
-    fputs("SongLocations\n", f);
+    fputs("SongLocations::\n", f);
     for (size_t i = 0; i < song_locations.size(); ++i) {
         fprintf(f,
                 "dw %i, $%x\n",
                 song_locations[i].bank,
                 song_locations[i].ptr);
     }
+    fputs("SongCount::\n", f);
+    fprintf(f, "DB %i\n", (int)song_locations.size());
 }
 
 void write_music_to_disk() {

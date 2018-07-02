@@ -22,12 +22,15 @@ An example Game Boy player ROM can be built using RGBDS:
 
 ### boot.s
 
-An example for how to call the player. Replace with
-your own game, music selector or whatever you feel like :)
+An example for how to call the player. Displays CPU usage
+using raster bars. Press A to skip to the next song.
+
+Replace with your own game, music selector or whatever
+you feel like :)
 
 ### player.s
 
-Contains the player code. Following functions are exported:
+Contains the player code. Following symbols are exported:
 
     ; IN: a = song number
     ; OUT: -
@@ -46,6 +49,9 @@ Contains the player code. Following functions are exported:
     ; evenly spread out over the screen.
     ;
     LsdjTick::
+
+    ; A byte with the number of songs.
+    SongCount::
 
 ## How Does It Work?
 

@@ -1,6 +1,8 @@
-; This is an example for how to call the player.
-; Replace with your own game, music selector,
-; or whatever you feel like :)
+; An example for how to call the player. Displays CPU usage
+; using raster bars. Press A to skip to the next song.
+;
+; Replace with your own game, music selector or whatever
+; you feel like :)
 
 Boot
 
@@ -40,6 +42,12 @@ SECTION "setup",ROM0[$150]
 
     ; play next song
     inc e
+    ld  a,[SongCount]
+    cp  a,e
+    jr  nz,.play_song
+    xor a ; go back to first song
+    ld  e,a
+.play_song
     ld  a,e
     di
     call    LsdjPlaySong
