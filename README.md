@@ -12,7 +12,7 @@ All songs in the .sav must first be prepared so that they are eventually stopped
 
 ## Playing Songs from Your Own Code
 
-An example Game Boy player ROM can be built using RGBDS:
+An example Game Boy player ROM can be built using RGBDS v0.3.7:
 
     rgbasm -o boot.o boot.s
     rgbasm -o player.o player.s
