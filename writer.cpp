@@ -196,12 +196,10 @@ static void write_song_locations() {
     fputs("SongLocations\n", f);
     for (size_t i = 0; i < song_locations.size(); ++i) {
         fprintf(f,
-                "DW %i, $%x\n",
+                "dw %i, $%x\n",
                 song_locations[i].bank,
                 song_locations[i].ptr);
     }
-    fprintf(f, "Export SongCount\nSongCount\nDB %i\n",
-            (int)song_locations.size());
 }
 
 void write_music_to_disk() {
