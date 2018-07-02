@@ -41,7 +41,7 @@ LsdjPlaySong::
 ;
 ; IN: -
 ; OUT: -
-; SIDE EFFECTS: changes ROM bank, wastes afbdehl
+; SIDE EFFECTS: changes ROM bank, trashes afbdehl
 ;
 LsdjTick::
 .tick
