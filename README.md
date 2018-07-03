@@ -20,14 +20,6 @@ An example Game Boy player ROM can be built using RGBDS v0.3.7:
     rgblink -o player.gb boot.o player.o lsdj.o
     rgbfix -v -m 0x19 -p 0 player.gb
 
-### boot.s
-
-An example for how to call the player. Displays CPU usage
-using raster bars. Press A to skip to the next song.
-
-Replace with your own game, music selector or whatever
-you feel like :)
-
 ### player.s
 
 Contains the player code. Following symbols are exported:
@@ -54,6 +46,14 @@ Contains the player code. Following symbols are exported:
     ; Each entry is 4 bytes big.
     SongLocations::
     SongLocationsEnd::
+
+### boot.s
+
+An example for how to call the player. Displays CPU usage
+using raster bars. Pressing A skips to the next song.
+
+Replace with your own game, music selector or whatever
+you feel like :)
 
 ## How Does It Work?
 
