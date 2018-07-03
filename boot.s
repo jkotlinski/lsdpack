@@ -42,13 +42,13 @@ SECTION "setup",ROM0[$150]
 
     ; play next song
     inc e
-    ld  a,[SongCount]
-    cp  a,e
+    ld  a,e
+    ; reached last song?
+    cp  a,(SongLocationsEnd - SongLocations) / 4
     jr  nz,.play_song
     xor a ; go back to first song
     ld  e,a
 .play_song
-    ld  a,e
     di
     call    LsdjPlaySong
     ei

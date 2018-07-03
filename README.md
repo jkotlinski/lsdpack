@@ -50,8 +50,10 @@ Contains the player code. Following symbols are exported:
     ;
     LsdjTick::
 
-    ; A byte with the number of songs.
-    SongCount::
+    ; A table that holds the ROM position for each song.
+    ; Each entry is 4 bytes big.
+    SongLocations::
+    SongLocationsEnd::
 
 ## How Does It Work?
 

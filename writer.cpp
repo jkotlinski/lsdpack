@@ -199,8 +199,7 @@ static void write_song_locations() {
                 song_locations[i].bank,
                 song_locations[i].ptr);
     }
-    fputs("SongCount::\n", f);
-    fprintf(f, "DB %i\n", (int)song_locations.size());
+    fputs("SongLocationsEnd::\n", f);
 }
 
 void write_music_to_disk() {
