@@ -59,6 +59,10 @@ SECTION "setup",ROM0[$150]
     cp  $f
     jr  nz,.wait_button_released
 
+.delay
+    inc a
+    jr  nz,.delay
+
     jr  .mainloop
 
 .lcd_interrupt_handler
