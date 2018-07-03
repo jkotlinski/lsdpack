@@ -53,17 +53,24 @@ SECTION "setup",ROM0[$150]
     call    LsdjPlaySong
     ei
 
+    call    .delay
+
 .wait_button_released
     ldh a,[0]
     and $f
     cp  $f
     jr  nz,.wait_button_released
 
-.delay
-    inc a
-    jr  nz,.delay
+    call    .delay
 
     jr  .mainloop
+
+.delay
+    xor a
+.delay_loop
+    inc a
+    jr  nz,.delay_loop
+    ret
 
 .lcd_interrupt_handler
     push    af

@@ -14,9 +14,12 @@ SECTION "player_code",ROM0
 ;
 ; IN: a = song number
 ; OUT: -
-; SIDE EFFECTS: trashes af, de, hl
+; SIDE EFFECTS: trashes af
 ;
 LsdjPlaySong::
+    push    de
+    push    hl
+
     ld  [Song],a
     ld  d,0
     add a,a
@@ -34,6 +37,9 @@ LsdjPlaySong::
     ld  [CurrentPtr],a
     ld  a,[hl]
     ld  [CurrentPtr+1],a
+
+    pop hl
+    pop de
     ret
 
 ; Call this six times per screen update,
