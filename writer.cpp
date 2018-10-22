@@ -29,9 +29,10 @@ static Location write_location;
 
 #define LYC_END_MASK 0x80
 
-#define START 0x100
-#define TYPE_ADDR  0x200
-#define TYPE_LYC  0x400
+#define START       0x100
+#define TYPE_ADDR   0x200
+#define TYPE_LYC    0x400
+#define TYPE_SAMPLE 0x800
 
 static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
@@ -50,13 +51,14 @@ static void new_bank() {
 
 static void write_byte(unsigned int byte) {
     if (write_location.ptr > 0x7ff8) {
-        if ((byte & TYPE_ADDR) || (byte & TYPE_LYC) || (write_location.ptr == 0x8000)) {
+        if ((byte & TYPE_ADDR) || (byte & TYPE_LYC) || (byte & TYPE_SAMPLE) || (write_location.ptr == 0x7fff)) {
             fprintf(f, "DB 3 ; next bank\n");
             new_bank();
         }
     }
     fprintf(f, "DB $%x\n", byte & 0xff);
     ++write_location.ptr;
+    assert(write_location.ptr < 0x8000);
 }
 
 static std::deque<unsigned int> sample_buffer;
@@ -120,7 +122,7 @@ static void write_sample_buffer() {
 #endif
         }
     }
-    music_stream.push_back(SAMPLE);
+    music_stream.push_back(SAMPLE | TYPE_SAMPLE);
     assert(sample_location->second.bank < 0x100);
     music_stream.push_back(sample_location->second.bank);
     music_stream.push_back(sample_location->second.ptr & 0xff);
