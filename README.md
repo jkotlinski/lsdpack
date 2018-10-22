@@ -49,11 +49,10 @@ Contains the player code. Following symbols are exported:
 
 ### boot.s
 
-An example for how to call the player. Displays CPU usage
+An example for how to use the player. Displays CPU usage
 using raster bars. Pressing A skips to the next song.
 
-Replace with your own game, music selector or whatever
-you feel like :)
+![Screenshot](/docs/screenshot.png)
 
 ## How Does It Work?
 
