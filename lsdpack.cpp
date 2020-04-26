@@ -13,7 +13,7 @@ std::string out_path;
 
 void run_one_frame() {
     size_t samples = 35112;
-    long unsigned int audioBuffer[35112 + 2064];
+    static gambatte::uint_least32_t audioBuffer[35112 + 2064];
     gameboy.runFor(0, 0, &audioBuffer[0], samples);
 }
 
