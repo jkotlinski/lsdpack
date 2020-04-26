@@ -101,8 +101,8 @@ void make_out_path(const char* in_path) {
     out_path = in_path;
     // .gb => .s
     out_path.replace(out_path.end() - 2, out_path.end(), "s");
-    out_path.replace(out_path.begin(), out_path.begin() + out_path.rfind('/') + 1, "");
-    out_path.replace(out_path.begin(), out_path.begin() + out_path.rfind('\\') + 1, "");
+    out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('/'), "");
+    out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('\\'), "");
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
