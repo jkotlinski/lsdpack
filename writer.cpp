@@ -156,6 +156,14 @@ static void record_byte(unsigned int byte) {
 void record_song_start(const char* out_path) {
     if (f == 0) {
         f = fopen(out_path, "w");
+        if (f == 0) {
+            char errormsg[1024];
+            snprintf(errormsg, sizeof(errormsg),
+                     "Opening '%s' for write failed",
+                     out_path);
+            perror(errormsg);
+            exit(1);
+        }
         new_bank();
     }
     music_stream.push_back(START);
