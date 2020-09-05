@@ -4,10 +4,8 @@
 ; Replace with your own game, music selector or whatever
 ; you feel like :)
 
-Boot
-
 SECTION "lcd_interrupt",ROM0[$48]
-    jp  .lcd_interrupt_handler
+    jp  lcd_interrupt_handler
 
 SECTION "boot",ROM0[$100]
     jr  $150
@@ -32,7 +30,7 @@ SECTION "setup",ROM0[$150]
     call LsdjPlaySong
     ei
 
-.mainloop
+mainloop
 
 .wait_button_pressed
     ldh a,[0]
@@ -63,7 +61,7 @@ SECTION "setup",ROM0[$150]
 
     call    .delay
 
-    jr  .mainloop
+    jr  mainloop
 
 .delay
     xor a
@@ -72,7 +70,7 @@ SECTION "setup",ROM0[$150]
     jr  nz,.delay_loop
     ret
 
-.lcd_interrupt_handler
+lcd_interrupt_handler
     push    af
 
     ld  a,$ff   ; black background

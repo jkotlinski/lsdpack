@@ -28,7 +28,7 @@ void press(unsigned key, float seconds = 0.1f) {
     wait(seconds);
 }
 
-void load_song(int position) {
+bool load_song(int position) {
     press(SELECT);
     press(SELECT | UP);
     press(0);
@@ -54,11 +54,10 @@ void load_song(int position) {
     // wait until song is loaded
     press(0, 5);
     if (gameboy.isSongEmpty()) {
-        write_music_to_disk();
-        puts("OK");
-        exit(0);
+	    return false;
     }
     printf("Song %i...\n", ++written_songs);
+    return true;
 }
 
 bool sound_enabled;
@@ -107,22 +106,28 @@ void make_out_path(const char* in_path) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "usage: lsdpack <lsdj.gb>");
+    if (argc < 2) {
+        fprintf(stderr, "usage: lsdpack [lsdj.gb lsdj2.gb ...]");
         return 1;
     }
-    gameboy.setInputGetter(&input);
-    gameboy.setWriteHandler(on_ff_write);
-    gameboy.setLcdHandler(on_lcd_interrupt);
-    gameboy.load(argv[1]);
 
     make_out_path(argv[1]);
 
-    press(0, 3);
+    gameboy.setInputGetter(&input);
+    gameboy.setWriteHandler(on_ff_write);
+    gameboy.setLcdHandler(on_lcd_interrupt);
 
-    int i = 0;
-    while (true) {
-        load_song(i++);
-        play_song();
+    for (int arg = 1; arg < argc; ++arg) {
+	    printf("Loading %s...\n", argv[arg]);
+	    gameboy.load(argv[arg]);
+	    press(0, 3);
+
+	    int song_index = 0;
+	    while (load_song(song_index++)) {
+		    play_song();
+	    }
     }
+
+    write_music_to_disk();
+    puts("OK");
 }
