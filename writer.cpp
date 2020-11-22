@@ -103,6 +103,65 @@ static bool sample_buffer_has_sample() {
         sample_buffer[42] == (0x25 | TYPE_ADDR);
 }
 
+/* LSDj 8.8.0+ soft envelope problem:
+ * To decrease volume on CGB, the byte 8 is written 15 times to
+ * either of addresses 0xff12, 0xff17 or 0xff21.
+ * To improve sound on DMG and reduce ROM/CPU usage, replace this
+ * with the sequence:
+ * addr=9 ; addr = 0x11 ; addr = 0x18
+ */
+static void optimize_volume_decreases() {
+    if (sample_buffer.size() < 15 * 2) {
+        return;
+    }
+    const size_t tail_start = sample_buffer.size() - 15 * 2;
+
+    // Check values.
+    for (size_t i = tail_start + 1; i < tail_start + 15 * 2; i += 2) {
+        if (sample_buffer[i] != 8) {
+            return;
+        }
+    }
+
+    // Check addresses.
+    unsigned int register_addr = 0;
+
+    for (size_t i = tail_start; i < tail_start + 15 * 2; i += 2) {
+        unsigned int addr = sample_buffer[i];
+        if (!(addr & TYPE_ADDR)) {
+            return;
+        }
+        switch (addr & 0x7f) {
+            case 0x12:
+            case 0x17:
+            case 0x21:
+                if (register_addr && ((addr & 0x7f) != register_addr)) {
+                    return;
+                }
+                register_addr = addr & 0x7f;
+                break;
+            default:
+                return;
+        }
+    }
+
+    // OK, there is a volume decrease at sample_buffer tail.
+    // Let's rewrite it in the optimized form.
+    std::deque<unsigned int> new_sample_buffer;
+    // Preserve head.
+    for (size_t i = 0; i < tail_start; ++i) {
+        new_sample_buffer.push_back(sample_buffer[i]);
+    }
+    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(9);
+    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(0x11);
+    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(0x18);
+
+    sample_buffer = new_sample_buffer;
+}
+
 typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
 static SampleLocations sample_locations;
 
@@ -148,6 +207,8 @@ static void record_byte(unsigned int byte) {
 
     if (sample_buffer_has_sample()) {
         write_sample_buffer();
+    } else {
+        optimize_volume_decreases();
     }
 }
 
