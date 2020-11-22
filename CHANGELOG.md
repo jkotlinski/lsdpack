@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Allow multiple input LSDj ROMs. e.g. "./lsdpack.exe 1.gb 2.gb 3.gb ..."
+- Timeout with error message when a song has played for one hour.
 
 ### Fixed
 - rgbasm 0.4.0 support.

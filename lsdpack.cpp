@@ -63,11 +63,17 @@ bool load_song(int position) {
 bool sound_enabled;
 
 void play_song() {
+    int seconds_elapsed = 0;
     sound_enabled = false;
     input.press(START);
     record_song_start(out_path.c_str());
     do {
         wait(1);
+
+        if (++seconds_elapsed == 60 * 60) {
+            fputs("Aborted: Song still playing after one hour. Please add a HFF command to song end to stop recording.", stderr);
+            exit(1);
+        }
     } while(sound_enabled);
 }
 
