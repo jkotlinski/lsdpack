@@ -54,7 +54,7 @@ bool load_song(int position) {
     // wait until song is loaded
     press(0, 5);
     if (gameboy.isSongEmpty()) {
-	    return false;
+        return false;
     }
     printf("Song %i...\n", ++written_songs);
     return true;
@@ -118,14 +118,14 @@ int main(int argc, char* argv[]) {
     gameboy.setLcdHandler(on_lcd_interrupt);
 
     for (int arg = 1; arg < argc; ++arg) {
-	    printf("Loading %s...\n", argv[arg]);
-	    gameboy.load(argv[arg]);
-	    press(0, 3);
+        printf("Loading %s...\n", argv[arg]);
+        gameboy.load(argv[arg]);
+        press(0, 3);
 
-	    int song_index = 0;
-	    while (load_song(song_index++)) {
-		    play_song();
-	    }
+        int song_index = 0;
+        while (load_song(song_index++)) {
+            play_song();
+        }
     }
 
     write_music_to_disk();

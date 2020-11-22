@@ -1,0 +1,16 @@
+root=true
+
+[*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.s]
+indent_style = space
+indent_size = 4
+
+[*.cpp]
+indent_style = space
+indent_size = 4
+
+[Makefile]
+indent_style = tab
