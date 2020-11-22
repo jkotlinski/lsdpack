@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timeout with error message when a song has played for one hour.
 
 ### Fixed
+- Crackling sound on DMG from LSDj v8.8.0+ soft envelopes.
 - rgbasm 0.4.0 support.
 - Visual Studio 2019 build.
 
