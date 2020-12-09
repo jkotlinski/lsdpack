@@ -152,11 +152,11 @@ static void optimize_volume_decreases() {
     for (size_t i = 0; i < tail_start; ++i) {
         new_sample_buffer.push_back(sample_buffer[i]);
     }
-    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
     new_sample_buffer.push_back(9);
-    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
     new_sample_buffer.push_back(0x11);
-    new_sample_buffer.push_back(register_addr);
+    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
     new_sample_buffer.push_back(0x18);
 
     sample_buffer = new_sample_buffer;
