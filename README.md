@@ -58,7 +58,7 @@ using raster bars. Pressing A skips to the next song.
 
 ## Game Boy Sound System (GBS)
 
-It is possible to put the recorded music in a .gbs file using the commands below. The makegbs -s option must be changed to the number of songs.
+It is possible to create a .gbs file using the commands below. The makegbs -s option must be changed to the number of songs.
 
 	./lsdpack.exe -g lsdj.gb
 	rgbasm -o player_gbs.o player_gbs.s
