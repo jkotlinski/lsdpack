@@ -1,12 +1,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
 
 #include "gambatte.h"
 
 #include "input.h"
 #include "writer.h"
+#include "getopt.h"
 
 int written_songs;
 gambatte::GB gameboy;

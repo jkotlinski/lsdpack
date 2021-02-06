@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <unistd.h>
+#include "getopt.h"
 
 void verify(FILE* f, const char* path) {
     if (f != 0) {
@@ -27,7 +27,7 @@ void fputs_padded(const char* s, FILE* f) {
         exit(1);
     }
     fputs(s, f);
-    for (int i = strlen(s); i < 32; ++i) {
+    for (size_t i = strlen(s); i < 32; ++i) {
         fputc(0, f);
     }
 }

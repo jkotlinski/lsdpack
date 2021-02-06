@@ -17,6 +17,7 @@ add_executable(lsdpack
 
     lsdpack.cpp
     writer.cpp
+    getopt.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp
@@ -48,6 +49,6 @@ add_executable(lsdpack
     libgambatte/src/video/ppu.cpp
     libgambatte/src/video/sprite_mapper.cpp)
 
-add_executable(makegbs makegbs.cpp)
+add_executable(makegbs makegbs.cpp getopt.cpp)
 
 set_property(TARGET lsdpack PROPERTY CXX_STANDARD 98)
