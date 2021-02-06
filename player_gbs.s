@@ -36,7 +36,7 @@ CurrentBank
 CurrentPtr
     ds  2
 
-SECTION "player",ROM0[$400]
+SECTION "player",ROM0[$3f00]
     ; .gbs player entry points
     ret
     jp LsdjPlaySong

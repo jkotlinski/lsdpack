@@ -22,9 +22,9 @@ An example Game Boy player ROM can be built using RGBDS:
 
 ## Game Boy Sound System (GBS) Support
 
-lsdpack can be used to create .gbs files, using below commands. The -s option needs to be adjusted to the number of songs in the .gbs.
+lsdpack can be used to create .gbs files, using below commands. The makegbs -s option must be changed to the number of songs.
 
-	./lsdpack -g lsdj.gb
+	./lsdpack.exe -g lsdj.gb
 	rgbasm -o player_gbs.o player_gbs.s
 	rgbasm -o lsdj.o lsdj.s
 	rgblink -o player.gb player_gbs.o lsdj.o

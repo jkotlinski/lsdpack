@@ -38,15 +38,15 @@ void write_gbs_header(FILE* f) {
 
     // load address
     fputc(0, f);
-    fputc(4, f);
+    fputc(0x3f, f);
 
     // init address
     fputc(1, f);
-    fputc(4, f);
+    fputc(0x3f, f);
 
     // play address
     fputc(4, f);
-    fputc(4, f);
+    fputc(0x3f, f);
 
     // SP init
     fputc(0xfe, f);
@@ -62,7 +62,6 @@ void write_gbs_header(FILE* f) {
     printf("Copyright: %s\n", copyright.c_str());
     fputs_padded(copyright.c_str(), f);
 }
-
 
 int main(int argc, char* argv[]) {
     int c;
@@ -99,7 +98,7 @@ int main(int argc, char* argv[]) {
 
     FILE* gb_f = fopen(argv[optind], "rb");
     verify(gb_f, argv[optind]);
-    fseek(gb_f, 0x400, SEEK_SET);
+    fseek(gb_f, 0x3f00, SEEK_SET);
 
     while (true) {
         int c = fgetc(gb_f);
