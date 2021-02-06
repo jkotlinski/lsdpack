@@ -4,6 +4,7 @@ Makefile
 cmake_install.cmake
 lsdpack.exe
 *.gb
+*.sav
 *.o
 music.s
 tags
