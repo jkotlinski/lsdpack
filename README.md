@@ -12,13 +12,23 @@ All songs in the .sav must first be prepared so that they are eventually stopped
 
 ## Playing Songs from Your Own Code
 
-An example Game Boy player ROM can be built using RGBDS v0.3.7:
+An example Game Boy player ROM can be built using RGBDS:
 
     rgbasm -o boot.o boot.s
     rgbasm -o player.o player.s
     rgbasm -o lsdj.o lsdj.s
     rgblink -o player.gb boot.o player.o lsdj.o
     rgbfix -v -m 0x19 -p 0 player.gb
+
+## Game Boy Sound System (GBS) Support
+
+lsdpack can be used to create .gbs files, using below commands. The -s option needs to be adjusted to the number of songs in the .gbs.
+
+	./lsdpack -g lsdj.gb
+	rgbasm -o player_gbs.o player_gbs.s
+	rgbasm -o lsdj.o lsdj.s
+	rgblink -o player.gb player_gbs.o lsdj.o
+	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "Violent Music" player.gb
 
 ### player.s
 

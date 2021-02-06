@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 #include "gambatte.h"
 
@@ -112,91 +113,40 @@ void make_out_path(const char* in_path) {
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
-void fputs_padded(const char* s, FILE* f) {
-    fputs(s, f);
-    for (int i = strlen(s); i != 32; ++i) {
-        fputc(0, f);
-    }
-}
-
-void write_gbs_header(int song_count) {
-    FILE* f = fopen("gbs-header.bin", "wb");
-    fputs("GBS", f);
-    fputc(1, f); // version 1
-
-    fputc(song_count, f); // number of songs
-    fputc(1, f); // first song
-
-    // load address
-    fputc(0, f);
-    fputc(4, f);
-
-    // init address
-    fputc(1, f);
-    fputc(4, f);
-
-    // play address
-    fputc(4, f);
-    fputc(4, f);
-
-    // SP init
-    fputc(0xfe, f);
-    fputc(0xff, f);
-
-    fputc(0x4a, f); // TMA
-    fputc(6, f); // TAC
-
-    fputs_padded("<Title>", f);
-    fputs_padded("<Artist>", f);
-    fputs_padded("<Copyright>", f);
-
-    fclose(f);
-}
-
 int main(int argc, char* argv[]) {
-    bool gbs_enabled = false;
-    int arg = 1;
-
-    while (argc > arg) {
-        if (!strcmp(argv[arg], "--gbs")) {
-            puts(".gbs mode enabled");
-            gbs_enabled = true;
-            enable_gbs_mode();
-            ++arg;
-            continue;
+    int c;
+    while ((c = getopt(argc, argv, "g")) != -1) {
+        switch (c) {
+            case 'g':
+                puts(".gbs mode enabled");
+                enable_gbs_mode();
+                break;
         }
-        break;
     }
 
-    if (argc <= arg) {
-        fprintf(stderr, "usage: lsdpack [--gbs] [lsdj.gb lsdj2.gb ...]");
+    if (argc <= optind) {
+        fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
         return 1;
     }
 
-    make_out_path(argv[arg]);
+    make_out_path(argv[optind]);
 
     gameboy.setInputGetter(&input);
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
 
-    int song_count = 0;
-    for (; arg < argc; ++arg) {
-        printf("Loading %s...\n", argv[arg]);
-        gameboy.load(argv[arg]);
+    for (; optind < argc; ++optind) {
+        printf("Loading %s...\n", argv[optind]);
+        gameboy.load(argv[optind]);
         press(0, 3);
 
         int song_index = 0;
         while (load_song(song_index++)) {
             play_song();
-            ++song_count;
         }
     }
 
     write_music_to_disk();
-
-    if (gbs_enabled) {
-        write_gbs_header(song_count);
-    }
 
     puts("OK");
 }
