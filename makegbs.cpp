@@ -22,8 +22,12 @@ std::string title = "<Title>";
 std::string copyright = "<Copyright>";
 
 void fputs_padded(const char* s, FILE* f) {
+    if (strlen(s) > 32) {
+        fprintf(stderr, "'%s' too long, max 32 characters", s);
+        exit(1);
+    }
     fputs(s, f);
-    for (int i = strlen(s); i != 32; ++i) {
+    for (int i = strlen(s); i < 32; ++i) {
         fputc(0, f);
     }
 }

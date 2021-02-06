@@ -28,7 +28,7 @@ lsdpack can be used to create .gbs files, using below commands. The makegbs -s o
 	rgbasm -o player_gbs.o player_gbs.s
 	rgbasm -o lsdj.o lsdj.s
 	rgblink -o player.gb player_gbs.o lsdj.o
-	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "Violent Music" player.gb
+	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player.gb
 
 ### player.s
 
