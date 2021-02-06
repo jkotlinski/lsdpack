@@ -20,7 +20,7 @@ An example Game Boy player ROM can be built using RGBDS:
     rgblink -o player.gb boot.o player.o lsdj.o
     rgbfix -v -m 0x19 -p 0 player.gb
 
-## Game Boy Sound System (GBS) Support
+## Game Boy Sound System (GBS)
 
 Use below commands to make a .gbs file. The makegbs -s option must be changed to the number of songs.
 
