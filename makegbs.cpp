@@ -17,8 +17,8 @@ void verify(FILE* f, const char* path) {
 }
 
 int song_count = 1;
-std::string artist = "<Artist>";
 std::string title = "<Title>";
+std::string artist = "<Artist>";
 std::string copyright = "<Copyright>";
 
 void fputs_padded(const char* s, FILE* f) {
@@ -59,10 +59,10 @@ void write_gbs_header(FILE* f) {
     fputc(0x4a, f); // TMA
     fputc(6, f); // TAC
 
-    printf("Artist: %s\n", artist.c_str());
-    fputs_padded(artist.c_str(), f);
     printf("Title: %s\n", title.c_str());
     fputs_padded(title.c_str(), f);
+    printf("Artist: %s\n", artist.c_str());
+    fputs_padded(artist.c_str(), f);
     printf("Copyright: %s\n", copyright.c_str());
     fputs_padded(copyright.c_str(), f);
 }
