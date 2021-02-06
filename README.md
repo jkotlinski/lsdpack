@@ -22,16 +22,6 @@ An example Game Boy player ROM can be built using RGBDS:
     rgblink -o player.gb boot.o player.o lsdj.o
     rgbfix -v -m 0x19 -p 0 player.gb
 
-## Game Boy Sound System (GBS)
-
-Use below commands to make a .gbs file. The makegbs -s option must be changed to the number of songs.
-
-	./lsdpack.exe -g lsdj.gb
-	rgbasm -o player_gbs.o player_gbs.s
-	rgbasm -o lsdj.o lsdj.s
-	rgblink -o player.gb player_gbs.o lsdj.o
-	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player.gb
-
 ### player.s
 
 Contains the player code. Following symbols are exported:
@@ -65,6 +55,16 @@ An example for how to use the player. Displays CPU usage
 using raster bars. Pressing A skips to the next song.
 
 ![Screenshot](/docs/screenshot.png)
+
+## Game Boy Sound System (GBS)
+
+It is possible to put the recorded music in a .gbs file using the commands below. The makegbs -s option must be changed to the number of songs.
+
+	./lsdpack.exe -g lsdj.gb
+	rgbasm -o player_gbs.o player_gbs.s
+	rgbasm -o lsdj.o lsdj.s
+	rgblink -o player.gb player_gbs.o lsdj.o
+	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player.gb
 
 ## How Does It Work?
 
