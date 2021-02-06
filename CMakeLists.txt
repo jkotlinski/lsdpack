@@ -48,4 +48,6 @@ add_executable(lsdpack
     libgambatte/src/video/ppu.cpp
     libgambatte/src/video/sprite_mapper.cpp)
 
+add_executable(makegbs makegbs.cpp)
+
 set_property(TARGET lsdpack PROPERTY CXX_STANDARD 98)

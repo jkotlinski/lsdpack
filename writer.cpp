@@ -265,7 +265,7 @@ void record_lcd() {
 
 static void write_song_locations() {
     fputs(gbs_mode
-            ?  "SECTION \"SONG_LOCATIONS\",ROM0[$470]\n"
+            ?  "SECTION \"SONG_LOCATIONS\",ROM0[$500]\n"
             :  "SECTION \"SONG_LOCATIONS\",ROM0\n",
             f);
     fputs("SongLocations::\n", f);

@@ -128,15 +128,15 @@ void write_gbs_header(int song_count) {
     fputc(1, f); // first song
 
     // load address
-    fputc(0x70, f);
+    fputc(0, f);
     fputc(4, f);
 
     // init address
-    fputc(0x90, f);
+    fputc(1, f);
     fputc(4, f);
 
     // play address
-    fputc(0xb1, f);
+    fputc(4, f);
     fputc(4, f);
 
     // SP init

@@ -1,3 +1,32 @@
+; ---- .gb file only
+
+SECTION "Timer interrupt",ROM0[$50]
+    call    LsdjTick
+    reti
+
+SECTION "boot",ROM0[$100]
+    jp  Setup
+
+SECTION "setup",ROM0[$150]
+Setup:
+    xor a
+    call    LsdjPlaySong
+
+    ldh [$41],a ; STAT
+    ld a,%11010001
+    ldh [$40],a ; LCDC
+    ld a,4
+    ldh [$FF],a ; IE
+    ld a,6
+    ldh [7],a   ; TAC
+    ld a,$4a
+    ldh [6],a   ; TMA
+    ei
+Main:
+    jr  Main
+
+; ---- .gbs start
+
 SECTION "player_ram",WRAM0
 
 Song
@@ -7,7 +36,11 @@ CurrentBank
 CurrentPtr
     ds  2
 
-SECTION "player_code",ROM0
+SECTION "player",ROM0[$400]
+    ; .gbs player entry points
+    ret
+    jp LsdjPlaySong
+    jp LsdjTick
 
 ; Starts playing a song. If a song is already playing,
 ; make sure interrupts are disabled when calling this.
