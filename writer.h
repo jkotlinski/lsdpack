@@ -5,3 +5,4 @@ void record_song_stop();
 void record_write(unsigned char addr, unsigned char data);
 void record_lcd();
 void write_music_to_disk();
+void enable_gbs_mode();

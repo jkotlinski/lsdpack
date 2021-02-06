@@ -22,6 +22,8 @@ struct Location {
 };
 static Location write_location;
 
+static bool gbs_mode;
+
 #define LYC 0
 #define SAMPLE 1
 #define STOP 2
@@ -40,7 +42,7 @@ static std::vector<unsigned int> music_stream;
 static int sample_count;
 
 static void new_bank() {
-    if (++write_location.bank == 0x200) {
+    if (++write_location.bank == (gbs_mode ? 0x100 : 0x200)) {
         fputs("ROM full!", stderr);
         exit(1);
     }
@@ -262,7 +264,10 @@ void record_lcd() {
 }
 
 static void write_song_locations() {
-    fputs("SECTION \"SONG_LOCATIONS\",ROM0\n", f);
+    fputs(gbs_mode
+            ?  "SECTION \"SONG_LOCATIONS\",ROM0[$470]\n"
+            :  "SECTION \"SONG_LOCATIONS\",ROM0\n",
+            f);
     fputs("SongLocations::\n", f);
     for (size_t i = 0; i < song_locations.size(); ++i) {
         fprintf(f,
@@ -287,4 +292,8 @@ void write_music_to_disk() {
         ++i;
     }
     write_song_locations();
+}
+
+void enable_gbs_mode() {
+    gbs_mode = true;
 }

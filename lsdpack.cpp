@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include "gambatte.h"
 
@@ -112,18 +113,26 @@ void make_out_path(const char* in_path) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "usage: lsdpack [lsdj.gb lsdj2.gb ...]");
+    int arg = 1;
+
+    if (argc > arg && !strcmp(argv[arg], "--gbs")) {
+        puts(".gbs mode enabled");
+        enable_gbs_mode();
+        ++arg;
+    }
+
+    if (argc <= arg) {
+        fprintf(stderr, "usage: lsdpack [--gbs] [lsdj.gb lsdj2.gb ...]");
         return 1;
     }
 
-    make_out_path(argv[1]);
+    make_out_path(argv[arg]);
 
     gameboy.setInputGetter(&input);
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
 
-    for (int arg = 1; arg < argc; ++arg) {
+    for (; arg < argc; ++arg) {
         printf("Loading %s...\n", argv[arg]);
         gameboy.load(argv[arg]);
         press(0, 3);
