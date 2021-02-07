@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
     FILE* gb_f = fopen(argv[optind], "rb");
     verify(gb_f, argv[optind]);
-    fseek(gb_f, 0x3e80, SEEK_SET);
+    fseek(gb_f, PLAYER_ADDRESS, SEEK_SET);
 
     while (true) {
         int c = fgetc(gb_f);
