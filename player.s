@@ -1,4 +1,4 @@
-SECTION "player",ROM0[$3e80]
+SECTION "player",ROM0[$3e70]
     ; .gbs player entry points
     ret
     jp LsdjPlaySong
@@ -12,9 +12,6 @@ SECTION "player",ROM0[$3e80]
 ; SIDE EFFECTS: trashes af
 ;
 LsdjPlaySong::
-    xor a
-    ldh [$26],a ; stop sound
-
     push    de
     push    hl
 
@@ -27,6 +24,9 @@ LsdjPlaySong::
     ld  hl,SongLocations
     add hl,de
 
+    xor a
+    ldh [$26],a ; stop sound
+    ld  [Wait],a
     ld  a,[hl+]
     ld  [CurrentBank],a
     ld  a,[hl+]
@@ -48,9 +48,20 @@ LsdjPlaySong::
 ; SIDE EFFECTS: changes ROM bank, trashes af
 ;
 LsdjTick::
-    push    bc
-    push    de
     push    hl
+
+    ld  hl,Wait
+    ld  a,[hl]
+    or  a
+    jr  z,.not_waiting
+    ld  b,b
+    dec [hl]
+    pop hl
+    ret
+
+.not_waiting
+    push    de
+    push    bc
 
 .tick
     ld  a,[CurrentBank+1]
@@ -70,10 +81,6 @@ LsdjTick::
     jr  z,.lyc_done
     cp  1
     jr  z,.handle_sample
-    cp  2
-    jr  z,.handle_stop
-    cp  3
-    jp  z,.next_bank
     cp  4
     jp  z,.volume_down_pu0
     cp  5
@@ -86,6 +93,12 @@ LsdjTick::
     jp  z,.pitch_pu1
     cp  9
     jp  z,.pitch_wav
+    cp  10
+    jr  z,.wait
+    cp  3
+    jp  z,.next_bank
+    cp  2
+    jr  z,.handle_stop
 
     ; write sound register
     ld  b,a
@@ -102,10 +115,16 @@ LsdjTick::
     ld  [CurrentPtr],a
     ld  a,h
     ld  [CurrentPtr+1],a
-    pop hl
-    pop de
     pop bc
+    pop de
+    pop hl
     ret
+
+.wait:
+    ld  b,b
+    ld  a,[hl+]
+    ld  [Wait],a
+    jr  .lyc_done
 
 .handle_stop
     ld  a,[Song]
@@ -269,3 +288,5 @@ CurrentBank
     ds  2
 CurrentPtr
     ds  2
+Wait
+    ds  1

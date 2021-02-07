@@ -34,6 +34,7 @@ static bool gbs_mode;
 #define PITCH_PU0       7
 #define PITCH_PU1       8
 #define PITCH_WAV       9
+#define WAIT            10
 
 #define LYC_END_MASK 0x80
 
@@ -155,6 +156,27 @@ static void optimize_pitch() {
     sample_buffer.push_back(freq2);
 }
 
+static void optimize_wait() {
+    if (sample_buffer.size() < 3) {
+        return;
+    }
+    const size_t tail_start = sample_buffer.size() - 3;
+    if (sample_buffer[tail_start] == (LYC | TYPE_LYC) &&
+            sample_buffer[tail_start + 1] == (LYC | TYPE_LYC) &&
+            sample_buffer[tail_start + 2] == (LYC | TYPE_LYC)) {
+        // LYC:LYC:LYC => WAIT:0
+        sample_buffer.resize(tail_start);
+        sample_buffer.push_back(WAIT | TYPE_CMD);
+        sample_buffer.push_back(2);
+    } else if (sample_buffer[tail_start] == (WAIT | TYPE_CMD) &&
+            sample_buffer[tail_start + 1] != 0xff &&
+            sample_buffer[tail_start + 2] == (LYC | TYPE_LYC)) {
+        // WAIT:duration:LYC => WAIT:(duration+1)
+        sample_buffer.resize(sample_buffer.size() - 1);
+        ++sample_buffer[tail_start + 1];
+    }
+}
+
 /* LSDj 8.8.0+ soft envelope problem:
  * To decrease volume on CGB, the byte 8 is written 15 times to
  * either of addresses 0xff12, 0xff17 or 0xff21.
@@ -265,6 +287,7 @@ static void record_byte(unsigned int byte) {
     } else {
         optimize_envelope();
         optimize_pitch();
+        optimize_wait();
     }
 }
 
