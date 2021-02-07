@@ -28,13 +28,16 @@ static bool gbs_mode;
 #define SAMPLE 1
 #define STOP 2
 #define NEXT_BANK 3
+#define VOLUME_DOWN_PU0 4
+#define VOLUME_DOWN_PU1 5
+#define VOLUME_DOWN_NOI 6
 
 #define LYC_END_MASK 0x80
 
-#define START       0x100
-#define TYPE_ADDR   0x200
-#define TYPE_LYC    0x400
-#define TYPE_SAMPLE 0x800
+#define START               0x100
+#define TYPE_ADDR           0x200
+#define TYPE_LYC            0x400
+#define TYPE_SAMPLE         0x800
 
 static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
@@ -117,13 +120,6 @@ static bool sample_buffer_has_sample() {
         sample_buffer[42] == (0x25 | TYPE_ADDR);
 }
 
-/* LSDj 8.8.0+ soft envelope problem:
- * To decrease volume on CGB, the byte 8 is written 15 times to
- * either of addresses 0xff12, 0xff17 or 0xff21.
- * To improve sound on DMG and reduce ROM/CPU usage, replace this
- * with the sequence:
- * addr=9 ; addr = 0x11 ; addr = 0x18
- */
 static void optimize_volume_decreases() {
     if (sample_buffer.size() < 15 * 2) {
         return;
@@ -166,12 +162,22 @@ static void optimize_volume_decreases() {
     for (size_t i = 0; i < tail_start; ++i) {
         new_sample_buffer.push_back(sample_buffer[i]);
     }
-    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
-    new_sample_buffer.push_back(9);
-    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
-    new_sample_buffer.push_back(0x11);
-    new_sample_buffer.push_back(register_addr | TYPE_ADDR);
-    new_sample_buffer.push_back(0x18);
+
+    unsigned int byte;
+    switch (register_addr) {
+        case 0x12:
+            byte = VOLUME_DOWN_PU0;
+            break;
+        case 0x17:
+            byte = VOLUME_DOWN_PU1;
+            break;
+        case 0x21:
+            byte = VOLUME_DOWN_NOI;
+            break;
+        default:
+            assert(false);
+    }
+    new_sample_buffer.push_back(byte);
 
     sample_buffer = new_sample_buffer;
 }

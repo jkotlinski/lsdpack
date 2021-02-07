@@ -1,13 +1,8 @@
-SECTION "player_ram",WRAM0
-
-Song
-    ds  1
-CurrentBank
-    ds  2
-CurrentPtr
-    ds  2
-
-SECTION "player_code",ROM0
+SECTION "player",ROM0[$3e80]
+    ; .gbs player entry points
+    ret
+    jp LsdjPlaySong
+    jp LsdjTick
 
 ; Starts playing a song. If a song is already playing,
 ; make sure interrupts are disabled when calling this.
@@ -76,6 +71,12 @@ LsdjTick::
     jr  z,.handle_stop
     cp  3
     jp  z,.next_bank
+    cp  4
+    jp  z,.volume_down_pu0
+    cp  5
+    jp  z,.volume_down_pu1
+    cp  6
+    jp  z,.volume_down_noi
 
     ; write sound register
     ld  b,a
@@ -167,10 +168,10 @@ LsdjTick::
 
     pop     hl
 
-    ld  a,[CurrentBank]
-    ld  [$2000],a
     ld  a,[CurrentBank+1]
     ld  [$3000],a
+    ld  a,[CurrentBank]
+    ld  [$2000],a
 
     ld  a,[hl+]
     ldh [$1e],a
@@ -198,4 +199,43 @@ LsdjTick::
     inc a
     ld  [CurrentBank+1],a
     ld  [$3000],a
+    ; Reapply LSB in case of non-MBC5 cartridge.
+    ld  [CurrentBank],a
+    ld  [$2000],a
     jp  .loop
+
+.volume_down_pu0:
+    ld  a,9
+    ldh [$12],a
+    ld  a,$11
+    ldh [$12],a
+    ld  a,$18
+    ldh [$12],a
+    jp  .loop
+
+.volume_down_pu1:
+    ld  a,9
+    ldh [$17],a
+    ld  a,$11
+    ldh [$17],a
+    ld  a,$18
+    ldh [$17],a
+    jp  .loop
+
+.volume_down_noi:
+    ld  a,9
+    ldh [$21],a
+    ld  a,$11
+    ldh [$21],a
+    ld  a,$18
+    ldh [$21],a
+    jp  .loop
+
+SECTION "player_ram",WRAM0
+
+Song
+    ds  1
+CurrentBank
+    ds  2
+CurrentPtr
+    ds  2

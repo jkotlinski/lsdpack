@@ -3,6 +3,8 @@
 #include <string>
 #include "getopt.h"
 
+#define PLAYER_ADDRESS 0x3e80
+
 void verify(FILE* f, const char* path) {
     if (f != 0) {
         return;
@@ -39,16 +41,16 @@ void write_gbs_header(FILE* f) {
     fputc(1, f); // first song
 
     // load address
-    fputc(0, f);
-    fputc(0x3f, f);
+    fputc(PLAYER_ADDRESS & 0xff, f);
+    fputc(PLAYER_ADDRESS >> 8, f);
 
     // init address
-    fputc(1, f);
-    fputc(0x3f, f);
+    fputc((PLAYER_ADDRESS + 1) & 0xff, f);
+    fputc((PLAYER_ADDRESS + 1) >> 8, f);
 
     // play address
-    fputc(4, f);
-    fputc(0x3f, f);
+    fputc((PLAYER_ADDRESS + 4) & 0xff, f);
+    fputc((PLAYER_ADDRESS + 4) >> 8, f);
 
     // SP init
     fputc(0xfe, f);
@@ -97,7 +99,7 @@ int main(int argc, char* argv[]) {
 
     FILE* gb_f = fopen(argv[optind], "rb");
     verify(gb_f, argv[optind]);
-    fseek(gb_f, 0x3f00, SEEK_SET);
+    fseek(gb_f, 0x3e80, SEEK_SET);
 
     while (true) {
         int c = fgetc(gb_f);

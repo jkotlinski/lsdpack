@@ -64,7 +64,7 @@ It is possible to create .gbs files using the commands below. For compatibility 
 	./lsdpack.exe -g lsdj.gb
 
     # assemble player
-	rgbasm -o player_gbs.o player_gbs.s
+	rgbasm -o player.o player.s
 
     # assemble songs individually
 	rgbasm -o lsdj-1.o lsdj-1.s
@@ -72,8 +72,8 @@ It is possible to create .gbs files using the commands below. For compatibility 
     ...
 
     # make one player for each song
-	rgblink -o player-1.gb player_gbs.o lsdj-1.o
-	rgblink -o player-2.gb player_gbs.o lsdj-2.o
+	rgblink -o player-1.gb player.o lsdj-1.o
+	rgblink -o player-2.gb player.o lsdj-2.o
     ...
 
     # create the final .gbs files, one by one
