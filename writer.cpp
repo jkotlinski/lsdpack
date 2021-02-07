@@ -41,8 +41,20 @@ static std::vector<unsigned int> music_stream;
 
 static int sample_count;
 
+static void reset() {
+    sample_count = 0;
+    song_locations.clear();
+    music_stream.clear();
+    write_location.bank = 0;
+    write_location.ptr = 0;
+    fclose(f);
+    f = 0;
+}
+
 static void new_bank() {
-    if (++write_location.bank == (gbs_mode ? 0x100 : 0x200)) {
+    // In GBS mode, assume max 32 banks for compatibility.
+    const int max_bank_count = (gbs_mode ? 0x20 : 0x200);
+    if (++write_location.bank == max_bank_count) {
         fputs("ROM full!", stderr);
         exit(1);
     }
@@ -292,6 +304,7 @@ void write_music_to_disk() {
         ++i;
     }
     write_song_locations();
+    reset();
 }
 
 void enable_gbs_mode() {

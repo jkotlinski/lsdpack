@@ -104,37 +104,18 @@ void on_lcd_interrupt() {
     }
 }
 
-void make_out_path(const char* in_path) {
+void make_out_path(const char* in_path, std::string suffix) {
     out_path = in_path;
     // .gb => .s
     out_path.replace(out_path.end() - 2, out_path.end(), "s");
+    out_path.insert(out_path.length() - 2, suffix);
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('/'), "");
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('\\'), "");
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
-int main(int argc, char* argv[]) {
-    int c;
-    while ((c = getopt(argc, argv, "g")) != -1) {
-        switch (c) {
-            case 'g':
-                puts(".gbs mode enabled");
-                enable_gbs_mode();
-                break;
-        }
-    }
-
-    if (argc <= optind) {
-        fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
-        return 1;
-    }
-
-    make_out_path(argv[optind]);
-
-    gameboy.setInputGetter(&input);
-    gameboy.setWriteHandler(on_ff_write);
-    gameboy.setLcdHandler(on_lcd_interrupt);
-
+void record_gb(int argc, char* argv[]) {
+    make_out_path(argv[optind], "");
     for (; optind < argc; ++optind) {
         printf("Loading %s...\n", argv[optind]);
         gameboy.load(argv[optind]);
@@ -145,8 +126,59 @@ int main(int argc, char* argv[]) {
             play_song();
         }
     }
-
     write_music_to_disk();
+}
+
+void record_gbs(int argc, char* argv[]) {
+    for (; optind < argc; ++optind) {
+        printf("Loading %s...\n", argv[optind]);
+
+        int song_index = 0;
+        while (true) {
+            gameboy.load(argv[optind]);
+            press(0, 3);
+
+            if (!load_song(song_index++)) {
+                break;
+            }
+
+            char suffix[20];
+            snprintf(suffix, sizeof(suffix), "-%i", song_index);
+            make_out_path(argv[optind], suffix);
+
+            play_song();
+            write_music_to_disk();
+        }
+    }
+}
+
+int main(int argc, char* argv[]) {
+    bool gbs = false;
+    int c;
+    while ((c = getopt(argc, argv, "g")) != -1) {
+        switch (c) {
+            case 'g':
+                puts(".gbs mode enabled");
+                gbs = true;
+                enable_gbs_mode();
+                break;
+        }
+    }
+
+    if (argc <= optind) {
+        fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
+        return 1;
+    }
+
+    gameboy.setInputGetter(&input);
+    gameboy.setWriteHandler(on_ff_write);
+    gameboy.setLcdHandler(on_lcd_interrupt);
+
+    if (gbs) {
+        record_gbs(argc, argv);
+    } else {
+        record_gb(argc, argv);
+    }
 
     puts("OK");
 }

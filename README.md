@@ -58,13 +58,27 @@ using raster bars. Pressing A skips to the next song.
 
 ## Game Boy Sound System (GBS)
 
-It is possible to create a .gbs file using the commands below. The makegbs -s option must be changed to the number of songs.
+It is possible to create .gbs files using the commands below. For compatibility reasons, .gbs files can only be 256 kB big, so there will be one .gbs file/song.
 
+    # dump songs
 	./lsdpack.exe -g lsdj.gb
+
+    # assemble player
 	rgbasm -o player_gbs.o player_gbs.s
-	rgbasm -o lsdj.o lsdj.s
-	rgblink -o player.gb player_gbs.o lsdj.o
-	./makegbs.exe -s 1 -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player.gb
+
+    # assemble songs individually
+	rgbasm -o lsdj-1.o lsdj-1.s
+	rgbasm -o lsdj-2.o lsdj-2.s
+    ...
+
+    # make one player for each song
+	rgblink -o player-1.gb player_gbs.o lsdj-1.o
+	rgblink -o player-2.gb player_gbs.o lsdj-2.o
+    ...
+
+    # create the final .gbs files, one by one
+	./makegbs.exe -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player-1.gb
+    ...
 
 ## How Does It Work?
 

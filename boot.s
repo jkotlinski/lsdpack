@@ -38,6 +38,10 @@ mainloop
     cp  $f
     jr  z,.wait_button_pressed
 
+    ; stop all sound
+    xor a
+    ldh [$26],a
+
     ; play next song
     inc e
     ld  a,e

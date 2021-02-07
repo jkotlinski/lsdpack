@@ -16,7 +16,6 @@ void verify(FILE* f, const char* path) {
     exit(1);
 }
 
-int song_count = 1;
 std::string title = "<Title>";
 std::string artist = "<Artist>";
 std::string copyright = "<Copyright>";
@@ -36,8 +35,7 @@ void write_gbs_header(FILE* f) {
     fputs("GBS", f);
     fputc(1, f); // version 1
 
-    printf("Number of Songs: %i\n", song_count);
-    fputc(song_count, f); // number of songs
+    fputc(1, f); // number of songs
     fputc(1, f); // first song
 
     // load address
@@ -69,11 +67,8 @@ void write_gbs_header(FILE* f) {
 
 int main(int argc, char* argv[]) {
     int c;
-    while ((c = getopt(argc, argv, "s:t:c:a:")) != -1) {
+    while ((c = getopt(argc, argv, "t:c:a:")) != -1) {
         switch (c) {
-            case 's':
-                song_count = atoi(optarg);
-                break;
             case 't':
                 title = optarg;
                 break;
@@ -87,7 +82,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (optind != argc - 1) {
-        fprintf(stderr, "usage: makegbs [-s <number of songs>] [-a <artist>] [-t <title>] [-c <copyright>] player.gb");
+        fprintf(stderr, "usage: makegbs [-a <artist>] [-t <title>] [-c <copyright>] player.gb");
         return 1;
     }
 
