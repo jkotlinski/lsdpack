@@ -70,7 +70,7 @@ It is possible to create a .gbs file using the commands below. The makegbs -s op
 
 lsdpack plays back LSDj songs using an emulated Game Boy Color and records direct writes to the sound chip. This recording can be played back from another ROM using a custom player.
 
-The included player is very fast and can easily play songs that would choke LSDj on a Game Boy Classic. Since recordings take a lot of ROM, an MBC5 cartridge is required.
+The included player is very fast and can easily play songs that would choke LSDj on a Game Boy Classic. Since recordings take a lot of ROM, an MBC5 cartridge is recommended.
 
 ROM+CPU consumption varies with song contents. Features like sample playback or FAST/DRUM P and V commands are especially demanding, since they update the sound chip 360 times/second.
 
@@ -78,4 +78,4 @@ To reduce CPU consumption and interfere less with game logic and graphics, it ca
 
  * Full speed (default): Call player six times/frame, evenly spaced out. Allows ~11 kHz sample playback ("1x" sample speed).
  * Half speed: Make two player calls in a row, three times/frame. Allows ~6 kHz sample playback ("0.5x" sample speed).
- * Normal speed: Make six player calls in a row, once a frame (typically driven by VBL interrupt). Useful if sample playback is not needed.
+ * Normal speed: Make six player calls in a row, once a frame from VBL interrupt. Useful if sample playback is not needed.
