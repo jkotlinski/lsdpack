@@ -12,6 +12,9 @@ SECTION "player",ROM0[$3e80]
 ; SIDE EFFECTS: trashes af
 ;
 LsdjPlaySong::
+    xor a
+    ldh [$26],a ; stop sound
+
     push    de
     push    hl
 
