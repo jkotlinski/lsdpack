@@ -73,3 +73,9 @@ lsdpack plays back LSDj songs using an emulated Game Boy Color and records direc
 The included player is very fast and can easily play songs that would choke LSDj on a Game Boy Classic. Since recordings take a lot of ROM, an MBC5 cartridge is required.
 
 ROM+CPU consumption varies with song contents. Features like sample playback or FAST/DRUM P and V commands are especially demanding, since they update the sound chip 360 times/second.
+
+To reduce CPU consumption and interfere less with game logic and graphics, it can help to batch up player calls. Examples:
+
+ * Full speed (default): Call player six times/frame, evenly spaced out. Allows ~11 kHz sample playback ("1x" sample speed).
+ * Half speed: Make two player calls in a row, three times/frame. Allows ~6 kHz sample playback ("0.5x" sample speed).
+ * Normal speed: Make six player calls in a row, once a frame (typically driven by VBL interrupt). Useful if sample playback is not needed.
