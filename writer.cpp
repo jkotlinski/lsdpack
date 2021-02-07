@@ -24,13 +24,16 @@ static Location write_location;
 
 static bool gbs_mode;
 
-#define LYC 0
-#define SAMPLE 1
-#define STOP 2
-#define NEXT_BANK 3
+#define LYC             0
+#define SAMPLE          1
+#define STOP            2
+#define NEXT_BANK       3
 #define VOLUME_DOWN_PU0 4
 #define VOLUME_DOWN_PU1 5
 #define VOLUME_DOWN_NOI 6
+#define PITCH_PU0       7
+#define PITCH_PU1       8
+#define PITCH_WAV       9
 
 #define LYC_END_MASK 0x80
 
@@ -38,6 +41,7 @@ static bool gbs_mode;
 #define TYPE_ADDR           0x200
 #define TYPE_LYC            0x400
 #define TYPE_SAMPLE         0x800
+#define TYPE_CMD            0x1000
 
 static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
@@ -68,12 +72,17 @@ static void new_bank() {
 
 static void write_byte(unsigned int byte) {
     if (write_location.ptr > 0x7ff8) {
-        if ((byte & TYPE_ADDR) || (byte & TYPE_LYC) || (byte & TYPE_SAMPLE) || (write_location.ptr == 0x7fff)) {
+        if ((byte & TYPE_ADDR) ||
+                (byte & TYPE_LYC) ||
+                (byte & TYPE_SAMPLE) ||
+                (byte & TYPE_CMD) ||
+                (write_location.ptr == 0x7fff)) {
             fprintf(f, "DB 3 ; next bank\n");
             new_bank();
         }
     }
-    fprintf(f, "DB $%x\n", byte & 0xff);
+    // fprintf(f, "DB $%x\n", byte & 0xff);
+    fprintf(f, "DB $%x ; %x\n", byte & 0xff, byte >> 8);
     ++write_location.ptr;
     assert(write_location.ptr < 0x8000);
 }
@@ -120,7 +129,39 @@ static bool sample_buffer_has_sample() {
         sample_buffer[42] == (0x25 | TYPE_ADDR);
 }
 
-static void optimize_volume_decreases() {
+static void optimize_pitch() {
+    if (sample_buffer.size() < 4) {
+        return;
+    }
+    const size_t tail_start = sample_buffer.size() - 4;
+    int cmd = 0;
+    if (sample_buffer[tail_start] == (0x13 | TYPE_ADDR) &&
+            sample_buffer[tail_start + 2] == (0x14 | TYPE_ADDR)) {
+        cmd = PITCH_PU0 | TYPE_CMD;
+    } else if (sample_buffer[tail_start] == (0x18 | TYPE_ADDR) &&
+            sample_buffer[tail_start + 2] == (0x19 | TYPE_ADDR)) {
+        cmd = PITCH_PU1 | TYPE_CMD;
+    } else if (sample_buffer[tail_start] == (0x1d | TYPE_ADDR) &&
+            sample_buffer[tail_start + 2] == (0x1e | TYPE_ADDR)) {
+        cmd = PITCH_WAV | TYPE_CMD;
+    } else {
+        return;
+    }
+    int freq1 = sample_buffer[tail_start + 1];
+    int freq2 = sample_buffer[tail_start + 3];
+    sample_buffer.resize(tail_start);
+    sample_buffer.push_back(cmd);
+    sample_buffer.push_back(freq1);
+    sample_buffer.push_back(freq2);
+}
+
+/* LSDj 8.8.0+ soft envelope problem:
+ * To decrease volume on CGB, the byte 8 is written 15 times to
+ * either of addresses 0xff12, 0xff17 or 0xff21.
+ * To improve sound on DMG and reduce ROM/CPU usage, replace this
+ * with commands VOLUME_DOWN_XXX
+ */
+static void optimize_envelope() {
     if (sample_buffer.size() < 15 * 2) {
         return;
     }
@@ -157,29 +198,23 @@ static void optimize_volume_decreases() {
 
     // OK, there is a volume decrease at sample_buffer tail.
     // Let's rewrite it in the optimized form.
-    std::deque<unsigned int> new_sample_buffer;
-    // Preserve head.
-    for (size_t i = 0; i < tail_start; ++i) {
-        new_sample_buffer.push_back(sample_buffer[i]);
-    }
+    sample_buffer.resize(tail_start);
 
     unsigned int byte;
     switch (register_addr) {
         case 0x12:
-            byte = VOLUME_DOWN_PU0;
+            byte = VOLUME_DOWN_PU0 | TYPE_CMD;
             break;
         case 0x17:
-            byte = VOLUME_DOWN_PU1;
+            byte = VOLUME_DOWN_PU1 | TYPE_CMD;
             break;
         case 0x21:
-            byte = VOLUME_DOWN_NOI;
+            byte = VOLUME_DOWN_NOI | TYPE_CMD;
             break;
         default:
             assert(false);
     }
-    new_sample_buffer.push_back(byte);
-
-    sample_buffer = new_sample_buffer;
+    sample_buffer.push_back(byte);
 }
 
 typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
@@ -228,7 +263,8 @@ static void record_byte(unsigned int byte) {
     if (sample_buffer_has_sample()) {
         write_sample_buffer();
     } else {
-        optimize_volume_decreases();
+        optimize_envelope();
+        optimize_pitch();
     }
 }
 

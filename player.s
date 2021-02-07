@@ -80,6 +80,12 @@ LsdjTick::
     jp  z,.volume_down_pu1
     cp  6
     jp  z,.volume_down_noi
+    cp  7
+    jp  z,.pitch_pu0
+    cp  8
+    jp  z,.pitch_pu1
+    cp  9
+    jp  z,.pitch_wav
 
     ; write sound register
     ld  b,a
@@ -232,6 +238,27 @@ LsdjTick::
     ldh [$21],a
     ld  a,$18
     ldh [$21],a
+    jp  .loop
+
+.pitch_pu0:
+    ld  a,[hl+]
+    ldh [$13],a
+    ld  a,[hl+]
+    ldh [$14],a
+    jp  .loop
+
+.pitch_pu1:
+    ld  a,[hl+]
+    ldh [$18],a
+    ld  a,[hl+]
+    ldh [$19],a
+    jp  .loop
+
+.pitch_wav:
+    ld  a,[hl+]
+    ldh [$1d],a
+    ld  a,[hl+]
+    ldh [$1e],a
     jp  .loop
 
 SECTION "player_ram",WRAM0
