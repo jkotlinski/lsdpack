@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <deque>
 #include <map>
 #include <vector>
@@ -23,6 +24,8 @@ struct Location {
 static Location write_location;
 
 static bool gbs_mode;
+
+static int regs[0x100];
 
 #define LYC             0
 #define SAMPLE          1
@@ -50,6 +53,7 @@ static void reset() {
     sample_count = 0;
     song_locations.clear();
     music_stream.clear();
+    memset(regs, -1, sizeof(regs));
     write_location.bank = 0;
     write_location.ptr = 0;
     fclose(f);
@@ -129,24 +133,65 @@ static void optimize_pitch() {
     }
     const size_t tail_start = sample_buffer.size() - 4;
     int cmd = 0;
+    int new_lsb;
+    int new_msb;
     if (sample_buffer[tail_start] == (0x13 | CMD_FLAG) &&
             sample_buffer[tail_start + 2] == (0x14 | CMD_FLAG)) {
-        cmd = PITCH_PU0 | CMD_FLAG;
+        new_lsb = sample_buffer[tail_start + 1];
+        new_msb = sample_buffer[tail_start + 3];
+        bool trig = new_msb & 0x80;
+        if (new_msb == regs[0x14] && !trig) {
+            // msb is redundant
+            cmd = (new_lsb == regs[0x13])
+                ? 0 // lsb is redundant, too
+                : (0x13 | CMD_FLAG); // only set lsb
+        } else {
+            cmd = PITCH_PU0 | CMD_FLAG;
+        }
+        regs[0x13] = new_lsb;
+        regs[0x14] = new_msb;
     } else if (sample_buffer[tail_start] == (0x18 | CMD_FLAG) &&
             sample_buffer[tail_start + 2] == (0x19 | CMD_FLAG)) {
-        cmd = PITCH_PU1 | CMD_FLAG;
+        new_lsb = sample_buffer[tail_start + 1];
+        new_msb = sample_buffer[tail_start + 3];
+        bool trig = new_msb & 0x80;
+        if (new_msb == regs[0x19] && !trig) {
+            // msb is redundant
+            cmd = (new_lsb == regs[0x18])
+                ? 0 // lsb is redundant, too
+                : (0x18 | CMD_FLAG); // only set lsb
+        } else {
+            cmd = PITCH_PU1 | CMD_FLAG;
+        }
+        regs[0x18] = new_lsb;
+        regs[0x19] = new_msb;
     } else if (sample_buffer[tail_start] == (0x1d | CMD_FLAG) &&
             sample_buffer[tail_start + 2] == (0x1e | CMD_FLAG)) {
-        cmd = PITCH_WAV | CMD_FLAG;
+        new_lsb = sample_buffer[tail_start + 1];
+        new_msb = sample_buffer[tail_start + 3];
+        bool trig = new_msb & 0x80;
+        if (new_msb == regs[0x1e] && !trig) {
+            // msb is redundant
+            cmd = (new_lsb == regs[0x1d])
+                ? 0 // lsb is redundant, too
+                : (0x1d | CMD_FLAG); // only set lsb
+        } else {
+            cmd = PITCH_WAV | CMD_FLAG;
+        }
+        regs[0x1d] = new_lsb;
+        regs[0x1e] = new_msb;
     } else {
         return;
     }
-    int freq1 = sample_buffer[tail_start + 1];
-    int freq2 = sample_buffer[tail_start + 3];
     sample_buffer.resize(tail_start);
+    if (!cmd) {
+        return;
+    }
     sample_buffer.push_back(cmd);
-    sample_buffer.push_back(freq1);
-    sample_buffer.push_back(freq2);
+    sample_buffer.push_back(new_lsb);
+    if (!(cmd & 0x10)) {
+        sample_buffer.push_back(new_msb);
+    }
 }
 
 static void optimize_wait() {
