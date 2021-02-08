@@ -72,6 +72,111 @@ static void new_bank() {
     write_location.ptr = 0x4000;
 }
 
+static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
+    if (!(cmd >> 8)) {
+        return;
+    }
+    fprintf(f, "\t; ");
+    if (cmd & 0x80) {
+        fprintf(f, "LYC+");
+    }
+    switch (cmd & 0x7f) {
+        case LYC:
+            fprintf(f, "LYC");
+            break;
+        case SAMPLE:
+            fprintf(f, "SAMPLE");
+            break;
+        case STOP:
+            fprintf(f, "STOP");
+            break;
+        case NEXT_BANK:
+            fprintf(f, "NEXT_BANK");
+            break;
+        case AMP_DOWN_PU0:
+            fprintf(f, "AMP_DOWN_PU0");
+            break;
+        case AMP_DOWN_PU1:
+            fprintf(f, "AMP_DOWN_PU1");
+            break;
+        case AMP_DOWN_NOI:
+            fprintf(f, "AMP_DOWN_NOI");
+            break;
+        case PITCH_PU0:
+            fprintf(f, "PITCH_PU0");
+            break;
+        case PITCH_PU1:
+            fprintf(f, "PITCH_PU1");
+            break;
+        case PITCH_WAV:
+            fprintf(f, "PITCH_WAV");
+            break;
+        case WAIT:
+            fprintf(f, "WAIT");
+            break;
+        case 0x10:
+            fprintf(f, "pu0 sweep");
+            break;
+        case 0x11:
+            fprintf(f, "pu0 length/wave");
+            break;
+        case 0x12:
+            fprintf(f, "pu0 env");
+            break;
+        case 0x13:
+            fprintf(f, "pu0 pitch lsb");
+            break;
+        case 0x14:
+            fprintf(f, "pu0 pitch msb");
+            break;
+
+        case 0x16:
+            fprintf(f, "pu1 length/wave");
+            break;
+        case 0x17:
+            fprintf(f, "pu1 env");
+            break;
+        case 0x18:
+            fprintf(f, "pu1 pitch lsb");
+            break;
+        case 0x19:
+            fprintf(f, "pu1 pitch msb");
+            break;
+
+        case 0x1a:
+            fprintf(f, "wav on/off");
+            break;
+        case 0x1b:
+            fprintf(f, "wav length");
+            break;
+        case 0x1c:
+            fprintf(f, "wav env");
+            break;
+        case 0x1d:
+            fprintf(f, "wav pitch lsb");
+            break;
+        case 0x1e:
+            fprintf(f, "wav pitch msb");
+            break;
+
+        case 0x20:
+            fprintf(f, "noi length");
+            break;
+        case 0x21:
+            fprintf(f, "noi env");
+            break;
+        case 0x22:
+            fprintf(f, "noi wave");
+            break;
+        case 0x23:
+            fprintf(f, "noi trig");
+            break;
+
+        default:
+            fprintf(f, "%x", cmd & 0x7f);
+    }
+}
+
 static void write_byte(unsigned int byte) {
     if (write_location.ptr > 0x7ff8) {
         if ((byte & CMD_FLAG) || (write_location.ptr == 0x7fff)) {
@@ -80,49 +185,7 @@ static void write_byte(unsigned int byte) {
         }
     }
     fprintf(f, "DB $%x", byte & 0xff);
-    if (byte >> 8) {
-        fprintf(f, "\t; ");
-        if (byte & 0x80) {
-            fprintf(f, "LYC+");
-        }
-        switch (byte & 0x7f) {
-            case LYC:
-                fprintf(f, "LYC");
-                break;
-            case SAMPLE:
-                fprintf(f, "SAMPLE");
-                break;
-            case STOP:
-                fprintf(f, "STOP");
-                break;
-            case NEXT_BANK:
-                fprintf(f, "NEXT_BANK");
-                break;
-            case AMP_DOWN_PU0:
-                fprintf(f, "AMP_DOWN_PU0");
-                break;
-            case AMP_DOWN_PU1:
-                fprintf(f, "AMP_DOWN_PU1");
-                break;
-            case AMP_DOWN_NOI:
-                fprintf(f, "AMP_DOWN_NOI");
-                break;
-            case PITCH_PU0:
-                fprintf(f, "PITCH_PU0");
-                break;
-            case PITCH_PU1:
-                fprintf(f, "PITCH_PU1");
-                break;
-            case PITCH_WAV:
-                fprintf(f, "PITCH_WAV");
-                break;
-            case WAIT:
-                fprintf(f, "WAIT");
-                break;
-            default:
-                fprintf(f, "%x", byte & 0x7f);
-        }
-    }
+    fprint_cmd_comment(f, byte);
     fprintf(f, "\n");
     ++write_location.ptr;
     assert(write_location.ptr < 0x8000);
