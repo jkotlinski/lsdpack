@@ -317,28 +317,28 @@ static void optimize_pitch() {
     }
 }
 
-static void optimize_pan() {
+static void optimize_redundant_writes(unsigned int reg) {
     if (sample_buffer.size() < 2) {
         return;
     }
     const size_t tail_start = 0;
-    if (sample_buffer[tail_start] == (0x25 | CMD_FLAG)) {
-        if (sample_buffer[tail_start + 1] == regs[0x25]) {
+    if (sample_buffer[tail_start] == (reg | CMD_FLAG)) {
+        if (sample_buffer[tail_start + 1] == regs[reg]) {
             // redundant write
             sample_buffer.pop_front();
             sample_buffer.pop_front();
         } else {
-            regs[0x25] = sample_buffer[tail_start + 1];
+            regs[reg] = sample_buffer[tail_start + 1];
         }
     }
-    if (sample_buffer[tail_start] == (0x25 | LYC_END_MASK | CMD_FLAG)) {
-        if (sample_buffer[tail_start + 1] == regs[0x25]) {
+    if (sample_buffer[tail_start] == (reg | LYC_END_MASK | CMD_FLAG)) {
+        if (sample_buffer[tail_start + 1] == regs[reg]) {
             // redundant write
             sample_buffer.pop_front();
             sample_buffer.pop_front();
             sample_buffer.push_front(LYC | CMD_FLAG);
         } else {
-            regs[0x25] = sample_buffer[tail_start + 1];
+            regs[reg] = sample_buffer[tail_start + 1];
         }
     }
 }
@@ -494,7 +494,11 @@ static void record_byte(unsigned int byte) {
         optimize_envelope();
         optimize_pitch();
         optimize_wait();
-        optimize_pan();
+        optimize_redundant_writes(0x25); // pan
+        optimize_redundant_writes(0x11); // pu0 length
+        optimize_redundant_writes(0x16); // pu1 length
+        optimize_redundant_writes(0x1b); // wav length
+        optimize_redundant_writes(0x20); // noi length
     }
 }
 
