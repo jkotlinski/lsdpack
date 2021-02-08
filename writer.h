@@ -9,6 +9,7 @@
 #include "rule.h"
 
 #include "rule_redundant_write.h"
+#include "rule_wait.h"
 
 // #define RECORD_WRITES
 
@@ -110,6 +111,8 @@ class Writer {
                 if (window.size() > rule.width()) {
                     new_music_stream.push_back(window.front());
                     window.pop_front();
+                }
+                if (window.size() == rule.width()) {
                     rule.transform(window);
                 }
             }
@@ -129,6 +132,7 @@ class Writer {
             RedundantWriteRule wav_volume(0x1c);
             RedundantWriteRule noi_length(0x20);
             RedundantWriteRule noi_wave(0x22);
+            WaitRule wait;
 
             optimize_rule(pan);
             optimize_rule(pu0_sweep);
@@ -138,6 +142,8 @@ class Writer {
             optimize_rule(wav_volume);
             optimize_rule(noi_length);
             optimize_rule(noi_wave);
+
+            optimize_rule(wait);
 
             /*
             if (sample_buffer_full()) {
@@ -451,27 +457,6 @@ class Writer {
             sample_buffer.push_back(new_lsb);
             if (!(cmd & 0x10)) {
                 sample_buffer.push_back(new_msb);
-            }
-        }
-
-        void optimize_wait() {
-            if (sample_buffer.size() < 3) {
-                return;
-            }
-            const size_t tail_start = sample_buffer.size() - 3;
-            if (sample_buffer[tail_start] == (LYC | CMD_FLAG) &&
-                    sample_buffer[tail_start + 1] == (LYC | CMD_FLAG) &&
-                    sample_buffer[tail_start + 2] == (LYC | CMD_FLAG)) {
-                // LYC:LYC:LYC => WAIT:0
-                sample_buffer.resize(tail_start);
-                sample_buffer.push_back(WAIT | CMD_FLAG);
-                sample_buffer.push_back(2);
-            } else if (sample_buffer[tail_start] == (WAIT | CMD_FLAG) &&
-                    sample_buffer[tail_start + 1] != 0xff &&
-                    sample_buffer[tail_start + 2] == (LYC | CMD_FLAG)) {
-                // WAIT:duration:LYC => WAIT:(duration+1)
-                sample_buffer.resize(sample_buffer.size() - 1);
-                ++sample_buffer[tail_start + 1];
             }
         }
 
