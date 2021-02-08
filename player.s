@@ -1,4 +1,4 @@
-SECTION "player",ROM0[$3e70]
+SECTION "player",ROM0[$3e00]
     ; .gbs player entry points
     ret
     jp LsdjPlaySong
