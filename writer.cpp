@@ -27,6 +27,11 @@ static bool gbs_mode;
 
 static int regs[0x100];
 
+typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
+static SampleLocations sample_locations;
+
+static std::deque<unsigned int> sample_buffer;
+
 #define LYC             0
 #define SAMPLE          1
 #define STOP            2
@@ -54,6 +59,8 @@ static void reset() {
     song_locations.clear();
     music_stream.clear();
     memset(regs, -1, sizeof(regs));
+    sample_locations.clear();
+    sample_buffer.clear();
     write_location.bank = 0;
     write_location.ptr = 0;
     fclose(f);
@@ -194,8 +201,6 @@ static void write_byte(unsigned int byte) {
     ++write_location.ptr;
     assert(write_location.ptr < 0x8000);
 }
-
-static std::deque<unsigned int> sample_buffer;
 
 static bool sample_buffer_full() {
     return sample_buffer.size() == 44;
@@ -386,9 +391,6 @@ static void optimize_envelope() {
     }
     sample_buffer.push_back(byte);
 }
-
-typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
-static SampleLocations sample_locations;
 
 static void write_sample_buffer() {
     std::vector<unsigned char> sample_contents;
