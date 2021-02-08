@@ -501,6 +501,7 @@ static void record_byte(unsigned int byte) {
         optimize_redundant_writes(0x1b); // wav length
         optimize_redundant_writes(0x1c); // wav volume
         optimize_redundant_writes(0x20); // noi length
+        optimize_redundant_writes(0x22); // noi wave
     }
 }
 
