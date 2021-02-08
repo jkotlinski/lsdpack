@@ -25,7 +25,7 @@ static Location write_location;
 
 static bool gbs_mode;
 
-static int regs[0x100];
+static unsigned int regs[0x100];
 
 typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
 static SampleLocations sample_locations;
@@ -256,8 +256,8 @@ static void optimize_pitch() {
     }
     const size_t tail_start = sample_buffer.size() - 4;
     int cmd = 0;
-    int new_lsb;
-    int new_msb;
+    unsigned int new_lsb;
+    unsigned int new_msb;
     if (sample_buffer[tail_start] == (0x13 | CMD_FLAG) &&
             sample_buffer[tail_start + 2] == (0x14 | CMD_FLAG)) {
         new_lsb = sample_buffer[tail_start + 1];
@@ -314,6 +314,20 @@ static void optimize_pitch() {
     sample_buffer.push_back(new_lsb);
     if (!(cmd & 0x10)) {
         sample_buffer.push_back(new_msb);
+    }
+}
+
+static void optimize_pan() {
+    assert(sample_buffer.size() >= 2);
+    if (sample_buffer[0] != (0x25 | CMD_FLAG)) {
+        return;
+    }
+    if (sample_buffer[1] == regs[0x25]) {
+        // redundant write
+        sample_buffer.pop_front();
+        sample_buffer.pop_front();
+    } else {
+        regs[0x25] = sample_buffer[1];
     }
 }
 
@@ -416,8 +430,8 @@ static void write_sample_buffer() {
 #endif
         }
     }
-    int new_pitch_lsb = sample_buffer[39];
-    int new_pitch_msb = sample_buffer[41];
+    unsigned int new_pitch_lsb = sample_buffer[39];
+    unsigned int new_pitch_msb = sample_buffer[41];
     sample_buffer.clear();
 
     if (new_pitch_lsb == regs[0x1d] && new_pitch_msb == regs[0x1e] &&
@@ -457,6 +471,7 @@ static void flush_sample_buffer() {
 
 static void record_byte(unsigned int byte) {
     if (sample_buffer_full()) {
+        optimize_pan();
         music_stream.push_back(sample_buffer.front());
         sample_buffer.pop_front();
     }
