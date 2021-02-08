@@ -43,6 +43,7 @@ static std::deque<unsigned int> sample_buffer;
 #define PITCH_PU1       8
 #define PITCH_WAV       9
 #define WAIT            10
+#define SAMPLE_NEXT     11
 
 #define LYC_END_MASK 0x80
 
@@ -53,6 +54,8 @@ static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
 
 static int sample_count;
+static int curr_sample_bank = -1;
+static int curr_sample_address = -1;
 
 static void reset() {
     sample_count = 0;
@@ -61,6 +64,8 @@ static void reset() {
     memset(regs, -1, sizeof(regs));
     sample_locations.clear();
     sample_buffer.clear();
+    curr_sample_bank = -1;
+    curr_sample_address = -1;
     write_location.bank = 0;
     write_location.ptr = 0;
     fclose(f);
@@ -93,6 +98,9 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
             break;
         case SAMPLE:
             fprintf(f, "SAMPLE");
+            break;
+        case SAMPLE_NEXT:
+            fprintf(f, "SAMPLE_NEXT");
             break;
         case STOP:
             fprintf(f, "STOP");
@@ -408,16 +416,36 @@ static void write_sample_buffer() {
 #endif
         }
     }
-    int pitch_lsb = sample_buffer[39];
-    int pitch_msb = sample_buffer[41];
+    int new_pitch_lsb = sample_buffer[39];
+    int new_pitch_msb = sample_buffer[41];
     sample_buffer.clear();
-    sample_buffer.push_back(SAMPLE | CMD_FLAG);
-    assert(sample_location->second.bank < 0x100);
-    sample_buffer.push_back(sample_location->second.bank);
-    sample_buffer.push_back(sample_location->second.ptr & 0xff);
-    sample_buffer.push_back(sample_location->second.ptr >> 8);
-    sample_buffer.push_back(pitch_lsb); // freq
-    sample_buffer.push_back(pitch_msb); // freq
+
+    if (new_pitch_lsb == regs[0x1d] && new_pitch_msb == regs[0x1e] &&
+            curr_sample_bank == sample_location->second.bank &&
+            curr_sample_address == sample_location->second.ptr - 0x10) {
+        sample_buffer.push_back(SAMPLE_NEXT | CMD_FLAG);
+    } else if (curr_sample_bank == sample_location->second.bank &&
+            curr_sample_address == sample_location->second.ptr) {
+        if (regs[0x1d] != new_pitch_lsb) {
+            sample_buffer.push_back(0x1d | CMD_FLAG);
+            sample_buffer.push_back(new_pitch_lsb);
+        }
+        sample_buffer.push_back(0x1e | CMD_FLAG);
+        sample_buffer.push_back(new_pitch_msb);
+    } else {
+        sample_buffer.push_back(SAMPLE | CMD_FLAG);
+        assert(sample_location->second.bank < 0x100);
+        sample_buffer.push_back(sample_location->second.bank);
+        sample_buffer.push_back(sample_location->second.ptr & 0xff);
+        sample_buffer.push_back(sample_location->second.ptr >> 8);
+        sample_buffer.push_back(new_pitch_lsb);
+        sample_buffer.push_back(new_pitch_msb);
+    }
+
+    regs[0x1d] = new_pitch_lsb;
+    regs[0x1e] = new_pitch_msb;
+    curr_sample_bank = sample_location->second.bank;
+    curr_sample_address = sample_location->second.ptr;
 }
 
 static void flush_sample_buffer() {

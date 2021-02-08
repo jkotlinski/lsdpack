@@ -3,7 +3,7 @@
 #include <string>
 #include "getopt.h"
 
-#define PLAYER_ADDRESS 0x3e00
+#define PLAYER_ADDRESS 0x3d00
 
 void verify(FILE* f, const char* path) {
     if (f != 0) {

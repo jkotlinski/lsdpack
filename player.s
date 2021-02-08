@@ -1,4 +1,4 @@
-SECTION "player",ROM0[$3e00]
+SECTION "player",ROM0[$3d00]
     ; .gbs player entry points
     ret
     jp LsdjPlaySong
@@ -33,8 +33,12 @@ LsdjPlaySong::
     ld  [CurrentBank+1],a
     ld  a,[hl+]
     ld  [CurrentPtr],a
-    ld  a,[hl]
+    ld  a,[hl+]
     ld  [CurrentPtr+1],a
+    ld  a,-1
+    ld  [SampleBank],a
+    ld  [SampleAddress],a
+    ld  [SampleAddress+1],a
 
     pop hl
     pop de
@@ -104,6 +108,8 @@ LsdjTick::
     jp  z,.pitch_wav
     cp  10
     jr  z,.wait
+    cp  11
+    jp  z,.sample_next
     cp  3
     jp  z,.next_bank
     cp  2
@@ -142,6 +148,7 @@ LsdjTick::
 .handle_sample
     ld  a,[hl+]
     ld  b,a     ; b = sample bank
+    ld  [SampleBank],a
     ld  a,[hl+]
     ld  e,a
     ld  a,[hl+]
@@ -199,6 +206,11 @@ LsdjTick::
     ld  a,[hl+]
     ldh [$3f],a
 
+    ld  a,l
+    ld  [SampleAddress],a
+    ld  a,h
+    ld  [SampleAddress+1],a
+
     ld  a,$80 ; unmute
     ldh [$1a],a
 
@@ -211,6 +223,7 @@ LsdjTick::
 
     ld  a,[hl+]
     ldh [$1e],a
+    ld  [SamplePitchMsb],a
     ld  a,[hl+]
     ldh [$1d],a
 
@@ -288,6 +301,91 @@ LsdjTick::
     ldh [$1e],a
     jp  .loop
 
+.sample_next
+    ld  a,[SampleBank]
+    ld  b,a     ; b = sample bank
+    ld  a,[SampleAddress]
+    ld  e,a
+    ld  a,[SampleAddress+1]
+    ld  d,a     ; de = sample ptr
+
+    push    hl
+    ; switch bank
+    xor a
+    ld  [$3000],a
+    ld  a,b
+    ld  [$2000],a
+
+    ld  h,d
+    ld  l,e
+
+    ; disable wave channel output
+    ldh a,[$25]
+    ld  e,a
+    and a,~$44
+    ldh [$25],a
+
+    xor a
+    ldh [$1a],a ; mute channel
+
+    ld  a,[hl+]
+    ldh [$30],a
+    ld  a,[hl+]
+    ldh [$31],a
+    ld  a,[hl+]
+    ldh [$32],a
+    ld  a,[hl+]
+    ldh [$33],a
+    ld  a,[hl+]
+    ldh [$34],a
+    ld  a,[hl+]
+    ldh [$35],a
+    ld  a,[hl+]
+    ldh [$36],a
+    ld  a,[hl+]
+    ldh [$37],a
+    ld  a,[hl+]
+    ldh [$38],a
+    ld  a,[hl+]
+    ldh [$39],a
+    ld  a,[hl+]
+    ldh [$3a],a
+    ld  a,[hl+]
+    ldh [$3b],a
+    ld  a,[hl+]
+    ldh [$3c],a
+    ld  a,[hl+]
+    ldh [$3d],a
+    ld  a,[hl+]
+    ldh [$3e],a
+    ld  a,[hl+]
+    ldh [$3f],a
+
+    ld  a,l
+    ld  [SampleAddress],a
+    ld  a,h
+    ld  [SampleAddress+1],a
+
+    ld  a,$80 ; unmute
+    ldh [$1a],a
+
+    pop     hl
+
+    ld  a,[CurrentBank+1]
+    ld  [$3000],a
+    ld  a,[CurrentBank]
+    ld  [$2000],a
+
+    ld  a,[SamplePitchMsb]
+    ldh [$1e],a
+
+    ld  a,e
+    ldh [$25],a
+
+    ld  d,$ff
+    jp  .loop
+
+
 SECTION "player_ram",WRAM0
 
 Song
@@ -297,4 +395,10 @@ CurrentBank
 CurrentPtr
     ds  2
 Wait
+    ds  1
+SampleBank
+    ds  1
+SampleAddress
+    ds  2
+SamplePitchMsb
     ds  1
