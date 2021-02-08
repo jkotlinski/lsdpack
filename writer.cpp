@@ -39,10 +39,7 @@ static bool gbs_mode;
 #define LYC_END_MASK 0x80
 
 #define START               0x100
-#define TYPE_ADDR           0x200
-#define TYPE_LYC            0x400
-#define TYPE_SAMPLE         0x800
-#define TYPE_CMD            0x1000
+#define CMD_FLAG            0x200
 
 static std::vector<Location> song_locations;
 static std::vector<unsigned int> music_stream;
@@ -73,11 +70,7 @@ static void new_bank() {
 
 static void write_byte(unsigned int byte) {
     if (write_location.ptr > 0x7ff8) {
-        if ((byte & TYPE_ADDR) ||
-                (byte & TYPE_LYC) ||
-                (byte & TYPE_SAMPLE) ||
-                (byte & TYPE_CMD) ||
-                (write_location.ptr == 0x7fff)) {
+        if ((byte & CMD_FLAG) || (write_location.ptr == 0x7fff)) {
             fprintf(f, "DB 3 ; next bank\n");
             new_bank();
         }
@@ -104,30 +97,30 @@ static bool sample_buffer_has_sample() {
      * $1d=?
      * $25=?  */
     return sample_buffer_full() &&
-        sample_buffer[0] == (0x25 | TYPE_ADDR) &&
-        sample_buffer[2] == (0x1a | TYPE_ADDR) &&
+        sample_buffer[0] == (0x25 | CMD_FLAG) &&
+        sample_buffer[2] == (0x1a | CMD_FLAG) &&
         sample_buffer[3] == 0 &&
-        sample_buffer[4] == (0x30 | TYPE_ADDR) &&
-        sample_buffer[6] == (0x31 | TYPE_ADDR) &&
-        sample_buffer[8] == (0x32 | TYPE_ADDR) &&
-        sample_buffer[10] == (0x33 | TYPE_ADDR) &&
-        sample_buffer[12] == (0x34 | TYPE_ADDR) &&
-        sample_buffer[14] == (0x35 | TYPE_ADDR) &&
-        sample_buffer[16] == (0x36 | TYPE_ADDR) &&
-        sample_buffer[18] == (0x37 | TYPE_ADDR) &&
-        sample_buffer[20] == (0x38 | TYPE_ADDR) &&
-        sample_buffer[22] == (0x39 | TYPE_ADDR) &&
-        sample_buffer[24] == (0x3a | TYPE_ADDR) &&
-        sample_buffer[26] == (0x3b | TYPE_ADDR) &&
-        sample_buffer[28] == (0x3c | TYPE_ADDR) &&
-        sample_buffer[30] == (0x3d | TYPE_ADDR) &&
-        sample_buffer[32] == (0x3e | TYPE_ADDR) &&
-        sample_buffer[34] == (0x3f | TYPE_ADDR) &&
-        sample_buffer[36] == (0x1a | TYPE_ADDR) &&
+        sample_buffer[4] == (0x30 | CMD_FLAG) &&
+        sample_buffer[6] == (0x31 | CMD_FLAG) &&
+        sample_buffer[8] == (0x32 | CMD_FLAG) &&
+        sample_buffer[10] == (0x33 | CMD_FLAG) &&
+        sample_buffer[12] == (0x34 | CMD_FLAG) &&
+        sample_buffer[14] == (0x35 | CMD_FLAG) &&
+        sample_buffer[16] == (0x36 | CMD_FLAG) &&
+        sample_buffer[18] == (0x37 | CMD_FLAG) &&
+        sample_buffer[20] == (0x38 | CMD_FLAG) &&
+        sample_buffer[22] == (0x39 | CMD_FLAG) &&
+        sample_buffer[24] == (0x3a | CMD_FLAG) &&
+        sample_buffer[26] == (0x3b | CMD_FLAG) &&
+        sample_buffer[28] == (0x3c | CMD_FLAG) &&
+        sample_buffer[30] == (0x3d | CMD_FLAG) &&
+        sample_buffer[32] == (0x3e | CMD_FLAG) &&
+        sample_buffer[34] == (0x3f | CMD_FLAG) &&
+        sample_buffer[36] == (0x1a | CMD_FLAG) &&
         sample_buffer[37] == 0x80 &&
-        sample_buffer[38] == (0x1e | TYPE_ADDR) &&
-        sample_buffer[40] == (0x1d | TYPE_ADDR) &&
-        sample_buffer[42] == (0x25 | TYPE_ADDR);
+        sample_buffer[38] == (0x1e | CMD_FLAG) &&
+        sample_buffer[40] == (0x1d | CMD_FLAG) &&
+        sample_buffer[42] == (0x25 | CMD_FLAG);
 }
 
 static void optimize_pitch() {
@@ -136,15 +129,15 @@ static void optimize_pitch() {
     }
     const size_t tail_start = sample_buffer.size() - 4;
     int cmd = 0;
-    if (sample_buffer[tail_start] == (0x13 | TYPE_ADDR) &&
-            sample_buffer[tail_start + 2] == (0x14 | TYPE_ADDR)) {
-        cmd = PITCH_PU0 | TYPE_CMD;
-    } else if (sample_buffer[tail_start] == (0x18 | TYPE_ADDR) &&
-            sample_buffer[tail_start + 2] == (0x19 | TYPE_ADDR)) {
-        cmd = PITCH_PU1 | TYPE_CMD;
-    } else if (sample_buffer[tail_start] == (0x1d | TYPE_ADDR) &&
-            sample_buffer[tail_start + 2] == (0x1e | TYPE_ADDR)) {
-        cmd = PITCH_WAV | TYPE_CMD;
+    if (sample_buffer[tail_start] == (0x13 | CMD_FLAG) &&
+            sample_buffer[tail_start + 2] == (0x14 | CMD_FLAG)) {
+        cmd = PITCH_PU0 | CMD_FLAG;
+    } else if (sample_buffer[tail_start] == (0x18 | CMD_FLAG) &&
+            sample_buffer[tail_start + 2] == (0x19 | CMD_FLAG)) {
+        cmd = PITCH_PU1 | CMD_FLAG;
+    } else if (sample_buffer[tail_start] == (0x1d | CMD_FLAG) &&
+            sample_buffer[tail_start + 2] == (0x1e | CMD_FLAG)) {
+        cmd = PITCH_WAV | CMD_FLAG;
     } else {
         return;
     }
@@ -161,16 +154,16 @@ static void optimize_wait() {
         return;
     }
     const size_t tail_start = sample_buffer.size() - 3;
-    if (sample_buffer[tail_start] == (LYC | TYPE_LYC) &&
-            sample_buffer[tail_start + 1] == (LYC | TYPE_LYC) &&
-            sample_buffer[tail_start + 2] == (LYC | TYPE_LYC)) {
+    if (sample_buffer[tail_start] == (LYC | CMD_FLAG) &&
+            sample_buffer[tail_start + 1] == (LYC | CMD_FLAG) &&
+            sample_buffer[tail_start + 2] == (LYC | CMD_FLAG)) {
         // LYC:LYC:LYC => WAIT:0
         sample_buffer.resize(tail_start);
-        sample_buffer.push_back(WAIT | TYPE_CMD);
+        sample_buffer.push_back(WAIT | CMD_FLAG);
         sample_buffer.push_back(2);
-    } else if (sample_buffer[tail_start] == (WAIT | TYPE_CMD) &&
+    } else if (sample_buffer[tail_start] == (WAIT | CMD_FLAG) &&
             sample_buffer[tail_start + 1] != 0xff &&
-            sample_buffer[tail_start + 2] == (LYC | TYPE_LYC)) {
+            sample_buffer[tail_start + 2] == (LYC | CMD_FLAG)) {
         // WAIT:duration:LYC => WAIT:(duration+1)
         sample_buffer.resize(sample_buffer.size() - 1);
         ++sample_buffer[tail_start + 1];
@@ -201,7 +194,7 @@ static void optimize_envelope() {
 
     for (size_t i = tail_start; i < tail_start + 15 * 2; i += 2) {
         unsigned int addr = sample_buffer[i];
-        if (!(addr & TYPE_ADDR)) {
+        if (!(addr & CMD_FLAG)) {
             return;
         }
         switch (addr & 0x7f) {
@@ -225,13 +218,13 @@ static void optimize_envelope() {
     unsigned int byte;
     switch (register_addr) {
         case 0x12:
-            byte = VOLUME_DOWN_PU0 | TYPE_CMD;
+            byte = VOLUME_DOWN_PU0 | CMD_FLAG;
             break;
         case 0x17:
-            byte = VOLUME_DOWN_PU1 | TYPE_CMD;
+            byte = VOLUME_DOWN_PU1 | CMD_FLAG;
             break;
         case 0x21:
-            byte = VOLUME_DOWN_NOI | TYPE_CMD;
+            byte = VOLUME_DOWN_NOI | CMD_FLAG;
             break;
         default:
             assert(false);
@@ -258,7 +251,7 @@ static void write_sample_buffer() {
 #endif
         }
     }
-    music_stream.push_back(SAMPLE | TYPE_SAMPLE);
+    music_stream.push_back(SAMPLE | CMD_FLAG);
     assert(sample_location->second.bank < 0x100);
     music_stream.push_back(sample_location->second.bank);
     music_stream.push_back(sample_location->second.ptr & 0xff);
@@ -325,19 +318,26 @@ void record_song_stop() {
 }
 
 void record_write(unsigned char addr, unsigned char data) {
-    record_byte(addr | TYPE_ADDR);
+    record_byte(addr | CMD_FLAG);
     record_byte(data);
 }
 
 void record_lcd() {
-    if (sample_buffer.size() >= 2 &&
-            (sample_buffer[sample_buffer.size() - 2] & TYPE_ADDR) &&
-            !(sample_buffer[sample_buffer.size() - 2] & LYC_END_MASK)) {
+    for (int i = (int)sample_buffer.size() - 1; i >= 0; --i) {
+        if (!(sample_buffer[i] & CMD_FLAG)) {
+            continue;
+        }
+        if (sample_buffer[i] == (LYC | CMD_FLAG)) {
+            break;
+        }
+        if (sample_buffer[i] & LYC_END_MASK) {
+            break;
+        }
         // Records LYC by setting LYC_END_MASK bit on last written address.
-        sample_buffer[sample_buffer.size() - 2] |= LYC_END_MASK;
-    } else {
-        record_byte(LYC | TYPE_LYC);
+        sample_buffer[i] |= LYC_END_MASK;
+        return;
     }
+    record_byte(LYC | CMD_FLAG);
 }
 
 static void write_song_locations() {

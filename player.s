@@ -54,7 +54,6 @@ LsdjTick::
     ld  a,[hl]
     or  a
     jr  z,.not_waiting
-    ld  b,b
     dec [hl]
     pop hl
     ret
@@ -64,6 +63,8 @@ LsdjTick::
     push    bc
 
 .tick
+    xor a
+    ld  c,a ; c = exit loop flag
     ld  a,[CurrentBank+1]
     ld  [$3000],a
     ld  a,[CurrentBank]
@@ -76,8 +77,16 @@ LsdjTick::
     ld  d,$ff
 
 .loop
-    ld  a,[hl+]
+    ld  a,c
     or  a
+    jr  nz,.lyc_done
+
+    ld  a,[hl]
+    and $80
+    ld  c,a
+
+    ld  a,[hl+]
+    and $7f
     jr  z,.lyc_done
     cp  1
     jr  z,.handle_sample
@@ -121,7 +130,6 @@ LsdjTick::
     ret
 
 .wait:
-    ld  b,b
     ld  a,[hl+]
     ld  [Wait],a
     jr  .lyc_done
