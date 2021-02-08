@@ -172,6 +172,10 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
             fprintf(f, "noi trig");
             break;
 
+        case 0x25:
+            fprintf(f, "pan");
+            break;
+
         default:
             fprintf(f, "%x", cmd & 0x7f);
     }
