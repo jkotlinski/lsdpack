@@ -318,16 +318,28 @@ static void optimize_pitch() {
 }
 
 static void optimize_pan() {
-    assert(sample_buffer.size() >= 2);
-    if (sample_buffer[0] != (0x25 | CMD_FLAG)) {
+    if (sample_buffer.size() < 2) {
         return;
     }
-    if (sample_buffer[1] == regs[0x25]) {
-        // redundant write
-        sample_buffer.pop_front();
-        sample_buffer.pop_front();
-    } else {
-        regs[0x25] = sample_buffer[1];
+    const size_t tail_start = 0;
+    if (sample_buffer[tail_start] == (0x25 | CMD_FLAG)) {
+        if (sample_buffer[tail_start + 1] == regs[0x25]) {
+            // redundant write
+            sample_buffer.pop_front();
+            sample_buffer.pop_front();
+        } else {
+            regs[0x25] = sample_buffer[tail_start + 1];
+        }
+    }
+    if (sample_buffer[tail_start] == (0x25 | LYC_END_MASK | CMD_FLAG)) {
+        if (sample_buffer[tail_start + 1] == regs[0x25]) {
+            // redundant write
+            sample_buffer.pop_front();
+            sample_buffer.pop_front();
+            sample_buffer.push_front(LYC | CMD_FLAG);
+        } else {
+            regs[0x25] = sample_buffer[tail_start + 1];
+        }
     }
 }
 
@@ -471,7 +483,6 @@ static void flush_sample_buffer() {
 
 static void record_byte(unsigned int byte) {
     if (sample_buffer_full()) {
-        optimize_pan();
         music_stream.push_back(sample_buffer.front());
         sample_buffer.pop_front();
     }
@@ -483,6 +494,7 @@ static void record_byte(unsigned int byte) {
         optimize_envelope();
         optimize_pitch();
         optimize_wait();
+        optimize_pan();
     }
 }
 
@@ -501,6 +513,7 @@ void record_song_start(const char* out_path) {
         }
         new_bank();
     }
+    memset(regs, -1, sizeof(regs));
     music_stream.push_back(START);
 }
 
