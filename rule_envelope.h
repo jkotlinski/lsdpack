@@ -2,7 +2,7 @@
 
 class EnvelopeRule : public Rule {
     public:
-        size_t width() { return 15 * 2; }
+        size_t width() const { return 15 * 2; }
 
         /* LSDj 8.8.0+ soft envelope problem:
          * To decrease volume on CGB, the byte 8 is written 15 times to

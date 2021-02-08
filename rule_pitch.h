@@ -18,7 +18,7 @@ class PitchRule : public Rule {
             wav_lsb_state(-1),
             wav_msb_state(-1) {}
 
-        size_t width() { return 4; }
+        size_t width() const { return 4; }
 
         void transform(std::deque<unsigned int>& bytes) {
             int cmd = 0;

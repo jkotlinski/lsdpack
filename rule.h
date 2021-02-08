@@ -25,6 +25,6 @@ enum Defines {
 
 class Rule {
     public:
-        virtual size_t width() = 0;
+        virtual size_t width() const = 0;
         virtual void transform(std::deque<unsigned int>& bytes) = 0;
 };
