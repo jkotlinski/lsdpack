@@ -495,6 +495,7 @@ static void record_byte(unsigned int byte) {
         optimize_pitch();
         optimize_wait();
         optimize_redundant_writes(0x25); // pan
+        optimize_redundant_writes(0x10); // pu0 sweep
         optimize_redundant_writes(0x11); // pu0 length
         optimize_redundant_writes(0x16); // pu1 length
         optimize_redundant_writes(0x1b); // wav length
