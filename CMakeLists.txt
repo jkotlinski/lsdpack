@@ -16,7 +16,6 @@ include_directories(
 add_executable(lsdpack
 
     lsdpack.cpp
-    writer.cpp
     getopt.cpp
 
     libgambatte/src/bitmap_font.cpp

@@ -13,6 +13,8 @@ gambatte::GB gameboy;
 Input input;
 std::string out_path;
 
+Writer* writer;
+
 void run_one_frame() {
     size_t samples = 35112;
     static gambatte::uint_least32_t audioBuffer[35112 + 2064];
@@ -68,7 +70,7 @@ void play_song() {
     int seconds_elapsed = 0;
     sound_enabled = false;
     input.press(START);
-    record_song_start(out_path.c_str());
+    writer->record_song_start(out_path.c_str());
     do {
         wait(1);
 
@@ -86,7 +88,7 @@ void on_ff_write(char p, char data) {
     switch (p) {
         case 0x26:
             if (sound_enabled && !data) {
-                record_song_stop();
+                writer->record_song_stop();
                 sound_enabled = false;
                 return;
             }
@@ -94,13 +96,13 @@ void on_ff_write(char p, char data) {
             break;
     }
     if (sound_enabled) {
-        record_write(p, data);
+        writer->record_write(p, data);
     }
 }
 
 void on_lcd_interrupt() {
     if (sound_enabled) {
-        record_lcd();
+        writer->record_lcd();
     }
 }
 
@@ -116,6 +118,7 @@ void make_out_path(const char* in_path, std::string suffix) {
 
 void record_gb(int argc, char* argv[]) {
     make_out_path(argv[optind], "");
+    writer = new Writer(false);
     for (; optind < argc; ++optind) {
         printf("Loading %s...\n", argv[optind]);
         gameboy.load(argv[optind]);
@@ -126,7 +129,8 @@ void record_gb(int argc, char* argv[]) {
             play_song();
         }
     }
-    write_music_to_disk();
+    writer->write_music_to_disk();
+    delete writer;
 }
 
 void record_gbs(int argc, char* argv[]) {
@@ -135,6 +139,8 @@ void record_gbs(int argc, char* argv[]) {
 
         int song_index = 0;
         while (true) {
+            writer = new Writer(true);
+
             gameboy.load(argv[optind]);
             press(0, 3);
 
@@ -147,20 +153,22 @@ void record_gbs(int argc, char* argv[]) {
             make_out_path(argv[optind], suffix);
 
             play_song();
-            write_music_to_disk();
+            writer->write_music_to_disk();
+
+            delete writer;
         }
     }
 }
 
 int main(int argc, char* argv[]) {
-    bool gbs = false;
+    bool gbs_mode = false;
+
     int c;
     while ((c = getopt(argc, argv, "g")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
-                gbs = true;
-                enable_gbs_mode();
+                gbs_mode = true;
                 break;
         }
     }
@@ -174,7 +182,7 @@ int main(int argc, char* argv[]) {
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
 
-    if (gbs) {
+    if (gbs_mode) {
         record_gbs(argc, argv);
     } else {
         record_gb(argc, argv);
