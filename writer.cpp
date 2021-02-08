@@ -408,14 +408,16 @@ static void write_sample_buffer() {
 #endif
         }
     }
-    music_stream.push_back(SAMPLE | CMD_FLAG);
-    assert(sample_location->second.bank < 0x100);
-    music_stream.push_back(sample_location->second.bank);
-    music_stream.push_back(sample_location->second.ptr & 0xff);
-    music_stream.push_back(sample_location->second.ptr >> 8);
-    music_stream.push_back(sample_buffer[39]); // freq
-    music_stream.push_back(sample_buffer[41]); // freq
+    int pitch_lsb = sample_buffer[39];
+    int pitch_msb = sample_buffer[41];
     sample_buffer.clear();
+    sample_buffer.push_back(SAMPLE | CMD_FLAG);
+    assert(sample_location->second.bank < 0x100);
+    sample_buffer.push_back(sample_location->second.bank);
+    sample_buffer.push_back(sample_location->second.ptr & 0xff);
+    sample_buffer.push_back(sample_location->second.ptr >> 8);
+    sample_buffer.push_back(pitch_lsb); // freq
+    sample_buffer.push_back(pitch_msb); // freq
 }
 
 static void flush_sample_buffer() {
