@@ -11,6 +11,7 @@
 #include "rule_redundant_write.h"
 #include "rule_wait.h"
 #include "rule_envelope.h"
+#include "rule_pitch.h"
 
 // #define RECORD_WRITES
 
@@ -133,8 +134,10 @@ class Writer {
             RedundantWriteRule wav_volume(0x1c);
             RedundantWriteRule noi_length(0x20);
             RedundantWriteRule noi_wave(0x22);
+
             WaitRule wait;
             EnvelopeRule envelope;
+            PitchRule pitch;
 
             optimize_rule(pan);
             optimize_rule(pu0_sweep);
@@ -147,6 +150,7 @@ class Writer {
 
             optimize_rule(wait);
             optimize_rule(envelope);
+            optimize_rule(pitch);
 
             /*
             if (sample_buffer_full()) {
@@ -157,7 +161,6 @@ class Writer {
             if (sample_buffer_has_sample()) {
                 write_sample_buffer();
             } else {
-                optimize_pitch();
             }
             */
         }
@@ -391,73 +394,6 @@ class Writer {
                 sample_buffer[38] == (0x1e | CMD_FLAG) &&
                 sample_buffer[40] == (0x1d | CMD_FLAG) &&
                 sample_buffer[42] == (0x25 | CMD_FLAG);
-        }
-
-        void optimize_pitch() {
-            if (sample_buffer.size() < 4) {
-                return;
-            }
-            const size_t tail_start = sample_buffer.size() - 4;
-            int cmd = 0;
-            unsigned int new_lsb;
-            unsigned int new_msb;
-            if (sample_buffer[tail_start] == (0x13 | CMD_FLAG) &&
-                    sample_buffer[tail_start + 2] == (0x14 | CMD_FLAG)) {
-                new_lsb = sample_buffer[tail_start + 1];
-                new_msb = sample_buffer[tail_start + 3];
-                bool trig = new_msb & 0x80;
-                if (new_msb == regs[0x14] && !trig) {
-                    // msb is redundant
-                    cmd = (new_lsb == regs[0x13])
-                        ? 0 // lsb is redundant, too
-                        : (0x13 | CMD_FLAG); // only set lsb
-                } else {
-                    cmd = PITCH_PU0 | CMD_FLAG;
-                }
-                regs[0x13] = new_lsb;
-                regs[0x14] = new_msb;
-            } else if (sample_buffer[tail_start] == (0x18 | CMD_FLAG) &&
-                    sample_buffer[tail_start + 2] == (0x19 | CMD_FLAG)) {
-                new_lsb = sample_buffer[tail_start + 1];
-                new_msb = sample_buffer[tail_start + 3];
-                bool trig = new_msb & 0x80;
-                if (new_msb == regs[0x19] && !trig) {
-                    // msb is redundant
-                    cmd = (new_lsb == regs[0x18])
-                        ? 0 // lsb is redundant, too
-                        : (0x18 | CMD_FLAG); // only set lsb
-                } else {
-                    cmd = PITCH_PU1 | CMD_FLAG;
-                }
-                regs[0x18] = new_lsb;
-                regs[0x19] = new_msb;
-            } else if (sample_buffer[tail_start] == (0x1d | CMD_FLAG) &&
-                    sample_buffer[tail_start + 2] == (0x1e | CMD_FLAG)) {
-                new_lsb = sample_buffer[tail_start + 1];
-                new_msb = sample_buffer[tail_start + 3];
-                bool trig = new_msb & 0x80;
-                if (new_msb == regs[0x1e] && !trig) {
-                    // msb is redundant
-                    cmd = (new_lsb == regs[0x1d])
-                        ? 0 // lsb is redundant, too
-                        : (0x1d | CMD_FLAG); // only set lsb
-                } else {
-                    cmd = PITCH_WAV | CMD_FLAG;
-                }
-                regs[0x1d] = new_lsb;
-                regs[0x1e] = new_msb;
-            } else {
-                return;
-            }
-            sample_buffer.resize(tail_start);
-            if (!cmd) {
-                return;
-            }
-            sample_buffer.push_back(cmd);
-            sample_buffer.push_back(new_lsb);
-            if (!(cmd & 0x10)) {
-                sample_buffer.push_back(new_msb);
-            }
         }
 
         void write_sample_buffer() {
