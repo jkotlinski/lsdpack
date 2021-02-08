@@ -6,6 +6,10 @@
 #include <map>
 #include <vector>
 
+#include "rule.h"
+
+#include "rule_redundant_write.h"
+
 // #define RECORD_WRITES
 
 #ifdef RECORD_WRITES
@@ -41,7 +45,7 @@ class Writer {
                 new_bank();
             }
             memset(regs, -1, sizeof(regs));
-            music_stream.push_back(START);
+            music_stream.push_back(SONG_START);
         }
 
         void log_written_bytes() {
@@ -97,7 +101,44 @@ class Writer {
             fputs("SongLocationsEnd::\n", f);
         }
 
+        void optimize_rule(Rule& rule) {
+            std::deque<unsigned int> window;
+            std::vector<unsigned int> new_music_stream;
+
+            for (size_t i = 0; i < music_stream.size(); ++i) {
+                window.push_back(music_stream[i]);
+                if (window.size() > rule.width()) {
+                    new_music_stream.push_back(window.front());
+                    window.pop_front();
+                    rule.transform(window);
+                }
+            }
+            while (window.size()) {
+                new_music_stream.push_back(window.front());
+                window.pop_front();
+            }
+            music_stream = new_music_stream;
+        }
+
         void optimize_music_stream() {
+            RedundantWriteRule pan(0x25);
+            RedundantWriteRule pu0_sweep(0x10);
+            RedundantWriteRule pu0_length(0x11);
+            RedundantWriteRule pu1_length(0x16);
+            RedundantWriteRule wav_length(0x1b);
+            RedundantWriteRule wav_volume(0x1c);
+            RedundantWriteRule noi_length(0x20);
+            RedundantWriteRule noi_wave(0x22);
+
+            optimize_rule(pan);
+            optimize_rule(pu0_sweep);
+            optimize_rule(pu0_length);
+            optimize_rule(pu1_length);
+            optimize_rule(wav_length);
+            optimize_rule(wav_volume);
+            optimize_rule(noi_length);
+            optimize_rule(noi_wave);
+
             /*
             if (sample_buffer_full()) {
                 sample_buffer.pop_front();
@@ -111,13 +152,6 @@ class Writer {
                 optimize_pitch();
                 optimize_wait();
                 optimize_redundant_writes(0x25); // pan
-                optimize_redundant_writes(0x10); // pu0 sweep
-                optimize_redundant_writes(0x11); // pu0 length
-                optimize_redundant_writes(0x16); // pu1 length
-                optimize_redundant_writes(0x1b); // wav length
-                optimize_redundant_writes(0x1c); // wav volume
-                optimize_redundant_writes(0x20); // noi length
-                optimize_redundant_writes(0x22); // noi wave
             }
             */
         }
@@ -128,7 +162,7 @@ class Writer {
             size_t song_start = 0;
             size_t i = 0;
             while (i < music_stream.size()) {
-                if (music_stream[i] == START) {
+                if (music_stream[i] == SONG_START) {
                     song_locations.push_back(write_location);
                     song_start = i;
                 } else {
@@ -146,27 +180,6 @@ class Writer {
         }
 
     private:
-        enum Cmds {
-            LYC,
-            SAMPLE,
-            STOP,
-            NEXT_BANK,
-            AMP_DOWN_PU0,
-            AMP_DOWN_PU1,
-            AMP_DOWN_NOI,
-            PITCH_PU0,
-            PITCH_PU1,
-            PITCH_WAV,
-            WAIT,
-            SAMPLE_NEXT
-        };
-
-        enum Defines {
-            LYC_END_MASK = 0x80,
-            START = 0x100,
-            CMD_FLAG = 0x200
-        };
-
         FILE* f;
 
         const bool gbs_mode;
@@ -438,32 +451,6 @@ class Writer {
             sample_buffer.push_back(new_lsb);
             if (!(cmd & 0x10)) {
                 sample_buffer.push_back(new_msb);
-            }
-        }
-
-        void optimize_redundant_writes(unsigned int reg) {
-            if (sample_buffer.size() < 2) {
-                return;
-            }
-            const size_t tail_start = 0;
-            if (sample_buffer[tail_start] == (reg | CMD_FLAG)) {
-                if (sample_buffer[tail_start + 1] == regs[reg]) {
-                    // redundant write
-                    sample_buffer.pop_front();
-                    sample_buffer.pop_front();
-                } else {
-                    regs[reg] = sample_buffer[tail_start + 1];
-                }
-            }
-            if (sample_buffer[tail_start] == (reg | LYC_END_MASK | CMD_FLAG)) {
-                if (sample_buffer[tail_start + 1] == regs[reg]) {
-                    // redundant write
-                    sample_buffer.pop_front();
-                    sample_buffer.pop_front();
-                    sample_buffer.push_front(LYC | CMD_FLAG);
-                } else {
-                    regs[reg] = sample_buffer[tail_start + 1];
-                }
             }
         }
 
