@@ -31,9 +31,9 @@ static int regs[0x100];
 #define SAMPLE          1
 #define STOP            2
 #define NEXT_BANK       3
-#define VOLUME_DOWN_PU0 4
-#define VOLUME_DOWN_PU1 5
-#define VOLUME_DOWN_NOI 6
+#define AMP_DOWN_PU0    4
+#define AMP_DOWN_PU1    5
+#define AMP_DOWN_NOI    6
 #define PITCH_PU0       7
 #define PITCH_PU1       8
 #define PITCH_WAV       9
@@ -79,8 +79,51 @@ static void write_byte(unsigned int byte) {
             new_bank();
         }
     }
-    // fprintf(f, "DB $%x\n", byte & 0xff);
-    fprintf(f, "DB $%x ; %x\n", byte & 0xff, byte >> 8);
+    fprintf(f, "DB $%x", byte & 0xff);
+    if (byte >> 8) {
+        fprintf(f, "\t; ");
+        if (byte & 0x80) {
+            fprintf(f, "LYC+");
+        }
+        switch (byte & 0x7f) {
+            case LYC:
+                fprintf(f, "LYC");
+                break;
+            case SAMPLE:
+                fprintf(f, "SAMPLE");
+                break;
+            case STOP:
+                fprintf(f, "STOP");
+                break;
+            case NEXT_BANK:
+                fprintf(f, "NEXT_BANK");
+                break;
+            case AMP_DOWN_PU0:
+                fprintf(f, "AMP_DOWN_PU0");
+                break;
+            case AMP_DOWN_PU1:
+                fprintf(f, "AMP_DOWN_PU1");
+                break;
+            case AMP_DOWN_NOI:
+                fprintf(f, "AMP_DOWN_NOI");
+                break;
+            case PITCH_PU0:
+                fprintf(f, "PITCH_PU0");
+                break;
+            case PITCH_PU1:
+                fprintf(f, "PITCH_PU1");
+                break;
+            case PITCH_WAV:
+                fprintf(f, "PITCH_WAV");
+                break;
+            case WAIT:
+                fprintf(f, "WAIT");
+                break;
+            default:
+                fprintf(f, "%x", byte & 0x7f);
+        }
+    }
+    fprintf(f, "\n");
     ++write_location.ptr;
     assert(write_location.ptr < 0x8000);
 }
@@ -219,7 +262,7 @@ static void optimize_wait() {
  * To decrease volume on CGB, the byte 8 is written 15 times to
  * either of addresses 0xff12, 0xff17 or 0xff21.
  * To improve sound on DMG and reduce ROM/CPU usage, replace this
- * with commands VOLUME_DOWN_XXX
+ * with commands AMP_DOWN_XXX
  */
 static void optimize_envelope() {
     if (sample_buffer.size() < 15 * 2) {
@@ -263,13 +306,13 @@ static void optimize_envelope() {
     unsigned int byte;
     switch (register_addr) {
         case 0x12:
-            byte = VOLUME_DOWN_PU0 | CMD_FLAG;
+            byte = AMP_DOWN_PU0 | CMD_FLAG;
             break;
         case 0x17:
-            byte = VOLUME_DOWN_PU1 | CMD_FLAG;
+            byte = AMP_DOWN_PU1 | CMD_FLAG;
             break;
         case 0x21:
-            byte = VOLUME_DOWN_NOI | CMD_FLAG;
+            byte = AMP_DOWN_NOI | CMD_FLAG;
             break;
         default:
             assert(false);
