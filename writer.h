@@ -12,6 +12,7 @@
 #include "rule_wait.h"
 #include "rule_envelope.h"
 #include "rule_pitch.h"
+#include "rule_lyc.h"
 
 // #define RECORD_WRITES
 
@@ -69,23 +70,6 @@ class Writer {
         }
 
         void record_lcd() {
-            for (int i = (int)sample_buffer.size() - 1; i >= 0; --i) {
-                if (!(sample_buffer[i] & CMD_FLAG)) {
-                    continue;
-                }
-                if (sample_buffer[i] == (LYC | CMD_FLAG)) {
-                    break;
-                }
-                if (sample_buffer[i] == (WAIT | CMD_FLAG)) {
-                    break;
-                }
-                if (sample_buffer[i] & LYC_END_MASK) {
-                    break;
-                }
-                // Records LYC by setting LYC_END_MASK bit on last written address.
-                sample_buffer[i] |= LYC_END_MASK;
-                return;
-            }
             record_byte(LYC | CMD_FLAG);
         }
 
@@ -138,6 +122,7 @@ class Writer {
             WaitRule wait;
             EnvelopeRule envelope;
             PitchRule pitch;
+            LycRule lyc;
 
             optimize_rule(pan);
             optimize_rule(pu0_sweep);
@@ -151,6 +136,7 @@ class Writer {
             optimize_rule(wait);
             optimize_rule(envelope);
             optimize_rule(pitch);
+            optimize_rule(lyc);
 
             /*
             if (sample_buffer_full()) {
