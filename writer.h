@@ -53,9 +53,7 @@ class Writer {
         }
 
         void record_song_stop() {
-            flush_sample_buffer();
-            music_stream.push_back(STOP);
-            log_written_bytes();
+            music_stream.push_back(STOP | CMD_FLAG);
         }
 
         void record_write(unsigned char addr, unsigned char data) {
@@ -99,16 +97,48 @@ class Writer {
             fputs("SongLocationsEnd::\n", f);
         }
 
+        void optimize_music_stream() {
+            /*
+            if (sample_buffer_full()) {
+                sample_buffer.pop_front();
+            }
+            sample_buffer.push_back(byte);
+
+            if (sample_buffer_has_sample()) {
+                write_sample_buffer();
+            } else {
+                optimize_envelope();
+                optimize_pitch();
+                optimize_wait();
+                optimize_redundant_writes(0x25); // pan
+                optimize_redundant_writes(0x10); // pu0 sweep
+                optimize_redundant_writes(0x11); // pu0 length
+                optimize_redundant_writes(0x16); // pu1 length
+                optimize_redundant_writes(0x1b); // wav length
+                optimize_redundant_writes(0x1c); // wav volume
+                optimize_redundant_writes(0x20); // noi length
+                optimize_redundant_writes(0x22); // noi wave
+            }
+            */
+        }
+
         void write_music_to_disk() {
+            optimize_music_stream();
+
+            size_t song_start = 0;
             size_t i = 0;
             while (i < music_stream.size()) {
                 if (music_stream[i] == START) {
                     song_locations.push_back(write_location);
+                    song_start = i;
                 } else {
                     write_byte(music_stream[i]);
 #ifdef RECORD_WRITES
                     fwrite(&music_stream[i], 1, 1, music_file);
 #endif
+                    if (music_stream[i] == (STOP | CMD_FLAG)) {
+                        printf("Wrote %i bytes\n", (int)(i - song_start));
+                    }
                 }
                 ++i;
             }
@@ -576,27 +606,7 @@ class Writer {
         }
 
         void record_byte(unsigned int byte) {
-            if (sample_buffer_full()) {
-                music_stream.push_back(sample_buffer.front());
-                sample_buffer.pop_front();
-            }
-            sample_buffer.push_back(byte);
-
-            if (sample_buffer_has_sample()) {
-                write_sample_buffer();
-            } else {
-                optimize_envelope();
-                optimize_pitch();
-                optimize_wait();
-                optimize_redundant_writes(0x25); // pan
-                optimize_redundant_writes(0x10); // pu0 sweep
-                optimize_redundant_writes(0x11); // pu0 length
-                optimize_redundant_writes(0x16); // pu1 length
-                optimize_redundant_writes(0x1b); // wav length
-                optimize_redundant_writes(0x1c); // wav volume
-                optimize_redundant_writes(0x20); // noi length
-                optimize_redundant_writes(0x22); // noi wave
-            }
+            music_stream.push_back(byte);
         }
 
 };
