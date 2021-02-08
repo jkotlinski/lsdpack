@@ -418,6 +418,9 @@ void record_lcd() {
         if (sample_buffer[i] == (LYC | CMD_FLAG)) {
             break;
         }
+        if (sample_buffer[i] == (WAIT | CMD_FLAG)) {
+            break;
+        }
         if (sample_buffer[i] & LYC_END_MASK) {
             break;
         }
