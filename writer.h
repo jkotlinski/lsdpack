@@ -10,6 +10,7 @@
 
 #include "rule_redundant_write.h"
 #include "rule_wait.h"
+#include "rule_envelope.h"
 
 // #define RECORD_WRITES
 
@@ -133,6 +134,7 @@ class Writer {
             RedundantWriteRule noi_length(0x20);
             RedundantWriteRule noi_wave(0x22);
             WaitRule wait;
+            EnvelopeRule envelope;
 
             optimize_rule(pan);
             optimize_rule(pu0_sweep);
@@ -144,6 +146,7 @@ class Writer {
             optimize_rule(noi_wave);
 
             optimize_rule(wait);
+            optimize_rule(envelope);
 
             /*
             if (sample_buffer_full()) {
@@ -154,10 +157,7 @@ class Writer {
             if (sample_buffer_has_sample()) {
                 write_sample_buffer();
             } else {
-                optimize_envelope();
                 optimize_pitch();
-                optimize_wait();
-                optimize_redundant_writes(0x25); // pan
             }
             */
         }
@@ -458,68 +458,6 @@ class Writer {
             if (!(cmd & 0x10)) {
                 sample_buffer.push_back(new_msb);
             }
-        }
-
-        /* LSDj 8.8.0+ soft envelope problem:
-         * To decrease volume on CGB, the byte 8 is written 15 times to
-         * either of addresses 0xff12, 0xff17 or 0xff21.
-         * To improve sound on DMG and reduce ROM/CPU usage, replace this
-         * with commands AMP_DOWN_XXX
-         */
-        void optimize_envelope() {
-            if (sample_buffer.size() < 15 * 2) {
-                return;
-            }
-            const size_t tail_start = sample_buffer.size() - 15 * 2;
-
-            // Check values.
-            for (size_t i = tail_start + 1; i < tail_start + 15 * 2; i += 2) {
-                if (sample_buffer[i] != 8) {
-                    return;
-                }
-            }
-
-            // Check addresses.
-            unsigned int register_addr = 0;
-
-            for (size_t i = tail_start; i < tail_start + 15 * 2; i += 2) {
-                unsigned int addr = sample_buffer[i];
-                if (!(addr & CMD_FLAG)) {
-                    return;
-                }
-                switch (addr & 0x7f) {
-                    case 0x12:
-                    case 0x17:
-                    case 0x21:
-                        if (register_addr && ((addr & 0x7f) != register_addr)) {
-                            return;
-                        }
-                        register_addr = addr & 0x7f;
-                        break;
-                    default:
-                        return;
-                }
-            }
-
-            // OK, there is a volume decrease at sample_buffer tail.
-            // Let's rewrite it in the optimized form.
-            sample_buffer.resize(tail_start);
-
-            unsigned int byte;
-            switch (register_addr) {
-                case 0x12:
-                    byte = AMP_DOWN_PU0 | CMD_FLAG;
-                    break;
-                case 0x17:
-                    byte = AMP_DOWN_PU1 | CMD_FLAG;
-                    break;
-                case 0x21:
-                    byte = AMP_DOWN_NOI | CMD_FLAG;
-                    break;
-                default:
-                    assert(false);
-            }
-            sample_buffer.push_back(byte);
         }
 
         void write_sample_buffer() {
