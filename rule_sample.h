@@ -1,4 +1,9 @@
+#pragma once
+
 #include "rule.h"
+
+#include <cassert>
+#include <map>
 
 #include "location.h"
 
