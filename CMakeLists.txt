@@ -18,6 +18,7 @@ add_executable(lsdpack
     lsdpack.cpp
     getopt.cpp
     writer.cpp
+    rule_sample.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp
