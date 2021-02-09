@@ -121,7 +121,10 @@ void record_gb(int argc, char* argv[]) {
     writer = new Writer(false);
     for (; optind < argc; ++optind) {
         printf("Loading %s...\n", argv[optind]);
-        gameboy.load(argv[optind]);
+        if (gameboy.load(argv[optind])) {
+            fprintf(stderr, "Loading %s failed\n", argv[optind]);
+            exit(1);
+        }
         press(0, 3);
 
         int song_index = 0;
