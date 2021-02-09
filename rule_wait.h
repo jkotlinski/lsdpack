@@ -2,7 +2,7 @@
 
 class WaitRule : public Rule {
     public:
-        size_t width() const { return 3; }
+        size_t window_size() const { return 3; }
 
         void transform(std::deque<unsigned int>& bytes) {
             if (bytes[0] == (LYC | CMD_FLAG) &&

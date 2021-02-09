@@ -76,11 +76,11 @@ void Writer::optimize_rule(Rule& rule) {
 
     for (size_t i = 0; i < music_stream.size(); ++i) {
         window.push_back(music_stream[i]);
-        if (window.size() > rule.width()) {
+        if (window.size() > rule.window_size()) {
             new_music_stream.push_back(window.front());
             window.pop_front();
         }
-        if (window.size() == rule.width()) {
+        if (window.size() == rule.window_size()) {
             rule.transform(window);
         }
     }

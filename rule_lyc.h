@@ -2,7 +2,7 @@
 
 class LycRule : public Rule {
     public:
-        size_t width() const { return 8; }
+        size_t window_size() const { return 8; }
 
         // CMD:*:LYC => CMD|0x80:*
         void transform(std::deque<unsigned int>& bytes) {

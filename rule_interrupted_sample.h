@@ -2,7 +2,7 @@
 
 class InterruptedSampleRule : public Rule {
     public:
-        size_t width() const { return 45; }
+        size_t window_size() const { return 45; }
 
         // Fixes the situation where an interrupt happens while starting a wave
         // by moving the interrupt after the wave.
