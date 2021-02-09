@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <deque>
-#include <map>
 #include <vector>
 
 #include "location.h"
