@@ -14,6 +14,7 @@
 #include "rule_pitch.h"
 #include "rule_lyc.h"
 #include "rule_sample.h"
+#include "rule_interrupted_sample.h"
 
 class Writer {
     public:
@@ -106,7 +107,9 @@ class Writer {
             EnvelopeRule envelope;
             PitchRule pitch;
             LycRule lyc;
+            InterruptedSampleRule interruptedSampleRule;
 
+            optimize_rule(interruptedSampleRule);
             optimize_rule(sample_rule);
 
             optimize_rule(pan);
