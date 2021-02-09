@@ -121,10 +121,10 @@ class Writer {
             optimize_rule(noi_length);
             optimize_rule(noi_wave);
 
-            optimize_rule(wait);
             optimize_rule(envelope);
             optimize_rule(pitch);
             optimize_rule(lyc);
+            optimize_rule(wait);
         }
 
         void write_music_to_disk() {

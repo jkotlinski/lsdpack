@@ -8,7 +8,7 @@ class WaitRule : public Rule {
             if (bytes[0] == (LYC | CMD_FLAG) &&
                     bytes[1] == (LYC | CMD_FLAG) &&
                     bytes[2] == (LYC | CMD_FLAG)) {
-                // LYC:LYC:LYC => WAIT:0
+                // LYC:LYC:LYC => WAIT:2
                 bytes.clear();
                 bytes.push_back(WAIT | CMD_FLAG);
                 bytes.push_back(2);

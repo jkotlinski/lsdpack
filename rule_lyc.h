@@ -2,34 +2,32 @@
 
 class LycRule : public Rule {
     public:
-        size_t width() const { return 4; }
+        size_t width() const { return 8; }
 
         // CMD:*:LYC => CMD|0x80:*
         void transform(std::deque<unsigned int>& bytes) {
-            if (bytes[3] != (LYC | CMD_FLAG)) {
+            if (bytes[7] != (LYC | CMD_FLAG)) {
                 return;
             }
 
-            int i = -1;
-            if (bytes[2] & CMD_FLAG) {
-                i = 2;
-            } else if (bytes[1] & CMD_FLAG) {
-                i = 1;
-            } else if (bytes[0] & CMD_FLAG) {
-                i = 0;
+            int i;
+            for (i = 6; i >= 0; --i) {
+                if (bytes[i] & CMD_FLAG) {
+                    break;
+                }
             }
             if (i == -1) {
                 return;
             }
 
-            if (bytes[i] == (WAIT | CMD_FLAG)) {
+            if (bytes[i] == (LYC | CMD_FLAG)) {
                 return;
             }
-            if (bytes[i] == (LYC | CMD_FLAG)) {
+            if (bytes[i] & LYC_END_MASK) {
                 return;
             }
 
             bytes[i] |= LYC_END_MASK;
-            bytes.resize(3);
+            bytes.resize(7);
         }
 };
