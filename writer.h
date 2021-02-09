@@ -281,8 +281,14 @@ class Writer {
                     fprintf(f, "noi trig");
                     break;
 
+                case 0x24:
+                    fprintf(f, "channel volume");
+                    break;
                 case 0x25:
                     fprintf(f, "pan");
+                    break;
+                case 0x26:
+                    fprintf(f, "sound off/on");
                     break;
 
                 default:
