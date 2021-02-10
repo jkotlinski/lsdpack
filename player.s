@@ -16,29 +16,29 @@ LsdjPlaySong::
     push    hl
 
     ld  [Song],a
-    ld  d,0
-    add a,a
-    add a,a
-    ld  e,a
 
     ld  hl,SongLocations
-    add hl,de
+    add a,a
+    add a,a
+    add a,l
+    ld  l,a
+
+    ld  de,CurrentBank
+    ld  a,[hl+]
+    ld  [de],a  ; CurrentBank
+    inc de
+    ld  a,[hl+]
+    ld  [de],a  ; CurrentBank + 1
+    inc de
+    ld  a,[hl+]
+    ld  [de],a  ; CurrentPtr
+    inc de
+    ld  a,[hl+]
+    ld  [de],a  ; CurrentPtr + 1
 
     xor a
     ldh [$26],a ; stop sound
     ld  [Wait],a
-    ld  a,[hl+]
-    ld  [CurrentBank],a
-    ld  a,[hl+]
-    ld  [CurrentBank+1],a
-    ld  a,[hl+]
-    ld  [CurrentPtr],a
-    ld  a,[hl+]
-    ld  [CurrentPtr+1],a
-    ld  a,-1
-    ld  [SampleBank],a
-    ld  [SampleAddress],a
-    ld  [SampleAddress+1],a
 
     pop hl
     pop de
@@ -67,8 +67,6 @@ LsdjTick::
     push    bc
 
 .tick
-    xor a
-    ld  c,a ; c = exit loop flag
     ld  a,[CurrentBank+1]
     ld  [$3000],a
     ld  a,[CurrentBank]
@@ -78,52 +76,46 @@ LsdjTick::
     ld  a,[CurrentPtr]
     ld  l,a
 
-    ld  d,$ff
+    xor a
+    ld  b,a ; b = last read command byte
 
 .loop
-    ld  a,c
-    or  a
+    bit 7,b
     jr  nz,.lyc_done
 
-    ld  a,[hl]
-    and $80
-    ld  c,a
-
     ld  a,[hl+]
+    ld  b,a
     and $7f
+
     jr  z,.lyc_done
     cp  1
-    jr  z,.handle_sample
-    cp  4
-    jp  z,.volume_down_pu0
-    cp  5
-    jp  z,.volume_down_pu1
-    cp  6
-    jp  z,.volume_down_noi
-    cp  7
-    jp  z,.pitch_pu0
-    cp  8
-    jp  z,.pitch_pu1
-    cp  9
-    jp  z,.pitch_wav
-    cp  10
-    jr  z,.wait
+    jp  z,.sample_start
     cp  11
     jp  z,.sample_next
+    cp  4
+    jr  z,.volume_down_pu0
+    cp  5
+    jr  z,.volume_down_pu1
+    cp  6
+    jr  z,.volume_down_noi
+    cp  7
+    jr  z,.pitch_pu0
+    cp  8
+    jr  z,.pitch_pu1
+    cp  9
+    jr  z,.pitch_wav
+    cp  10
+    jr  z,.wait
     cp  3
-    jp  z,.next_bank
+    jr  z,.next_bank
     cp  2
     jr  z,.handle_stop
 
     ; write sound register
-    ld  b,a
-    and $7f
-    ld  e,a
+    ld  c,a
     ld  a,[hl+]
-    ld  [de],a
-    ld  a,b
-    bit 7,a ; test LYC_END
-    jr  z,.loop
+    ldh [c],a
+    jr  .loop
 
 .lyc_done
     ld  a,l
@@ -140,14 +132,82 @@ LsdjTick::
     ld  [Wait],a
     jr  .lyc_done
 
-.handle_stop
+.handle_stop:
     ld  a,[Song]
     call    LsdjPlaySong
     jr  .tick
 
-.handle_sample
+.volume_down_pu0:
+    ld  a,9
+    ldh [$12],a
+    ld  a,$11
+    ldh [$12],a
+    ld  a,$18
+    ldh [$12],a
+    jr  .loop
+
+.volume_down_pu1:
+    ld  a,9
+    ldh [$17],a
+    ld  a,$11
+    ldh [$17],a
+    ld  a,$18
+    ldh [$17],a
+    jr  .loop
+
+.volume_down_noi:
+    ld  a,9
+    ldh [$21],a
+    ld  a,$11
+    ldh [$21],a
+    ld  a,$18
+    ldh [$21],a
+    jp  .loop
+
+.pitch_pu0:
     ld  a,[hl+]
-    ld  b,a     ; b = sample bank
+    ldh [$13],a
+    ld  a,[hl+]
+    ldh [$14],a
+    jp  .loop
+
+.pitch_pu1:
+    ld  a,[hl+]
+    ldh [$18],a
+    ld  a,[hl+]
+    ldh [$19],a
+    jp  .loop
+
+.pitch_wav:
+    ld  a,[hl+]
+    ldh [$1d],a
+    ld  a,[hl+]
+    ldh [$1e],a
+    jp  .loop
+
+.next_bank:
+    ld  a,$40
+    ld  h,a
+    xor a
+    ld  l,a
+
+    ld  a,[CurrentBank]
+    inc a
+    ld  [CurrentBank],a
+    ld  [$2000],a
+    jp  nz,.loop
+    ld  a,[CurrentBank+1]
+    inc a
+    ld  [CurrentBank+1],a
+    ld  [$3000],a
+    ; Reapply LSB in case of non-MBC5 cartridge.
+    ld  [CurrentBank],a
+    ld  [$2000],a
+    jp  .loop
+
+.sample_start:
+    ld  a,[hl+]
+    ld  c,a     ; c = sample bank
     ld  [SampleBank],a
     ld  a,[hl+]
     ld  e,a
@@ -158,7 +218,7 @@ LsdjTick::
     ; switch bank
     xor a
     ld  [$3000],a
-    ld  a,b
+    ld  a,c
     ld  [$2000],a
 
     ld  h,d
@@ -230,80 +290,11 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
-    ld  d,$ff
     jp  .loop
 
-.next_bank
-    ld  a,$40
-    ld  h,a
-    xor a
-    ld  l,a
-
-    ld  a,[CurrentBank]
-    inc a
-    ld  [CurrentBank],a
-    ld  [$2000],a
-    jp  nz,.loop
-    ld  a,[CurrentBank+1]
-    inc a
-    ld  [CurrentBank+1],a
-    ld  [$3000],a
-    ; Reapply LSB in case of non-MBC5 cartridge.
-    ld  [CurrentBank],a
-    ld  [$2000],a
-    jp  .loop
-
-.volume_down_pu0:
-    ld  a,9
-    ldh [$12],a
-    ld  a,$11
-    ldh [$12],a
-    ld  a,$18
-    ldh [$12],a
-    jp  .loop
-
-.volume_down_pu1:
-    ld  a,9
-    ldh [$17],a
-    ld  a,$11
-    ldh [$17],a
-    ld  a,$18
-    ldh [$17],a
-    jp  .loop
-
-.volume_down_noi:
-    ld  a,9
-    ldh [$21],a
-    ld  a,$11
-    ldh [$21],a
-    ld  a,$18
-    ldh [$21],a
-    jp  .loop
-
-.pitch_pu0:
-    ld  a,[hl+]
-    ldh [$13],a
-    ld  a,[hl+]
-    ldh [$14],a
-    jp  .loop
-
-.pitch_pu1:
-    ld  a,[hl+]
-    ldh [$18],a
-    ld  a,[hl+]
-    ldh [$19],a
-    jp  .loop
-
-.pitch_wav:
-    ld  a,[hl+]
-    ldh [$1d],a
-    ld  a,[hl+]
-    ldh [$1e],a
-    jp  .loop
-
-.sample_next
+.sample_next:
     ld  a,[SampleBank]
-    ld  b,a     ; b = sample bank
+    ld  c,a     ; c = sample bank
     ld  a,[SampleAddress]
     ld  e,a
     ld  a,[SampleAddress+1]
@@ -313,7 +304,7 @@ LsdjTick::
     ; switch bank
     xor a
     ld  [$3000],a
-    ld  a,b
+    ld  a,c
     ld  [$2000],a
 
     ld  h,d
@@ -382,7 +373,6 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
-    ld  d,$ff
     jp  .loop
 
 

@@ -68,7 +68,7 @@ void write_gbs_header(FILE* f) {
 }
 
 void print_help_and_exit() {
-    fprintf(stderr, "usage: makegbs [-a <artist>] [-t <title>] [-c <copyright>] player.gb");
+    fprintf(stderr, "usage: makegbs [-t <title>] [-a <artist>] [-c <copyright>] player.gb");
     exit(1);
 }
 
