@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Crackling sound on DMG from LSDj v8.8.0+ soft envelopes.
 - rgbasm 0.4.0 support.
 - Visual Studio 2019 build.
+- Crash when failing to load .gb file.
 
 ## 0.0.2 - 2018-10-24
 ### Fixed
