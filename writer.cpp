@@ -7,15 +7,14 @@
 #include <deque>
 #include <vector>
 
-#include "location.h"
-#include "rule.h"
-#include "rule_redundant_write.h"
-#include "rule_wait.h"
-#include "rule_envelope.h"
-#include "rule_pitch.h"
-#include "rule_lyc.h"
-#include "rule_sample.h"
-#include "rule_interrupted_sample.h"
+#include "rules/rule.h"
+#include "rules/rule_redundant_write.h"
+#include "rules/rule_wait.h"
+#include "rules/rule_envelope.h"
+#include "rules/rule_pitch.h"
+#include "rules/rule_lyc.h"
+#include "rules/rule_sample.h"
+#include "rules/rule_interrupted_sample.h"
 
 Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode)
 {

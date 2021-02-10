@@ -1,7 +1,6 @@
 #include <vector>
 
-#include "location.h"
-#include "rule_sample.h"
+#include "rules/rule_sample.h"
 
 class Rule;
 
@@ -23,6 +22,11 @@ class Writer {
 
         const bool gbs_mode;
 
+        struct Location {
+            Location() : bank(0), ptr(0) {}
+            int bank;
+            int ptr;
+        };
         Location write_location;
 
         unsigned int regs[0x100];

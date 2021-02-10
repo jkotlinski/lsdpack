@@ -1,14 +1,18 @@
 #pragma once
 
-#include "rule.h"
-
 #include <map>
 #include <vector>
 
-#include "location.h"
+#include "rule.h"
 
 class SampleRule : public Rule {
     private:
+        struct Location {
+            Location() : bank(0), ptr(0) {}
+            int bank;
+            int ptr;
+        };
+
         typedef std::map<std::vector<unsigned char>, Location> SampleLocations;
         SampleLocations sample_locations;
 

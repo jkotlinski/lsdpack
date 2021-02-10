@@ -19,10 +19,10 @@ add_executable(lsdpack
     lsdpack.cpp
     getopt.cpp
     writer.cpp
-    rule_envelope.cpp
-    rule_pitch.cpp
-    rule_sample.cpp
-    rule_interrupted_sample.cpp
+    rules/rule_envelope.cpp
+    rules/rule_pitch.cpp
+    rules/rule_sample.cpp
+    rules/rule_interrupted_sample.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp
