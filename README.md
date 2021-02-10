@@ -1,16 +1,40 @@
 # lsdpack
 
-Records LSDj songs for use in stand-alone Game Boy ROMs. (E.g. your own games, demos, music albums...)
+Records LSDj songs for .gbs conversion or use in stand-alone Game Boy ROMs. (E.g. your own games, demos, music albums...)
 
 ## Building
-Requires CMake and a C++ compiler. Exact build steps are platform dependent - see [Running CMake](https://cmake.org/runningcmake/)
+Requires CMake, ![RGBDS](https://github.com/gbdev/rgbds) and a C++ compiler. Exact build steps are platform dependent - see [Running CMake](https://cmake.org/runningcmake/)
 
 ![C++ CI with CMake](https://github.com/jkotlinski/lsdpack/workflows/CMake-Ubuntu/badge.svg)
 ![C++ CI with CMake](https://github.com/jkotlinski/lsdpack/workflows/CMake-Windows/badge.svg)
 
 ## Recording Songs
 
-All songs in the .sav must first be prepared so that they are eventually stopped with the HFF command. Then, place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`. To record songs from several .gb files, add them all to the command line, like `./lsdpack.exe 1.gb 2.gb 3.gb`.
+All songs must first be prepared so that they eventually stop with the HFF command. Place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`. To record songs from several .gb files, add them all to the command line, like `./lsdpack.exe 1.gb 2.gb 3.gb`.
+
+## Game Boy Sound System (GBS)
+
+Create .gbs files using the commands below. For compatibility reasons, .gbs files should be below 512 kB, so each .gbs file will contain one song only.
+
+    # dump songs
+	./lsdpack.exe -g lsdj.gb
+
+    # assemble player
+	rgbasm -o player.o player.s
+
+    # assemble songs individually
+	rgbasm -o lsdj-1.o lsdj-1.s
+	rgbasm -o lsdj-2.o lsdj-2.s
+    ...
+
+    # make one .gb file for each song
+	rgblink -o player-1.gb player.o lsdj-1.o
+	rgblink -o player-2.gb player.o lsdj-2.o
+    ...
+
+    # create the final .gbs files, one by one
+	./makegbs.exe -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player-1.gb
+    ...
 
 ## Playing Songs from Your Own Code
 
@@ -55,30 +79,6 @@ An example for how to use the player. Displays CPU usage
 using raster bars. Pressing A skips to the next song.
 
 ![Screenshot](/docs/screenshot.png)
-
-## Game Boy Sound System (GBS)
-
-It is possible to create .gbs files using the commands below. For compatibility reasons, it is safest to keep .gbs files below 512 kB, so each .gbs file will only fit one song.
-
-    # dump songs
-	./lsdpack.exe -g lsdj.gb
-
-    # assemble player
-	rgbasm -o player.o player.s
-
-    # assemble songs individually
-	rgbasm -o lsdj-1.o lsdj-1.s
-	rgbasm -o lsdj-2.o lsdj-2.s
-    ...
-
-    # make one player for each song
-	rgblink -o player-1.gb player.o lsdj-1.o
-	rgblink -o player-2.gb player.o lsdj-2.o
-    ...
-
-    # create the final .gbs files, one by one
-	./makegbs.exe -t "Better Off Alone" -a "Alice Deejay" -c "(C) Violent Music 1997" player-1.gb
-    ...
 
 ## How Does It Work?
 
