@@ -32,7 +32,7 @@ class SampleRule : public Rule {
 
         std::vector<unsigned char> get_samples() { return all_samples; }
 
-        size_t window_size() const { return 44; }
+        size_t window_size() const override { return 44; }
 
-        void transform(std::deque<unsigned int>& bytes);
+        void transform(std::deque<unsigned int>& bytes) override;
 };

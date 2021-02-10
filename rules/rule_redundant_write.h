@@ -6,9 +6,9 @@ class RedundantWriteRule : public Rule {
     public:
         explicit RedundantWriteRule(unsigned int reg) : reg(reg), reg_state(-1) { }
 
-        size_t window_size() const { return 2; }
+        size_t window_size() const override { return 2; }
 
-        void transform(std::deque<unsigned int>& bytes) {
+        void transform(std::deque<unsigned int>& bytes) override {
             if (bytes[0] != (reg | CMD_FLAG)) {
                 return;
             }

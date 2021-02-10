@@ -2,9 +2,9 @@
 
 class WaitRule : public Rule {
     public:
-        size_t window_size() const { return 3; }
+        size_t window_size() const override { return 3; }
 
-        void transform(std::deque<unsigned int>& bytes) {
+        void transform(std::deque<unsigned int>& bytes) override {
             if (bytes[0] == (LYC | CMD_FLAG) &&
                     bytes[1] == (LYC | CMD_FLAG) &&
                     bytes[2] == (LYC | CMD_FLAG)) {

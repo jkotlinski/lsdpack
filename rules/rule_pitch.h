@@ -12,7 +12,7 @@ class PitchRule : public Rule {
     public:
         PitchRule();
 
-        size_t window_size() const { return 4; }
+        size_t window_size() const override { return 4; }
 
-        void transform(std::deque<unsigned int>& bytes);
+        void transform(std::deque<unsigned int>& bytes) override;
 };
