@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - rgbasm 0.4.0 support.
 - Visual Studio 2019 build.
 - Crash when failing to load .gb file.
+- Skip past empty songs.
 
 ## 0.0.2 - 2018-10-24
 ### Fixed

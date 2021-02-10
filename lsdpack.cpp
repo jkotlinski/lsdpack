@@ -8,7 +8,6 @@
 #include "writer.h"
 #include "getopt.h"
 
-int written_songs;
 gambatte::GB gameboy;
 Input input;
 std::string out_path;
@@ -60,7 +59,6 @@ bool load_song(int position) {
     if (gameboy.isSongEmpty()) {
         return false;
     }
-    printf("Song %i...\n", ++written_songs);
     return true;
 }
 
@@ -116,47 +114,51 @@ void make_out_path(const char* in_path, std::string suffix) {
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
+void load_gb(const char* path) {
+    if (gameboy.load(path)) {
+        fprintf(stderr, "Loading %s failed\n", path);
+        exit(1);
+    }
+    printf("Loaded %s\n", path);
+    press(0, 3);
+}
+
 void record_gb(int argc, char* argv[]) {
     make_out_path(argv[optind], "");
     writer = new Writer(false);
-    for (; optind < argc; ++optind) {
-        printf("Loading %s...\n", argv[optind]);
-        if (gameboy.load(argv[optind])) {
-            fprintf(stderr, "Loading %s failed\n", argv[optind]);
-            exit(1);
-        }
-        press(0, 3);
 
-        int song_index = 0;
-        while (load_song(song_index++)) {
-            play_song();
+    for (; optind < argc; ++optind) {
+        load_gb(argv[optind]);
+
+        for (int song_index = 0; song_index < 32; ++song_index) {
+            if (load_song(song_index)) {
+                printf("Playing song %i...\n", song_index + 1);
+                play_song();
+            }
         }
     }
     writer->write_music_to_disk();
+
     delete writer;
 }
 
 void record_gbs(int argc, char* argv[]) {
     for (; optind < argc; ++optind) {
-        printf("Loading %s...\n", argv[optind]);
+        load_gb(argv[optind]);
 
-        int song_index = 0;
-        while (true) {
+        for (int song_index = 0; song_index < 32; ++song_index) {
             writer = new Writer(true);
 
-            gameboy.load(argv[optind]);
-            press(0, 3);
+            if (load_song(song_index)) {
+                printf("Playing song %i...\n", song_index + 1);
 
-            if (!load_song(song_index++)) {
-                break;
+                char suffix[20];
+                snprintf(suffix, sizeof(suffix), "-%i", song_index + 1);
+                make_out_path(argv[optind], suffix);
+
+                play_song();
+                writer->write_music_to_disk();
             }
-
-            char suffix[20];
-            snprintf(suffix, sizeof(suffix), "-%i", song_index);
-            make_out_path(argv[optind], suffix);
-
-            play_song();
-            writer->write_music_to_disk();
 
             delete writer;
         }
