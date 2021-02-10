@@ -4,7 +4,7 @@
 
 class RedundantWriteRule : public Rule {
     public:
-        RedundantWriteRule(unsigned int reg) : reg(reg), reg_state(-1) { }
+        explicit RedundantWriteRule(unsigned int reg) : reg(reg), reg_state(-1) { }
 
         size_t window_size() const { return 2; }
 

@@ -20,7 +20,6 @@ Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode)
 {
     memset(regs, -1, sizeof(regs));
     f = 0;
-    gbs_mode = false;
     last_music_size = 0;
 }
 
