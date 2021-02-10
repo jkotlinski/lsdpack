@@ -58,7 +58,7 @@ using raster bars. Pressing A skips to the next song.
 
 ## Game Boy Sound System (GBS)
 
-It is possible to create .gbs files using the commands below. For compatibility reasons, .gbs files can only be 256 kB big, so there will be one .gbs file/song.
+It is possible to create .gbs files using the commands below. For compatibility reasons, it is safest to keep .gbs files below 512 kB, so there is a limit of one .gbs file/song.
 
     # dump songs
 	./lsdpack.exe -g lsdj.gb
