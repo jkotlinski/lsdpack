@@ -56,4 +56,4 @@ add_executable(lsdpack
 
 add_executable(makegbs makegbs.cpp getopt.cpp)
 
-set_property(TARGET lsdpack PROPERTY CXX_STANDARD 11)
+set_property(TARGET lsdpack PROPERTY CXX_STANDARD 14)
