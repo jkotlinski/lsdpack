@@ -73,7 +73,7 @@ void play_song() {
         wait(1);
 
         if (++seconds_elapsed == 60 * 60) {
-            fputs("Aborted: Song still playing after one hour. Please add a HFF command to song end to stop recording.", stderr);
+            fputs("Aborted: Song still playing after one hour. Please add a HFF command to song end to stop recording.\n", stderr);
             exit(1);
         }
     } while(sound_enabled);
@@ -170,7 +170,7 @@ void record_gbs(int argc, char* argv[]) {
 }
 
 void print_help_and_exit() {
-    fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
+    fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]\n");
     exit(1);
 }
 

@@ -24,7 +24,7 @@ std::string copyright = "<Copyright>";
 
 void fputs_padded(const char* s, FILE* f) {
     if (strlen(s) > 32) {
-        fprintf(stderr, "'%s' too long, max 32 characters", s);
+        fprintf(stderr, "'%s' too long, max 32 characters\n", s);
         exit(1);
     }
     fputs(s, f);
@@ -68,7 +68,7 @@ void write_gbs_header(FILE* f) {
 }
 
 void print_help_and_exit() {
-    fprintf(stderr, "usage: makegbs [-t <title>] [-a <artist>] [-c <copyright>] player.gb");
+    fprintf(stderr, "usage: makegbs [-t <title>] [-a <artist>] [-c <copyright>] player.gb\n");
     exit(1);
 }
 
