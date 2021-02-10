@@ -33,5 +33,6 @@ int getopt(int argc, char* const argv[], const char *optstring) {
         ++optstring;
     }
 
-    return -1;
+    ++optind;
+    return optchar;
 }

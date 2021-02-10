@@ -105,6 +105,10 @@ void on_lcd_interrupt() {
 }
 
 void make_out_path(const char* in_path, std::string suffix) {
+    if (strlen(in_path) < strlen("a.gb")) {
+        return;
+    }
+
     out_path = in_path;
     // .gb => .s
     out_path.replace(out_path.end() - 2, out_path.end(), "s");
@@ -165,6 +169,11 @@ void record_gbs(int argc, char* argv[]) {
     }
 }
 
+void print_help_and_exit() {
+    fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
+    exit(1);
+}
+
 int main(int argc, char* argv[]) {
     bool gbs_mode = false;
 
@@ -175,12 +184,13 @@ int main(int argc, char* argv[]) {
                 puts(".gbs mode enabled");
                 gbs_mode = true;
                 break;
+            default:
+                print_help_and_exit();
         }
     }
 
     if (argc <= optind) {
-        fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
-        return 1;
+        print_help_and_exit();
     }
 
     gameboy.setInputGetter(&input);

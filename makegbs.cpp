@@ -67,6 +67,11 @@ void write_gbs_header(FILE* f) {
     fputs_padded(copyright.c_str(), f);
 }
 
+void print_help_and_exit() {
+    fprintf(stderr, "usage: makegbs [-a <artist>] [-t <title>] [-c <copyright>] player.gb");
+    exit(1);
+}
+
 int main(int argc, char* argv[]) {
     int c;
     while ((c = getopt(argc, argv, "t:c:a:")) != -1) {
@@ -80,12 +85,13 @@ int main(int argc, char* argv[]) {
             case 'c':
                 copyright = optarg;
                 break;
+            default:
+                print_help_and_exit();
         }
     }
 
     if (optind != argc - 1) {
-        fprintf(stderr, "usage: makegbs [-a <artist>] [-t <title>] [-c <copyright>] player.gb");
-        return 1;
+        print_help_and_exit();
     }
 
     std::string gbs_path = argv[optind];
