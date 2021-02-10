@@ -38,7 +38,7 @@ LsdjPlaySong::
 
     xor a
     ldh [$26],a ; stop sound
-    ld  [Wait],a
+    ld  [RepeatCmdCounter],a
 
     pop hl
     pop de
@@ -53,16 +53,6 @@ LsdjPlaySong::
 ;
 LsdjTick::
     push    hl
-
-    ld  hl,Wait
-    ld  a,[hl]
-    or  a
-    jr  z,.not_waiting
-    dec [hl]
-    pop hl
-    ret
-
-.not_waiting
     push    de
     push    bc
 
@@ -83,14 +73,36 @@ LsdjTick::
     bit 7,b
     jr  nz,.lyc_done
 
+    ; load repeated cmd
+    ld  a,[RepeatCmdCounter]
+    or  a
+    jr  z,.load_new_cmd_from_stream
+    dec a
+    ld  [RepeatCmdCounter],a
+    ld  a,[RepeatCmd]
+    jr  .apply_cmd
+
+.load_new_cmd_from_stream
     ld  a,[hl+]
+    bit 6,a
+    jr  z,.apply_cmd
+
+    ; save repeated cmd
+    and ~$40
+    ld  [RepeatCmd],a
+    ld  b,a
+    ld  a,[hl+]
+    ld  [RepeatCmdCounter],a
+    ld  a,b
+
+.apply_cmd
     ld  b,a
     and $7f
 
     jr  z,.lyc_done
     cp  1
     jp  z,.sample_start
-    cp  11
+    cp  10
     jp  z,.sample_next
     cp  4
     jr  z,.volume_down_pu0
@@ -104,8 +116,6 @@ LsdjTick::
     jr  z,.pitch_pu1
     cp  9
     jr  z,.pitch_wav
-    cp  10
-    jr  z,.wait
     cp  3
     jr  z,.next_bank
     cp  2
@@ -127,15 +137,10 @@ LsdjTick::
     pop hl
     ret
 
-.wait:
-    ld  a,[hl+]
-    ld  [Wait],a
-    jr  .lyc_done
-
 .handle_stop:
     ld  a,[Song]
     call    LsdjPlaySong
-    jr  .tick
+    jp  .tick
 
 .volume_down_pu0:
     ld  a,9
@@ -144,7 +149,7 @@ LsdjTick::
     ldh [$12],a
     ld  a,$18
     ldh [$12],a
-    jr  .loop
+    jp  .loop
 
 .volume_down_pu1:
     ld  a,9
@@ -153,7 +158,7 @@ LsdjTick::
     ldh [$17],a
     ld  a,$18
     ldh [$17],a
-    jr  .loop
+    jp  .loop
 
 .volume_down_noi:
     ld  a,9
@@ -384,11 +389,13 @@ CurrentBank
     ds  2
 CurrentPtr
     ds  2
-Wait
-    ds  1
 SampleBank
     ds  1
 SampleAddress
     ds  2
 SamplePitchMsb
+    ds  1
+RepeatCmd
+    ds  1
+RepeatCmdCounter
     ds  1

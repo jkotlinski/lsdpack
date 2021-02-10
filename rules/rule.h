@@ -14,12 +14,12 @@ enum Cmds {
     PITCH_PU0,
     PITCH_PU1,
     PITCH_WAV,
-    WAIT,
     SAMPLE_NEXT
 };
 
 enum Defines {
     LYC_END_MASK = 0x80,
+    REPEAT_MASK = 0x40,
     SONG_START = 0x100,
     CMD_FLAG = 0x200
 };

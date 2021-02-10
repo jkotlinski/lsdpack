@@ -23,6 +23,7 @@ add_executable(lsdpack
     rules/rule_pitch.cpp
     rules/rule_sample.cpp
     rules/rule_interrupted_sample.cpp
+    rules/rule_repeat_command.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp

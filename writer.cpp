@@ -9,12 +9,12 @@
 
 #include "rules/rule.h"
 #include "rules/rule_redundant_write.h"
-#include "rules/rule_wait.h"
 #include "rules/rule_envelope.h"
 #include "rules/rule_pitch.h"
 #include "rules/rule_lyc.h"
 #include "rules/rule_sample.h"
 #include "rules/rule_interrupted_sample.h"
+#include "rules/rule_repeat_command.h"
 
 Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode)
 {
@@ -99,11 +99,11 @@ void Writer::optimize_music_stream() {
     RedundantWriteRule noi_length(0x20);
     RedundantWriteRule noi_wave(0x22);
 
-    WaitRule wait;
     EnvelopeRule envelope;
     PitchRule pitch;
     LycRule lyc;
     InterruptedSampleRule interruptedSampleRule;
+    RepeatCommandRule repeatCommandRule;
 
     optimize_rule(interruptedSampleRule);
     optimize_rule(sample_rule);
@@ -120,7 +120,7 @@ void Writer::optimize_music_stream() {
     optimize_rule(envelope);
     optimize_rule(pitch);
     optimize_rule(lyc);
-    optimize_rule(wait);
+    optimize_rule(repeatCommandRule);
 }
 
 void Writer::write_music_to_disk() {
@@ -166,10 +166,10 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
         return;
     }
     fprintf(f, "\t; ");
-    if (cmd & 0x80) {
-        fprintf(f, "LYC+");
+    if (cmd & REPEAT_MASK) {
+        fprintf(f, "REPEAT+");
     }
-    switch (cmd & 0x7f) {
+    switch (cmd & 0x3f) {
         case LYC:
             fprintf(f, "LYC");
             break;
@@ -202,9 +202,6 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
             break;
         case PITCH_WAV:
             fprintf(f, "PITCH_WAV");
-            break;
-        case WAIT:
-            fprintf(f, "WAIT");
             break;
         case 0x10:
             fprintf(f, "pu0 sweep");
@@ -276,6 +273,9 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
 
         default:
             fprintf(f, "%x", cmd & 0x7f);
+    }
+    if (cmd & LYC_END_MASK) {
+        fprintf(f, "+LYC_END");
     }
 }
 
