@@ -1,2 +1,0 @@
-map <F3> :wall!<CR>:make<CR>:!./lsdpack.exe ../lsdj/lsdj.gb<CR>
-map <F4> :wall!<CR>:!rgbasm -o lsdj.o lsdj.s<CR>:!rgbasm -o boot.o boot.s<CR>:!rgbasm -o player.o player.s<CR>:!rgblink -o player.gb boot.o player.o lsdj.o<CR>:!rgbfix -v -m 0x19 -p 0 player.gb<CR>
