@@ -454,13 +454,13 @@ static void doFullTilesUnrolledDmg(PPUPriv &p, int const xend, uint_least32_t *c
 
 					if (!(attrib & attr_bgpriority)) {
 						switch (n) {
-						case 8: if (spword >> 14    ) { d[7] = spPalette[spword >> 14    ]; }
-						case 7: if (spword >> 12 & 3) { d[6] = spPalette[spword >> 12 & 3]; }
-						case 6: if (spword >> 10 & 3) { d[5] = spPalette[spword >> 10 & 3]; }
-						case 5: if (spword >>  8 & 3) { d[4] = spPalette[spword >>  8 & 3]; }
-						case 4: if (spword >>  6 & 3) { d[3] = spPalette[spword >>  6 & 3]; }
-						case 3: if (spword >>  4 & 3) { d[2] = spPalette[spword >>  4 & 3]; }
-						case 2: if (spword >>  2 & 3) { d[1] = spPalette[spword >>  2 & 3]; }
+						case 8: if (spword >> 14    ) { d[7] = spPalette[spword >> 14    ]; } [[fallthrough]];
+						case 7: if (spword >> 12 & 3) { d[6] = spPalette[spword >> 12 & 3]; } [[fallthrough]];
+						case 6: if (spword >> 10 & 3) { d[5] = spPalette[spword >> 10 & 3]; } [[fallthrough]];
+						case 5: if (spword >>  8 & 3) { d[4] = spPalette[spword >>  8 & 3]; } [[fallthrough]];
+						case 4: if (spword >>  6 & 3) { d[3] = spPalette[spword >>  6 & 3]; } [[fallthrough]];
+						case 3: if (spword >>  4 & 3) { d[2] = spPalette[spword >>  4 & 3]; } [[fallthrough]];
+						case 2: if (spword >>  2 & 3) { d[1] = spPalette[spword >>  2 & 3]; } [[fallthrough]];
 						case 1: if (spword       & 3) { d[0] = spPalette[spword       & 3]; }
 						}
 
@@ -649,31 +649,31 @@ static void doFullTilesUnrolledCgb(PPUPriv &p, int const xend, uint_least32_t *c
 						case 8: if ((spword >> 14    ) && id < idt[7]) {
 						        	idt[7] = id;
 						        	  d[7] = spPalette[spword >> 14    ];
-						        }
+						        } [[fallthrough]];
 						case 7: if ((spword >> 12 & 3) && id < idt[6]) {
 						        	idt[6] = id;
 						        	  d[6] = spPalette[spword >> 12 & 3];
-						        }
+						        } [[fallthrough]];
 						case 6: if ((spword >> 10 & 3) && id < idt[5]) {
 						        	idt[5] = id;
 						        	  d[5] = spPalette[spword >> 10 & 3];
-						        }
+						        } [[fallthrough]];
 						case 5: if ((spword >>  8 & 3) && id < idt[4]) {
 						        	idt[4] = id;
 						        	  d[4] = spPalette[spword >>  8 & 3];
-						        }
+						        } [[fallthrough]];
 						case 4: if ((spword >>  6 & 3) && id < idt[3]) {
 						        	idt[3] = id;
 						        	  d[3] = spPalette[spword >>  6 & 3];
-						        }
+						        } [[fallthrough]];
 						case 3: if ((spword >>  4 & 3) && id < idt[2]) {
 						        	idt[2] = id;
 						        	  d[2] = spPalette[spword >>  4 & 3];
-						        }
+						        } [[fallthrough]];
 						case 2: if ((spword >>  2 & 3) && id < idt[1]) {
 						        	idt[1] = id;
 						        	  d[1] = spPalette[spword >>  2 & 3];
-						        }
+						        } [[fallthrough]];
 						case 1: if ((spword       & 3) && id < idt[0]) {
 						        	idt[0] = id;
 						        	  d[0] = spPalette[spword       & 3];
