@@ -95,6 +95,9 @@ void Writer::optimize_music_stream() {
     RedundantWriteRule pu0_length(0x11);
     RedundantWriteRule pu1_length(0x16);
     RedundantWriteRule wav_length(0x1b);
+    RedundantWriteRule pu0_pitch_lsb(0x13);
+    RedundantWriteRule pu1_pitch_lsb(0x18);
+    RedundantWriteRule wav_pitch_lsb(0x1d);
     RedundantWriteRule wav_volume(0x1c);
     RedundantWriteRule noi_length(0x20);
     RedundantWriteRule noi_wave(0x22);
@@ -119,6 +122,9 @@ void Writer::optimize_music_stream() {
 
     optimize_rule(envelope);
     optimize_rule(pitch);
+    optimize_rule(pu0_pitch_lsb);
+    optimize_rule(pu1_pitch_lsb);
+    optimize_rule(wav_pitch_lsb);
     optimize_rule(lyc);
     optimize_rule(repeatCommandRule);
 }
