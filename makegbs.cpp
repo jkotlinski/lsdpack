@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
     fseek(gb_f, PLAYER_ADDRESS, SEEK_SET);
 
     while (true) {
-        int c = fgetc(gb_f);
+        c = fgetc(gb_f);
         if (c == EOF) {
             break;
         }
