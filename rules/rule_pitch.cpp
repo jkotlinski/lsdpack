@@ -13,36 +13,36 @@ void PitchRule::transform(std::deque<unsigned int>& bytes) {
     unsigned int new_lsb = bytes[1];
     unsigned int new_msb = bytes[3];
     bool trig = new_msb & 0x80;
-    if (bytes[0] == (0x13 | CMD_FLAG) && bytes[2] == (0x14 | CMD_FLAG)) {
+    if (bytes[0] == (0x13 | FLAG_CMD) && bytes[2] == (0x14 | FLAG_CMD)) {
         if (new_msb == pu0_msb_state && !trig) {
             // msb is redundant
             cmd = (new_lsb == pu0_lsb_state)
                 ? 0 // lsb is redundant, too
-                : (0x13 | CMD_FLAG); // only set lsb
+                : (0x13 | FLAG_CMD); // only set lsb
         } else {
-            cmd = PITCH_PU0 | CMD_FLAG;
+            cmd = CMD_PITCH_PU0 | FLAG_CMD;
         }
         pu0_msb_state = new_msb;
         pu0_lsb_state = new_lsb;
-    } else if (bytes[0] == (0x18 | CMD_FLAG) && bytes[2] == (0x19 | CMD_FLAG)) {
+    } else if (bytes[0] == (0x18 | FLAG_CMD) && bytes[2] == (0x19 | FLAG_CMD)) {
         if (new_msb == pu1_msb_state && !trig) {
             // msb is redundant
             cmd = (new_lsb == pu1_lsb_state)
                 ? 0 // lsb is redundant, too
-                : (0x18 | CMD_FLAG); // only set lsb
+                : (0x18 | FLAG_CMD); // only set lsb
         } else {
-            cmd = PITCH_PU1 | CMD_FLAG;
+            cmd = CMD_PITCH_PU1 | FLAG_CMD;
         }
         pu1_msb_state = new_lsb;
         pu1_lsb_state = new_msb;
-    } else if (bytes[0] == (0x1d | CMD_FLAG) && bytes[2] == (0x1e | CMD_FLAG)) {
+    } else if (bytes[0] == (0x1d | FLAG_CMD) && bytes[2] == (0x1e | FLAG_CMD)) {
         if (new_msb == wav_msb_state && !trig) {
             // msb is redundant
             cmd = (new_lsb == wav_lsb_state)
                 ? 0 // lsb is redundant, too
-                : (0x1d | CMD_FLAG); // only set lsb
+                : (0x1d | FLAG_CMD); // only set lsb
         } else {
-            cmd = PITCH_WAV | CMD_FLAG;
+            cmd = CMD_PITCH_WAV | FLAG_CMD;
         }
         wav_msb_state = new_msb;
         wav_lsb_state = new_lsb;

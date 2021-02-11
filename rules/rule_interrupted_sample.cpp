@@ -4,8 +4,8 @@
 
 void InterruptedSampleRule::transform(std::deque<unsigned int>& bytes) {
     const bool interrupted_sample =
-        (bytes[0] == (0x25 | CMD_FLAG) && bytes[4] == (0x30 | CMD_FLAG) && bytes[43] == (0x25 | CMD_FLAG)) ||
-        (bytes[0] == (0x25 | CMD_FLAG) && bytes[5] == (0x30 | CMD_FLAG) && bytes[43] == (0x25 | CMD_FLAG));
+        (bytes[0] == (0x25 | FLAG_CMD) && bytes[4] == (0x30 | FLAG_CMD) && bytes[43] == (0x25 | FLAG_CMD)) ||
+        (bytes[0] == (0x25 | FLAG_CMD) && bytes[5] == (0x30 | FLAG_CMD) && bytes[43] == (0x25 | FLAG_CMD));
 
     if (!interrupted_sample) {
         return;
@@ -13,7 +13,7 @@ void InterruptedSampleRule::transform(std::deque<unsigned int>& bytes) {
 
     size_t i = 0;
     while (i < bytes.size()) {
-        if (bytes[i] == (LYC | CMD_FLAG)) {
+        if (bytes[i] == (CMD_END_TICK | FLAG_CMD)) {
             break;
         }
         ++i;
@@ -23,5 +23,5 @@ void InterruptedSampleRule::transform(std::deque<unsigned int>& bytes) {
         bytes[i] = bytes[i + 1];
         ++i;
     }
-    bytes[i] = (LYC | CMD_FLAG);
+    bytes[i] = (CMD_END_TICK | FLAG_CMD);
 }

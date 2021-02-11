@@ -9,7 +9,7 @@ class RedundantWriteRule : public Rule {
         size_t window_size() const override { return 2; }
 
         void transform(std::deque<unsigned int>& bytes) override {
-            if (bytes[0] != (reg | CMD_FLAG)) {
+            if (bytes[0] != (reg | FLAG_CMD)) {
                 return;
             }
 

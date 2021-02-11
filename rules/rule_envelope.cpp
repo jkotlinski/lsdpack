@@ -15,7 +15,7 @@ void EnvelopeRule::transform(std::deque<unsigned int>& bytes) {
 
     for (size_t i = 0; i < 15 * 2; i += 2) {
         unsigned int addr = bytes[i];
-        if (!(addr & CMD_FLAG)) {
+        if (!(addr & FLAG_CMD)) {
             return;
         }
         switch (addr & 0x7f) {
@@ -39,17 +39,16 @@ void EnvelopeRule::transform(std::deque<unsigned int>& bytes) {
     unsigned int byte;
     switch (register_addr) {
         case 0x12:
-            byte = AMP_DOWN_PU0 | CMD_FLAG;
+            byte = CMD_AMP_DEC_PU0 | FLAG_CMD;
             break;
         case 0x17:
-            byte = AMP_DOWN_PU1 | CMD_FLAG;
+            byte = CMD_AMP_DEC_PU1 | FLAG_CMD;
             break;
         case 0x21:
-            byte = AMP_DOWN_NOI | CMD_FLAG;
+            byte = CMD_AMP_DEC_NOI | FLAG_CMD;
             break;
         default:
             assert(false);
     }
     bytes.push_back(byte);
 }
-

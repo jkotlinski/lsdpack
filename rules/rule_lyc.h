@@ -6,13 +6,13 @@ class LycRule : public Rule {
 
         // CMD:*:LYC => CMD|0x80:*
         void transform(std::deque<unsigned int>& bytes) override {
-            if (bytes[7] != (LYC | CMD_FLAG)) {
+            if (bytes[7] != (FLAG_CMD | CMD_END_TICK)) {
                 return;
             }
 
             int i;
             for (i = 6; i >= 0; --i) {
-                if (bytes[i] & CMD_FLAG) {
+                if (bytes[i] & FLAG_CMD) {
                     break;
                 }
             }
@@ -20,14 +20,14 @@ class LycRule : public Rule {
                 return;
             }
 
-            if (bytes[i] == (LYC | CMD_FLAG)) {
+            if (bytes[i] == (FLAG_CMD | CMD_END_TICK)) {
                 return;
             }
-            if (bytes[i] & LYC_END_MASK) {
+            if (bytes[i] & FLAG_END_TICK) {
                 return;
             }
 
-            bytes[i] |= LYC_END_MASK;
+            bytes[i] |= FLAG_END_TICK;
             bytes.resize(7);
         }
 };

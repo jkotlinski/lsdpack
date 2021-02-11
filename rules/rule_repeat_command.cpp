@@ -11,23 +11,23 @@ static void remove_duplicate_command(std::deque<unsigned int>& bytes, size_t i) 
 }
 
 /* If the same command appears more than twice in a row:
- * - add REPEAT_MASK to the first command byte
+ * - add FLAG_REPEAT to the first command byte
  * - discard following repeated command bytes
  * - insert a repetition count byte immediately after the first command byte
  */
 void RepeatCommandRule::transform(std::deque<unsigned int>& bytes) {
-    if (!(bytes[0] & CMD_FLAG)) {
+    if (!(bytes[0] & FLAG_CMD)) {
         return;
     }
 
     // Returns if the command does not appear at least three times in a row.
-    if (!(bytes[0] & REPEAT_MASK)) {
+    if (!(bytes[0] & FLAG_REPEAT)) {
         int duplicate_count = 0;
         for (size_t i = 1; i < bytes.size(); ++i) {
-            if (!(bytes[i] & CMD_FLAG)) {
+            if (!(bytes[i] & FLAG_CMD)) {
                 continue;
             }
-            if ((bytes[i] & ~REPEAT_MASK) == (bytes[0] & ~REPEAT_MASK)) {
+            if ((bytes[i] & ~FLAG_REPEAT) == (bytes[0] & ~FLAG_REPEAT)) {
                 ++duplicate_count;
             } else {
                 break;
@@ -43,10 +43,10 @@ void RepeatCommandRule::transform(std::deque<unsigned int>& bytes) {
 
         // Finds the next duplicate command.
         for (i = 1; i < bytes.size(); ++i) {
-            if (!(bytes[i] & CMD_FLAG)) {
+            if (!(bytes[i] & FLAG_CMD)) {
                 continue;
             }
-            if ((bytes[i] & ~REPEAT_MASK) == (bytes[0] & ~REPEAT_MASK)) {
+            if ((bytes[i] & ~FLAG_REPEAT) == (bytes[0] & ~FLAG_REPEAT)) {
                 break;
             } else {
                 return;
@@ -57,7 +57,7 @@ void RepeatCommandRule::transform(std::deque<unsigned int>& bytes) {
             return; // No more duplicate command found.
         }
 
-        if (bytes[0] & REPEAT_MASK) {
+        if (bytes[0] & FLAG_REPEAT) {
             // Repeat flag already set. Increase repetition count.
             if (bytes[1] != 0xff) {
                 ++bytes[1];
@@ -69,7 +69,7 @@ void RepeatCommandRule::transform(std::deque<unsigned int>& bytes) {
         remove_duplicate_command(bytes, i);
 
         // Adds the repeat flag with one repetition.
-        bytes[0] |= REPEAT_MASK;
+        bytes[0] |= FLAG_REPEAT;
         bytes.insert(bytes.begin() + 1, 1);
     }
 }

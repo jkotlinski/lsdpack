@@ -37,20 +37,20 @@ void Writer::record_song_start(const char* out_path) {
         new_bank();
     }
     memset(regs, -1, sizeof(regs));
-    music_stream.push_back(SONG_START);
+    music_stream.push_back(FLAG_SONG_START);
 }
 
 void Writer::record_song_stop() {
-    music_stream.push_back(STOP | CMD_FLAG);
+    music_stream.push_back(CMD_SONG_STOP | FLAG_CMD);
 }
 
 void Writer::record_write(unsigned char addr, unsigned char data) {
-    record_byte(addr | CMD_FLAG);
+    record_byte(addr | FLAG_CMD);
     record_byte(data);
 }
 
 void Writer::record_lcd() {
-    record_byte(LYC | CMD_FLAG);
+    record_byte(FLAG_CMD | CMD_END_TICK);
 }
 
 void Writer::write_song_locations() {
@@ -132,13 +132,13 @@ void Writer::write_music_to_disk() {
     size_t i = 0;
     int song_count = 0;
     while (i < music_stream.size()) {
-        if (music_stream[i] == SONG_START) {
+        if (music_stream[i] == FLAG_SONG_START) {
             fprintf(f, "; === Start song %i\n", ++song_count);
             song_locations.push_back(write_location);
             song_start = i;
         } else {
             write_byte(music_stream[i]);
-            if (music_stream[i] == (STOP | CMD_FLAG)) {
+            if (music_stream[i] == (FLAG_CMD | CMD_SONG_STOP)) {
                 printf("Song %i: %i bytes\n", song_count, (int)(i - song_start));
             }
         }
@@ -166,122 +166,124 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
         return;
     }
     fprintf(f, "\t; ");
-    if (cmd & REPEAT_MASK) {
-        fprintf(f, "REPEAT+");
+    if (cmd & FLAG_REPEAT) {
+        fprintf(f, "FLAG_REPEAT + ");
     }
     switch (cmd & 0x3f) {
-        case LYC:
-            fprintf(f, "LYC");
+        case CMD_END_TICK:
+            fprintf(f, "CMD_END_TICK");
             break;
-        case SAMPLE:
-            fprintf(f, "SAMPLE");
+        case CMD_SAMPLE_START:
+            fprintf(f, "CMD_SAMPLE_START");
             break;
-        case SAMPLE_NEXT:
-            fprintf(f, "SAMPLE_NEXT");
+        case CMD_SAMPLE_NEXT:
+            fprintf(f, "CMD_SAMPLE_NEXT");
             break;
-        case STOP:
-            fprintf(f, "STOP");
+        case CMD_SONG_STOP:
+            fprintf(f, "CMD_SONG_STOP");
             break;
-        case NEXT_BANK:
-            fprintf(f, "NEXT_BANK");
+        case CMD_NEXT_BANK:
+            fprintf(f, "CMD_NEXT_BANK");
             break;
-        case AMP_DOWN_PU0:
-            fprintf(f, "AMP_DOWN_PU0");
+        case CMD_AMP_DEC_PU0:
+            fprintf(f, "CMD_AMP_DEC_PU0");
             break;
-        case AMP_DOWN_PU1:
-            fprintf(f, "AMP_DOWN_PU1");
+        case CMD_AMP_DEC_PU1:
+            fprintf(f, "CMD_AMP_DEC_PU1");
             break;
-        case AMP_DOWN_NOI:
-            fprintf(f, "AMP_DOWN_NOI");
+        case CMD_AMP_DEC_NOI:
+            fprintf(f, "CMD_AMP_DEC_NOI");
             break;
-        case PITCH_PU0:
-            fprintf(f, "PITCH_PU0");
+        case CMD_PITCH_PU0:
+            fprintf(f, "CMD_PITCH_PU0");
             break;
-        case PITCH_PU1:
-            fprintf(f, "PITCH_PU1");
+        case CMD_PITCH_PU1:
+            fprintf(f, "CMD_PITCH_PU1");
             break;
-        case PITCH_WAV:
-            fprintf(f, "PITCH_WAV");
+        case CMD_PITCH_WAV:
+            fprintf(f, "CMD_PITCH_WAV");
             break;
+
         case 0x10:
-            fprintf(f, "pu0 sweep");
+            fprintf(f, "[pu0 sweep]");
             break;
         case 0x11:
-            fprintf(f, "pu0 length/wave");
+            fprintf(f, "[pu0 length/wave]");
             break;
         case 0x12:
-            fprintf(f, "pu0 env");
+            fprintf(f, "[pu0 env]");
             break;
         case 0x13:
-            fprintf(f, "pu0 pitch lsb");
+            fprintf(f, "[pu0 pitch lsb]");
             break;
         case 0x14:
-            fprintf(f, "pu0 pitch msb");
+            fprintf(f, "[pu0 pitch msb]");
             break;
 
         case 0x16:
-            fprintf(f, "pu1 length/wave");
+            fprintf(f, "[pu1 length/wave]");
             break;
         case 0x17:
-            fprintf(f, "pu1 env");
+            fprintf(f, "[pu1 env]");
             break;
         case 0x18:
-            fprintf(f, "pu1 pitch lsb");
+            fprintf(f, "[pu1 pitch lsb]");
             break;
         case 0x19:
-            fprintf(f, "pu1 pitch msb");
+            fprintf(f, "[pu1 pitch msb]");
             break;
 
         case 0x1a:
-            fprintf(f, "wav on/off");
+            fprintf(f, "[wav on/off]");
             break;
         case 0x1b:
-            fprintf(f, "wav length");
+            fprintf(f, "[wav length]");
             break;
         case 0x1c:
-            fprintf(f, "wav env");
+            fprintf(f, "[wav env]");
             break;
         case 0x1d:
-            fprintf(f, "wav pitch lsb");
+            fprintf(f, "[wav pitch lsb]");
             break;
         case 0x1e:
-            fprintf(f, "wav pitch msb");
+            fprintf(f, "[wav pitch msb]");
             break;
 
         case 0x20:
-            fprintf(f, "noi length");
+            fprintf(f, "[noi length]");
             break;
         case 0x21:
-            fprintf(f, "noi env");
+            fprintf(f, "[noi env]");
             break;
         case 0x22:
-            fprintf(f, "noi wave");
+            fprintf(f, "[noi wave]");
             break;
         case 0x23:
-            fprintf(f, "noi trig");
+            fprintf(f, "[noi trig]");
             break;
 
         case 0x24:
-            fprintf(f, "channel volume");
+            fprintf(f, "[channel volume]");
             break;
         case 0x25:
-            fprintf(f, "pan");
+            fprintf(f, "[pan]");
             break;
         case 0x26:
-            fprintf(f, "sound off/on");
+            fprintf(f, "[sound off/on]");
             break;
 
         default:
             fprintf(f, "%x", cmd & 0x7f);
+            assert(false);
     }
-    if (cmd & LYC_END_MASK) {
-        fprintf(f, "+LYC_END");
+    if (cmd & FLAG_END_TICK) {
+        fprintf(f, " + FLAG_END_TICK");
     }
 }
 
 void Writer::write_byte(unsigned int byte) {
     if (write_location.ptr > 0x7ff8) {
-        if ((byte & CMD_FLAG) || (write_location.ptr == 0x7fff)) {
+        if ((byte & FLAG_CMD) || (write_location.ptr == 0x7fff)) {
             fprintf(f, "DB 3 ; next bank\n");
             new_bank();
         }

@@ -14,9 +14,9 @@ SampleRule::SampleRule() :
 
 void SampleRule::transform(std::deque<unsigned int>& bytes) {
     const bool wav_write =
-        bytes[0] == (0x25 | CMD_FLAG) &&
-        bytes[4] == (0x30 | CMD_FLAG) &&
-        bytes[42] == (0x25 | CMD_FLAG);
+        bytes[0] == (0x25 | FLAG_CMD) &&
+        bytes[4] == (0x30 | FLAG_CMD) &&
+        bytes[42] == (0x25 | FLAG_CMD);
 
     if (!wav_write) {
         return;
@@ -46,17 +46,17 @@ void SampleRule::transform(std::deque<unsigned int>& bytes) {
     if (new_pitch_lsb == pitch_lsb_state && new_pitch_msb == pitch_msb_state &&
             curr_sample_bank == sample_location->second.bank &&
             curr_sample_address == sample_location->second.ptr - 0x10) {
-        bytes.push_back(SAMPLE_NEXT | CMD_FLAG);
+        bytes.push_back(CMD_SAMPLE_NEXT | FLAG_CMD);
     } else if (curr_sample_bank == sample_location->second.bank &&
             curr_sample_address == sample_location->second.ptr) {
         if (pitch_lsb_state != new_pitch_lsb) {
-            bytes.push_back(0x1d | CMD_FLAG);
+            bytes.push_back(0x1d | FLAG_CMD);
             bytes.push_back(new_pitch_lsb);
         }
-        bytes.push_back(0x1e | CMD_FLAG);
+        bytes.push_back(0x1e | FLAG_CMD);
         bytes.push_back(new_pitch_msb);
     } else {
-        bytes.push_back(SAMPLE | CMD_FLAG);
+        bytes.push_back(CMD_SAMPLE_START | FLAG_CMD);
         assert(sample_location->second.bank < 0x100);
         bytes.push_back(sample_location->second.bank);
         bytes.push_back(sample_location->second.ptr & 0xff);

@@ -4,24 +4,24 @@
 #include <deque>
 
 enum Cmds {
-    LYC,
-    SAMPLE,
-    STOP,
-    NEXT_BANK,
-    AMP_DOWN_PU0,
-    AMP_DOWN_PU1,
-    AMP_DOWN_NOI,
-    PITCH_PU0,
-    PITCH_PU1,
-    PITCH_WAV,
-    SAMPLE_NEXT
+    CMD_END_TICK,
+    CMD_SAMPLE_START,
+    CMD_SONG_STOP,
+    CMD_NEXT_BANK,
+    CMD_AMP_DEC_PU0,
+    CMD_AMP_DEC_PU1,
+    CMD_AMP_DEC_NOI,
+    CMD_PITCH_PU0,
+    CMD_PITCH_PU1,
+    CMD_PITCH_WAV,
+    CMD_SAMPLE_NEXT
 };
 
-enum Defines {
-    LYC_END_MASK = 0x80,
-    REPEAT_MASK = 0x40,
-    SONG_START = 0x100,
-    CMD_FLAG = 0x200
+enum Flags {
+    FLAG_END_TICK   = 0x80,
+    FLAG_REPEAT     = 0x40,
+    FLAG_SONG_START = 0x100,
+    FLAG_CMD        = 0x200
 };
 
 class Rule {
