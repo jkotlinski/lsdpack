@@ -1,6 +1,11 @@
 cmake_minimum_required (VERSION 3.1)
 project (lsdpack)
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -O0 -g")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -pedantic -O2")
+endif()
+
 add_definitions(-DHAVE_STDINT_H)
 
 include_directories(
@@ -52,13 +57,4 @@ add_executable(lsdpack
 
 add_executable(makegbs makegbs.cpp getopt.cpp)
 
-get_directory_property(TARGET_NAMES BUILDSYSTEM_TARGETS)
-
-foreach(TARGET_NAME ${TARGET_NAMES})
-    set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 17)
-    if(MSVC)
-        target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
-    else()
-        target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
-    endif()
-endforeach()
+set_property(TARGET lsdpack PROPERTY CXX_STANDARD 14)

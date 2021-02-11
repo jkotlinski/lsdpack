@@ -16,9 +16,5 @@ indent_size = 4
 indent_style = space
 indent_size = 4
 
-[CMakeLists.txt]
-indent_style = space
-indent_size = 4
-
 [Makefile]
 indent_style = tab

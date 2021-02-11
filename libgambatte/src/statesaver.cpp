@@ -109,9 +109,9 @@ static unsigned long read(std::ifstream &file) {
 
 	unsigned long out = 0;
 	switch (size) {
-	case 4: out = (out | (file.get() & 0xFF)) << 8; [[fallthrough]];
-	case 3: out = (out | (file.get() & 0xFF)) << 8; [[fallthrough]];
-	case 2: out = (out | (file.get() & 0xFF)) << 8; [[fallthrough]];
+	case 4: out = (out | (file.get() & 0xFF)) << 8;
+	case 3: out = (out | (file.get() & 0xFF)) << 8;
+	case 2: out = (out | (file.get() & 0xFF)) << 8;
 	case 1: out =  out | (file.get() & 0xFF);
 	}
 
