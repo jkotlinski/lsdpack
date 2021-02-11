@@ -44,6 +44,18 @@ LsdjPlaySong::
     pop de
     ret
 
+CMD_END_TICK        = 0
+CMD_SAMPLE_START    = 1
+CMD_SONG_STOP       = 2
+CMD_NEXT_BANK       = 3
+CMD_AMP_DEC_PU0     = 4
+CMD_AMP_DEC_PU1     = 5
+CMD_AMP_DEC_NOI     = 6
+CMD_PITCH_PU0       = 7
+CMD_PITCH_PU1       = 8
+CMD_PITCH_WAV       = 9
+CMD_SAMPLE_NEXT     = 10
+
 ; Call this six times per screen update,
 ; evenly spread out over the screen.
 ;
@@ -109,24 +121,24 @@ LsdjTick::
     jr  .loop
 
 .is_command
-    cp  1
+    cp  CMD_SAMPLE_START
     jp  z,.sample_start
-    cp  4
-    jr  z,.volume_down_pu0
-    cp  5
-    jr  z,.volume_down_pu1
-    cp  6
-    jr  z,.volume_down_noi
-    cp  7
+    cp  CMD_AMP_DEC_PU0
+    jr  z,.amp_dec_pu0
+    cp  CMD_AMP_DEC_PU1
+    jr  z,.amp_dec_pu1
+    cp  CMD_AMP_DEC_NOI
+    jr  z,.amp_dec_noi
+    cp  CMD_PITCH_PU0
     jr  z,.pitch_pu0
-    cp  8
+    cp  CMD_PITCH_PU1
     jr  z,.pitch_pu1
-    cp  9
+    cp  CMD_PITCH_WAV
     jr  z,.pitch_wav
-    cp  3
+    cp  CMD_NEXT_BANK
     jr  z,.next_bank
-    cp  2
-    jr  z,.handle_stop
+    cp  CMD_SONG_STOP
+    jr  z,.handle_song_stop
 
 .lyc_done
     ld  a,l
@@ -137,12 +149,12 @@ LsdjTick::
     pop hl
     ret
 
-.handle_stop:
+.handle_song_stop:
     ld  a,[Song]
     call    LsdjPlaySong
     jp  .tick
 
-.volume_down_pu0:
+.amp_dec_pu0:
     ld  a,9
     ldh [$12],a
     ld  a,$11
@@ -151,7 +163,7 @@ LsdjTick::
     ldh [$12],a
     jp  .loop
 
-.volume_down_pu1:
+.amp_dec_pu1:
     ld  a,9
     ldh [$17],a
     ld  a,$11
@@ -160,7 +172,7 @@ LsdjTick::
     ldh [$17],a
     jp  .loop
 
-.volume_down_noi:
+.amp_dec_noi:
     ld  a,9
     ldh [$21],a
     ld  a,$11
