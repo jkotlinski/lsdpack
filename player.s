@@ -53,7 +53,6 @@ LsdjPlaySong::
 ;
 LsdjTick::
     push    hl
-    push    de
     push    bc
 
 .tick
@@ -97,13 +96,21 @@ LsdjTick::
 
 .apply_cmd
     ld  b,a
-    and $7f
-
+    and $3f
     jr  z,.lyc_done
-    cp  1
-    jp  z,.sample_start
     cp  10
     jp  z,.sample_next
+    jr  c,.is_command
+
+    ; write sound register
+    ld  c,a
+    ld  a,[hl+]
+    ldh [c],a
+    jr  .loop
+
+.is_command
+    cp  1
+    jp  z,.sample_start
     cp  4
     jr  z,.volume_down_pu0
     cp  5
@@ -121,19 +128,12 @@ LsdjTick::
     cp  2
     jr  z,.handle_stop
 
-    ; write sound register
-    ld  c,a
-    ld  a,[hl+]
-    ldh [c],a
-    jr  .loop
-
 .lyc_done
     ld  a,l
     ld  [CurrentPtr],a
     ld  a,h
     ld  [CurrentPtr+1],a
     pop bc
-    pop de
     pop hl
     ret
 
@@ -211,6 +211,7 @@ LsdjTick::
     jp  .loop
 
 .sample_start:
+    push    de
     ld  a,[hl+]
     ld  c,a     ; c = sample bank
     ld  [SampleBank],a
@@ -295,9 +296,11 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
+    pop de
     jp  .loop
 
 .sample_next:
+    push    de
     ld  a,[SampleBank]
     ld  c,a     ; c = sample bank
     ld  a,[SampleAddress]
@@ -378,6 +381,7 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
+    pop de
     jp  .loop
 
 
