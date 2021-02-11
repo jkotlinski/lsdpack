@@ -1,6 +1,13 @@
 cmake_minimum_required (VERSION 3.1)
 project (lsdpack)
 
+set(CPACK_PACKAGE_VENDOR "Johan Kotlinski")
+set(CPACK_VERBATIM_VARIABLES true)
+set(CPACK_PACKAGE_VERSION_MAJOR 0)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH 3)
+include (CPack)
+
 add_definitions(-DHAVE_STDINT_H)
 
 include_directories(
@@ -54,8 +61,10 @@ add_executable(makegbs makegbs.cpp getopt.cpp)
 
 get_directory_property(TARGET_NAMES BUILDSYSTEM_TARGETS)
 
+install(TARGETS ${TARGET_NAMES})
+
 foreach(TARGET_NAME ${TARGET_NAMES})
-    set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 17)
+    set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 14)
     if(MSVC)
         target_compile_options(${TARGET_NAME} PRIVATE /W4)
     else()
