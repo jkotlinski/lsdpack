@@ -2,7 +2,6 @@ cmake_minimum_required (VERSION 3.1)
 project (lsdpack)
 
 set(CPACK_PACKAGE_VENDOR "Johan Kotlinski")
-
 set(CPACK_PACKAGE_VERSION_MAJOR 0)
 set(CPACK_PACKAGE_VERSION_MINOR 0)
 set(CPACK_PACKAGE_VERSION_PATCH 3)
