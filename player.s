@@ -372,20 +372,8 @@ LsdjTick::
     ld  a,[hl+]
     ldh [$3f],a
 
-    ld  a,l
-    ld  [SampleAddress],a
-    ld  a,h
-    ld  [SampleAddress+1],a
-
     ld  a,$80 ; unmute
     ldh [$1a],a
-
-    pop     hl
-
-    ld  a,[CurrentBank+1]
-    ld  [$3000],a
-    ld  a,[CurrentBank]
-    ld  [$2000],a
 
     ld  a,[SamplePitchMsb]
     ldh [$1e],a
@@ -393,6 +381,17 @@ LsdjTick::
     ld  a,e
     ldh [$25],a
 
+    ld  a,[CurrentBank+1]
+    ld  [$3000],a
+    ld  a,[CurrentBank]
+    ld  [$2000],a
+
+    ld  a,l
+    ld  [SampleAddress],a
+    ld  a,h
+    ld  [SampleAddress+1],a
+
+    pop hl
     pop de
     jp  .loop
 
