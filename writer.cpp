@@ -278,8 +278,27 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
             fprintf(f, "[sound off/on]");
             break;
 
+        case 0x30:
+        case 0x31:
+        case 0x32:
+        case 0x33:
+        case 0x34:
+        case 0x35:
+        case 0x36:
+        case 0x37:
+        case 0x38:
+        case 0x39:
+        case 0x3a:
+        case 0x3b:
+        case 0x3c:
+        case 0x3d:
+        case 0x3e:
+        case 0x3f:
+            fprintf(f, "[wave]");
+            break;
+
         default:
-            fprintf(f, "%x", cmd & 0x7f);
+            fprintf(stderr, "Write to unknown register: %x\n", cmd & 0x7f);
             assert(false);
     }
     if (cmd & FLAG_END_TICK) {
