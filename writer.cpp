@@ -331,7 +331,6 @@ void Writer::write_byte(unsigned int byte) {
     assert(write_location.ptr < 0x8000);
 
     fprintf(f, "DB $%x", byte & 0xff);
-    fprintf(f, ";%x ", write_location.ptr);
     fprint_cmd_comment(f, byte);
     fprintf(f, "\n");
 
