@@ -44,4 +44,5 @@ class Writer {
         void write_byte(unsigned int byte);
         void record_byte(unsigned int byte);
         void write_samples();
+        void insert_new_bank_cmds();
 };

@@ -16,8 +16,7 @@
 #include "rules/rule_interrupted_sample.h"
 #include "rules/rule_repeat_command.h"
 
-Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode)
-{
+Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode) {
     memset(regs, -1, sizeof(regs));
     f = 0;
     last_music_size = 0;
@@ -129,10 +128,31 @@ void Writer::optimize_music_stream() {
     optimize_rule(repeatCommandRule);
 }
 
+// Inserts CMD_NEXT_BANK where needed.
+void Writer::insert_new_bank_cmds() {
+    int last_cmd = 0;
+    int write_ptr = write_location.ptr;
+
+    for (size_t i = 0; i < music_stream.size(); ++i) {
+        if (music_stream[i] & FLAG_CMD) {
+            last_cmd = i;
+        }
+
+        ++write_ptr;
+        if (write_ptr == 0x7fff) {
+            music_stream.insert(music_stream.begin() + last_cmd, FLAG_CMD | CMD_NEXT_BANK);
+            write_ptr = 0x4000;
+            i = last_cmd + 1;
+        }
+    }
+}
+
 void Writer::write_music_to_disk() {
     optimize_music_stream();
 
     write_samples();
+
+    insert_new_bank_cmds();
 
     size_t song_start = 0;
     size_t i = 0;
@@ -307,17 +327,19 @@ static void fprint_cmd_comment(FILE* f, unsigned int cmd) {
 }
 
 void Writer::write_byte(unsigned int byte) {
-    if (write_location.ptr > 0x7ff8) {
-        if ((byte & FLAG_CMD) || (write_location.ptr == 0x7fff)) {
-            fprintf(f, "DB 3 ; next bank\n");
-            new_bank();
-        }
-    }
+    assert(write_location.ptr >= 0x4000);
+    assert(write_location.ptr < 0x8000);
+
     fprintf(f, "DB $%x", byte & 0xff);
+    fprintf(f, ";%x ", write_location.ptr);
     fprint_cmd_comment(f, byte);
     fprintf(f, "\n");
-    ++write_location.ptr;
-    assert(write_location.ptr < 0x8000);
+
+    if (byte == (FLAG_CMD | CMD_NEXT_BANK)) {
+        new_bank();
+    } else {
+        ++write_location.ptr;
+    }
 }
 
 void Writer::record_byte(unsigned int byte) {
@@ -327,6 +349,9 @@ void Writer::record_byte(unsigned int byte) {
 void Writer::write_samples() {
     std::vector<unsigned char> samples = sample_rule.get_samples();
     for (size_t i = 0; i < samples.size(); i += 0x10) {
+        assert(write_location.ptr >= 0x4000);
+        assert(write_location.ptr < 0x8000);
+
         fprintf(f, "DB ");
         for (size_t j = i; j < i + 0x10; ++j) {
             fprintf(f, "$%x", samples[j]);

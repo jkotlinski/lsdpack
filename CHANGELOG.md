@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Assert on writes to wave pattern RAM.
+- Bank switching sometimes failed.
 
 ## 0.0.3 - 2021-02-12
 ### Added
