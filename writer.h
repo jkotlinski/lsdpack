@@ -17,6 +17,8 @@ class Writer {
         void optimize_music_stream();
         void write_music_to_disk();
 
+        static void disable_optimizations();
+
     private:
         FILE* f;
 

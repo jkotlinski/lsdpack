@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Assert on writes to wave pattern RAM.
 - Bank switching sometimes failed.
 
+### Added
+- lsdpack -r flag to record raw register writes and disable all optimisations.
+
 ## 0.0.3 - 2021-02-12
 ### Added
 - Game Boy Sound System (GBS) support.

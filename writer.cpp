@@ -16,6 +16,8 @@
 #include "rules/rule_interrupted_sample.h"
 #include "rules/rule_repeat_command.h"
 
+static bool optimizations_disabled;
+
 Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode) {
     memset(regs, -1, sizeof(regs));
     f = 0;
@@ -89,6 +91,10 @@ void Writer::optimize_rule(Rule& rule) {
 }
 
 void Writer::optimize_music_stream() {
+    if (optimizations_disabled) {
+        return;
+    }
+
     RedundantWriteRule pan(0x25);
     RedundantWriteRule pu0_sweep(0x10);
     RedundantWriteRule pu0_length(0x11);
@@ -365,4 +371,8 @@ void Writer::write_samples() {
         }
     }
     printf("Wrote %i samples\n", (int)samples.size());
+}
+
+void Writer::disable_optimizations() {
+    optimizations_disabled = true;
 }
