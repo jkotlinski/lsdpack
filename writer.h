@@ -28,14 +28,17 @@ class Writer {
 
         void record_song_start(const char* out_path);
         void record_song_stop();
-        void record_write(unsigned char addr, unsigned char data);
-        void record_lcd();
+        void record_write(unsigned char addr, unsigned char data, unsigned long cc);
+        void record_lcd(unsigned long);
         void write_song_locations();
         void optimize_rule(Rule& rule);
         void optimize_music_stream();
         void write_music_to_disk();
 
         static void disable_optimizations();
+        static void set_dump_mode();
+        unsigned long count = 0;
+        unsigned long last_cc = 0;
 
     private:
         FILE* f;
@@ -62,7 +65,7 @@ class Writer {
 
         void new_bank();
         void write_byte(unsigned int byte);
-        void record_byte(unsigned int byte);
+        void record_byte(unsigned int byte, unsigned long cc);
         void write_samples();
         void insert_new_bank_cmds();
 };

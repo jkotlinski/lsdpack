@@ -209,12 +209,12 @@ void GB::setGameShark(std::string const &codes) {
 	p_->cpu.setGameShark(codes);
 }
 
-void GB::setWriteHandler(void(*writeHandler)(char, char)) {
-    p_->cpu.setWriteHandler(writeHandler);
+void GB::setWriteHandler(void (*writeHandler)(char, char, unsigned long)) {
+	p_->cpu.setWriteHandler(writeHandler);
 }
 
-void GB::setLcdHandler(void(*lcdHandler)(void)) {
-    p_->cpu.setLcdHandler(lcdHandler);
+void GB::setLcdHandler(void (*lcdHandler)(unsigned long)) {
+	p_->cpu.setLcdHandler(lcdHandler);
 }
 
 bool GB::isSongEmpty() const {
