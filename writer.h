@@ -30,14 +30,15 @@ class Writer {
         void record_song_stop();
         void record_write(unsigned char addr, unsigned char data);
         void record_lcd();
-        void write_song_locations();
-        void optimize_rule(Rule& rule);
-        void optimize_music_stream();
         void write_music_to_disk();
 
         static void disable_optimizations();
 
     private:
+        void write_song_locations();
+        void optimize_rule(Rule& rule);
+        void optimize_music_stream();
+
         FILE* f;
 
         const bool gbs_mode;
