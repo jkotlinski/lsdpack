@@ -28,11 +28,8 @@ class Writer {
 
         void record_song_start(const char* out_path);
         void record_song_stop();
-        void record_write(unsigned char addr, unsigned char data, unsigned long cc);
-        void record_lcd(unsigned long);
-        void write_song_locations();
-        void optimize_rule(Rule& rule);
-        void optimize_music_stream();
+        void record_write(unsigned char addr, unsigned char data, unsigned long cycles);
+        void record_lcd(unsigned long cycles);
         void write_music_to_disk();
 
         static void disable_optimizations();
@@ -41,6 +38,10 @@ class Writer {
         unsigned long last_cc = 0;
 
     private:
+        void write_song_locations();
+        void optimize_rule(Rule& rule);
+        void optimize_music_stream();
+
         FILE* f;
 
         const bool gbs_mode;
