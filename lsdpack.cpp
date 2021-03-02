@@ -188,7 +188,9 @@ void record_gbs(int argc, char* argv[]) {
 }
 
 void print_help_and_exit() {
-    fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]\n");
+    puts("usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
+    puts("");
+    puts("-g: .gbs conversion");
     exit(1);
 }
 
