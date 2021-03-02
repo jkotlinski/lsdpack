@@ -44,7 +44,7 @@ An example Game Boy player ROM can be built using RGBDS:
     rgbasm -o player.o player.s
     rgbasm -o lsdj.o lsdj.s
     rgblink -o player.gb boot.o player.o lsdj.o
-    rgbfix -v -m 0x19 -p 0 player.gb
+    rgbfix -v -m 0x19 -p 0xff player.gb
 
 ### player.s
 

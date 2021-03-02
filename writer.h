@@ -18,11 +18,12 @@
 
 #include <vector>
 
+#include "iwriter.h"
 #include "rules/rule_sample.h"
 
 class Rule;
 
-class Writer {
+class Writer : public IWriter {
     public:
         explicit Writer(bool gbs_mode);
 
@@ -31,11 +32,6 @@ class Writer {
         void record_write(unsigned char addr, unsigned char data, unsigned long cycles);
         void record_lcd(unsigned long cycles);
         void write_music_to_disk();
-
-        static void disable_optimizations();
-        static void set_dump_mode();
-        unsigned long count = 0;
-        unsigned long last_cc = 0;
 
     private:
         void write_song_locations();

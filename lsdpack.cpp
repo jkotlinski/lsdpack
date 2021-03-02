@@ -30,7 +30,7 @@ gambatte::GB gameboy;
 Input input;
 std::string out_path;
 
-Writer* writer;
+IWriter* writer;
 
 void run_one_frame() {
     size_t samples = 35112;
@@ -210,10 +210,9 @@ void record_dump(int argc, char* argv[]) {
 }
 
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [-r] [-d] [lsdj.gb lsdj2.gb ...]");
+    puts("usage: lsdpack [-g] [-d] [lsdj.gb lsdj2.gb ...]");
     puts("");
     puts("-g: .gbs conversion");
-    puts("-r: raw register writes; optimizations disabled");
     puts("-d: raw register dump; optimizations disabled");
     exit(1);
 }
@@ -223,15 +222,11 @@ int main(int argc, char* argv[]) {
     bool dump_mode = false;
 
     int c;
-    while ((c = getopt(argc, argv, "grd")) != -1) {
+    while ((c = getopt(argc, argv, "gd")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
                 gbs_mode = true;
-                break;
-            case 'r':
-                puts("disabled optimizations");
-                Writer::disable_optimizations();
                 break;
             case 'd':
                 puts("dump mode enabled");
