@@ -30,7 +30,7 @@ gambatte::GB gameboy;
 Input input;
 std::string out_path;
 
-Writer* writer;
+IWriter* writer;
 
 void run_one_frame() {
     size_t samples = 35112;

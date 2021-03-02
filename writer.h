@@ -18,11 +18,12 @@
 
 #include <vector>
 
+#include "iwriter.h"
 #include "rules/rule_sample.h"
 
 class Rule;
 
-class Writer {
+class Writer : public IWriter {
     public:
         explicit Writer(bool gbs_mode);
 
