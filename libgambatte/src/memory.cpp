@@ -296,7 +296,7 @@ unsigned long Memory::event(unsigned long cc) {
 
 			intreq_.ackIrq(n);
             if (address == 0x48) {
-                lcdHandler_();
+                lcdHandler_(cc);
             }
 			cc = interrupter_.interrupt(address, cc, *this);
 		}
@@ -593,7 +593,7 @@ void Memory::nontrivial_ff_write(unsigned const p, unsigned data, unsigned long 
 	if (lastOamDmaUpdate_ != disabled_time)
 		updateOamDma(cc);
 
-    writeHandler_(p, data);
+    writeHandler_(p, data, cc);
 
 	switch (p & 0xFF) {
 	case 0x00:

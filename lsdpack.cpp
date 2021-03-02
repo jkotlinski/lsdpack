@@ -86,6 +86,7 @@ void play_song() {
     int seconds_elapsed = 0;
     sound_enabled = false;
     input.press(START);
+    writer->count = 0;  /* reset register counter to 0 */
     writer->record_song_start(out_path.c_str());
     do {
         wait(1);
@@ -97,7 +98,7 @@ void play_song() {
     } while(sound_enabled);
 }
 
-void on_ff_write(char p, char data) {
+void on_ff_write(char p, char data, unsigned long cc) {
     if (p < 0x10 || p >= 0x40) {
         return; // not sound
     }
@@ -112,13 +113,13 @@ void on_ff_write(char p, char data) {
             break;
     }
     if (sound_enabled) {
-        writer->record_write(p, data);
+        writer->record_write(p, data, cc);
     }
 }
 
-void on_lcd_interrupt() {
+void on_lcd_interrupt(unsigned long cc) {
     if (sound_enabled) {
-        writer->record_lcd();
+        writer->record_lcd(cc);
     }
 }
 
@@ -187,22 +188,50 @@ void record_gbs(int argc, char* argv[]) {
     }
 }
 
+void record_dump(int argc, char* argv[]) {
+    writer = new Writer(false);
+
+    for (; optind < argc; ++optind) {
+        load_gb(argv[optind]);
+
+        for (int song_index = 0; song_index < 32; ++song_index) {
+            if (load_song(song_index)) {
+                printf("Playing song %i...\n", song_index + 1);
+
+                char suffix[20];
+                snprintf(suffix, sizeof(suffix), "-%i", song_index + 1);
+                make_out_path(argv[optind], suffix);
+
+                play_song();
+            }
+        }
+    }
+    delete writer;
+}
+
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]");
+    puts("usage: lsdpack [-g] [-d] [lsdj.gb lsdj2.gb ...]");
     puts("");
     puts("-g: .gbs conversion");
+    puts("-d: raw register dump; optimizations disabled");
     exit(1);
 }
 
 int main(int argc, char* argv[]) {
     bool gbs_mode = false;
+    bool dump_mode = false;
 
     int c;
-    while ((c = getopt(argc, argv, "g")) != -1) {
+    while ((c = getopt(argc, argv, "gd")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
                 gbs_mode = true;
+                break;
+            case 'd':
+                puts("dump mode enabled");
+                Writer::set_dump_mode();
+                dump_mode = true;
                 break;
             default:
                 print_help_and_exit();
@@ -219,6 +248,8 @@ int main(int argc, char* argv[]) {
 
     if (gbs_mode) {
         record_gbs(argc, argv);
+    } else if (dump_mode) {
+        record_dump(argc, argv);
     } else {
         record_gb(argc, argv);
     }

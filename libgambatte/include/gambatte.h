@@ -180,8 +180,8 @@ public:
 	  */
 	void setGameShark(std::string const &codes);
 
-    void setWriteHandler(void(*writeHandler)(char, char));
-    void setLcdHandler(void(*lcdHandler)(void));
+    void setWriteHandler(void (*writeHandler)(char, char, unsigned long));
+    void setLcdHandler(void (*lcdHandler)(unsigned long));
 
     bool isSongEmpty() const;
 
