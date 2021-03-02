@@ -33,8 +33,6 @@ class Writer : public IWriter {
         void record_lcd();
         void write_music_to_disk();
 
-        static void disable_optimizations();
-
     private:
         void write_song_locations();
         void optimize_rule(Rule& rule);

@@ -188,10 +188,7 @@ void record_gbs(int argc, char* argv[]) {
 }
 
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [-r] [lsdj.gb lsdj2.gb ...]");
-    puts("");
-    puts("-g: .gbs conversion");
-    puts("-r: raw register writes; optimizations disabled");
+    fprintf(stderr, "usage: lsdpack [-g] [lsdj.gb lsdj2.gb ...]\n");
     exit(1);
 }
 
@@ -199,15 +196,11 @@ int main(int argc, char* argv[]) {
     bool gbs_mode = false;
 
     int c;
-    while ((c = getopt(argc, argv, "gr")) != -1) {
+    while ((c = getopt(argc, argv, "g")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
                 gbs_mode = true;
-                break;
-            case 'r':
-                puts("disabled optimizations");
-                Writer::disable_optimizations();
                 break;
             default:
                 print_help_and_exit();
