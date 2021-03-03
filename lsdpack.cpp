@@ -24,6 +24,7 @@
 
 #include "input.h"
 #include "writer.h"
+#include "dumpwriter.h"
 #include "getopt.h"
 
 gambatte::GB gameboy;
@@ -86,7 +87,6 @@ void play_song() {
     int seconds_elapsed = 0;
     sound_enabled = false;
     input.press(START);
-    writer->count = 0;  /* reset register counter to 0 */
     writer->record_song_start(out_path.c_str());
     do {
         wait(1);
@@ -98,7 +98,7 @@ void play_song() {
     } while(sound_enabled);
 }
 
-void on_ff_write(char p, char data, unsigned long cc) {
+void on_ff_write(char p, char data, unsigned long cycle) {
     if (p < 0x10 || p >= 0x40) {
         return; // not sound
     }
@@ -113,13 +113,13 @@ void on_ff_write(char p, char data, unsigned long cc) {
             break;
     }
     if (sound_enabled) {
-        writer->record_write(p, data, cc);
+        writer->record_write(p, data, cycle);
     }
 }
 
-void on_lcd_interrupt(unsigned long cc) {
+void on_lcd_interrupt() {
     if (sound_enabled) {
-        writer->record_lcd(cc);
+        writer->record_lcd();
     }
 }
 
@@ -129,9 +129,8 @@ void make_out_path(const char* in_path, std::string suffix) {
     }
 
     out_path = in_path;
-    // .gb => .s
-    out_path.replace(out_path.end() - 2, out_path.end(), "s");
-    out_path.insert(out_path.length() - 2, suffix);
+    out_path.replace(out_path.end() - 3, out_path.end(), ""); // strip .gb
+    out_path += suffix;
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('/'), "");
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('\\'), "");
     printf("Recording to '%s'\n", out_path.c_str());
@@ -147,7 +146,7 @@ void load_gb(const char* path) {
 }
 
 void record_gb(int argc, char* argv[]) {
-    make_out_path(argv[optind], "");
+    make_out_path(argv[optind], ".s");
     writer = new Writer(false);
 
     for (; optind < argc; ++optind) {
@@ -176,7 +175,7 @@ void record_gbs(int argc, char* argv[]) {
                 printf("Playing song %i...\n", song_index + 1);
 
                 char suffix[20];
-                snprintf(suffix, sizeof(suffix), "-%i", song_index + 1);
+                snprintf(suffix, sizeof(suffix), "-%i.s", song_index + 1);
                 make_out_path(argv[optind], suffix);
 
                 play_song();
@@ -189,7 +188,7 @@ void record_gbs(int argc, char* argv[]) {
 }
 
 void record_dump(int argc, char* argv[]) {
-    writer = new Writer(false);
+    writer = new DumpWriter();
 
     for (; optind < argc; ++optind) {
         load_gb(argv[optind]);
@@ -199,7 +198,7 @@ void record_dump(int argc, char* argv[]) {
                 printf("Playing song %i...\n", song_index + 1);
 
                 char suffix[20];
-                snprintf(suffix, sizeof(suffix), "-%i", song_index + 1);
+                snprintf(suffix, sizeof(suffix), "-%i.txt", song_index + 1);
                 make_out_path(argv[optind], suffix);
 
                 play_song();
@@ -230,7 +229,6 @@ int main(int argc, char* argv[]) {
                 break;
             case 'd':
                 puts("dump mode enabled");
-                Writer::set_dump_mode();
                 dump_mode = true;
                 break;
             default:

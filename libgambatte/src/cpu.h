@@ -71,7 +71,7 @@ public:
 	void setGameGenie(std::string const &codes) { mem_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { mem_.setGameShark(codes); }
     void setWriteHandler(void (*writeHandler)(char, char, unsigned long)) { mem_.setWriteHandler(writeHandler); }
-    void setLcdHandler(void (*lcdHandler)(unsigned long)) { mem_.setLcdHandler(lcdHandler); }
+    void setLcdHandler(void (*lcdHandler)()) { mem_.setLcdHandler(lcdHandler); }
     bool isSongEmpty() { return mem_.isSongEmpty(); }
 
 private:

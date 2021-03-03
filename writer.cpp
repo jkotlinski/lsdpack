@@ -61,23 +61,14 @@ void Writer::record_song_stop() {
     music_stream.push_back(CMD_SONG_STOP | FLAG_CMD);
 }
 
-void Writer::record_write(unsigned char addr, unsigned char data, unsigned long cc) {
-    if(dump_mode) {
-        if (count == 0) {
-            last_cc = cc;
-        }
-        fprintf(f, "%08lx ff%02x=%02x\n", cc - last_cc,  addr, data);
-        last_cc = cc;
-    }
-    else {
-        record_byte(addr | FLAG_CMD, cc);
-        record_byte(data, cc);
-    }
-    count++;
+void Writer::record_write(unsigned char addr, unsigned char data, unsigned long cycle) {
+    (void)cycle;
+    record_byte(addr | FLAG_CMD);
+    record_byte(data);
 }
 
-void Writer::record_lcd(unsigned long cc) {
-    record_byte(FLAG_CMD | CMD_END_TICK, cc);
+void Writer::record_lcd() {
+    record_byte(FLAG_CMD | CMD_END_TICK);
 }
 
 void Writer::write_song_locations() {
@@ -210,10 +201,8 @@ void Writer::new_bank() {
         fputs("ROM full!", stderr);
         exit(1);
     }
-    if (!dump_mode) {
-        fprintf(f, "SECTION \"MUSIC_%i\",ROMX,BANK[%i]\n",
-                write_location.bank, write_location.bank);
-    }
+    fprintf(f, "SECTION \"MUSIC_%i\",ROMX,BANK[%i]\n",
+            write_location.bank, write_location.bank);
     write_location.ptr = 0x4000;
 }
 
@@ -371,8 +360,7 @@ void Writer::write_byte(unsigned int byte) {
     }
 }
 
-void Writer::record_byte(unsigned int byte, unsigned long cc) {
-    if(cc) {}
+void Writer::record_byte(unsigned int byte) {
     music_stream.push_back(byte);
 }
 

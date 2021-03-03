@@ -213,7 +213,7 @@ void GB::setWriteHandler(void (*writeHandler)(char, char, unsigned long)) {
 	p_->cpu.setWriteHandler(writeHandler);
 }
 
-void GB::setLcdHandler(void (*lcdHandler)(unsigned long)) {
+void GB::setLcdHandler(void (*lcdHandler)()) {
 	p_->cpu.setLcdHandler(lcdHandler);
 }
 

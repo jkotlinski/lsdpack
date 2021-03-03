@@ -108,7 +108,7 @@ public:
 	void setGameGenie(std::string const &codes) { cart_.setGameGenie(codes); }
 	void setGameShark(std::string const &codes) { interrupter_.setGameShark(codes); }
     void setWriteHandler(void (*writeHandler)(char, char, unsigned long)) { writeHandler_ = writeHandler; }
-    void setLcdHandler(void (*lcdHandler)(unsigned long)) { lcdHandler_ = lcdHandler; }
+    void setLcdHandler(void (*lcdHandler)()) { lcdHandler_ = lcdHandler; }
 	void updateInput();
     bool isSongEmpty() {
         write(0, 0xa, 0); // enable SRAM
@@ -140,7 +140,7 @@ private:
 	unsigned char serialCnt_;
 	bool blanklcd_;
     void (*writeHandler_)(char, char, unsigned long);
-    void (*lcdHandler_)(unsigned long);
+    void (*lcdHandler_)();
 
 	void decEventCycles(IntEventId eventId, unsigned long dec);
 	void oamDmaInitSetup();

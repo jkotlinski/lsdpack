@@ -181,7 +181,7 @@ public:
 	void setGameShark(std::string const &codes);
 
     void setWriteHandler(void (*writeHandler)(char, char, unsigned long));
-    void setLcdHandler(void (*lcdHandler)(unsigned long));
+    void setLcdHandler(void (*lcdHandler)());
 
     bool isSongEmpty() const;
 

@@ -29,8 +29,8 @@ class Writer : public IWriter {
 
         void record_song_start(const char* out_path);
         void record_song_stop();
-        void record_write(unsigned char addr, unsigned char data, unsigned long cycles);
-        void record_lcd(unsigned long cycles);
+        void record_write(unsigned char addr, unsigned char data, unsigned long cycle);
+        void record_lcd();
         void write_music_to_disk();
 
     private:
@@ -62,7 +62,7 @@ class Writer : public IWriter {
 
         void new_bank();
         void write_byte(unsigned int byte);
-        void record_byte(unsigned int byte, unsigned long cc);
+        void record_byte(unsigned int byte);
         void write_samples();
         void insert_new_bank_cmds();
 };
