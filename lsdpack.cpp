@@ -47,7 +47,7 @@ void wait(float seconds) {
 
 void press(unsigned key, float seconds = 0.1f) {
     input.press(key);
-    wait(seconds);
+    wait(seconds * (gameboy.isCgb()?1:2));
 }
 
 bool load_song(int position) {
@@ -136,8 +136,8 @@ void make_out_path(const char* in_path, std::string suffix) {
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
-void load_gb(const char* path) {
-    if (gameboy.load(path)) {
+void load_gb(const char* path, unsigned flags) {
+    if (gameboy.load(path, flags)) {
         fprintf(stderr, "Loading %s failed\n", path);
         exit(1);
     }
@@ -145,12 +145,12 @@ void load_gb(const char* path) {
     press(0, 3);
 }
 
-void record_gb(int argc, char* argv[]) {
+void record_gb(int argc, char* argv[], unsigned flags) {
     make_out_path(argv[optind], ".s");
     writer = new Writer(false);
 
     for (; optind < argc; ++optind) {
-        load_gb(argv[optind]);
+        load_gb(argv[optind], flags);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             if (load_song(song_index)) {
@@ -164,9 +164,9 @@ void record_gb(int argc, char* argv[]) {
     delete writer;
 }
 
-void record_gbs(int argc, char* argv[]) {
+void record_gbs(int argc, char* argv[], unsigned flags) {
     for (; optind < argc; ++optind) {
-        load_gb(argv[optind]);
+        load_gb(argv[optind], flags);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             writer = new Writer(true);
@@ -187,11 +187,11 @@ void record_gbs(int argc, char* argv[]) {
     }
 }
 
-void record_dump(int argc, char* argv[]) {
+void record_dump(int argc, char* argv[], unsigned flags) {
     writer = new DumpWriter();
 
     for (; optind < argc; ++optind) {
-        load_gb(argv[optind]);
+        load_gb(argv[optind], flags);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             if (load_song(song_index)) {
@@ -209,19 +209,22 @@ void record_dump(int argc, char* argv[]) {
 }
 
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [-d] [lsdj.gb lsdj2.gb ...]");
+    puts("usage: lsdpack [-g] [-d] [-D] [lsdj.gb lsdj2.gb ...]");
     puts("");
     puts("-g: .gbs conversion");
     puts("-d: raw register dump; optimizations disabled");
+    puts("-D: DMG mode");
     exit(1);
 }
 
 int main(int argc, char* argv[]) {
     bool gbs_mode = false;
     bool dump_mode = false;
+    bool dmg_mode = false;
+    unsigned flags = 0;
 
     int c;
-    while ((c = getopt(argc, argv, "gd")) != -1) {
+    while ((c = getopt(argc, argv, "gdD")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
@@ -230,6 +233,10 @@ int main(int argc, char* argv[]) {
             case 'd':
                 puts("dump mode enabled");
                 dump_mode = true;
+                break;
+            case 'D':
+                puts("DMG mode enabled");
+                dmg_mode = true;
                 break;
             default:
                 print_help_and_exit();
@@ -244,12 +251,15 @@ int main(int argc, char* argv[]) {
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
 
+    if (dmg_mode) {
+        flags |= gameboy.FORCE_DMG;
+    }
     if (gbs_mode) {
-        record_gbs(argc, argv);
+        record_gbs(argc, argv, flags);
     } else if (dump_mode) {
-        record_dump(argc, argv);
+        record_dump(argc, argv, flags);
     } else {
-        record_gb(argc, argv);
+        record_gb(argc, argv, flags);
     }
 
     puts("OK");
