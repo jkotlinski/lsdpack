@@ -143,6 +143,10 @@ void load_gb(const char* path, unsigned flags) {
     }
     printf("Loaded %s\n", path);
     press(0, 3);
+
+    /* Press B to skip the first LittleFM screen, if the ROM is patched with it */
+    press(B);
+    press(0);
 }
 
 void record_gb(int argc, char* argv[], unsigned flags) {
@@ -151,8 +155,6 @@ void record_gb(int argc, char* argv[], unsigned flags) {
 
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
-        press(B);
-        press(0);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             if (load_song(song_index)) {
@@ -169,8 +171,6 @@ void record_gb(int argc, char* argv[], unsigned flags) {
 void record_gbs(int argc, char* argv[], unsigned flags) {
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
-        press(B);
-        press(0);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             writer = new Writer(true);
@@ -196,8 +196,6 @@ void record_dump(int argc, char* argv[], unsigned flags) {
 
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
-        press(B);
-        press(0);
 
         for (int song_index = 0; song_index < 32; ++song_index) {
             if (load_song(song_index)) {
