@@ -136,7 +136,8 @@ void make_out_path(const char* in_path, std::string suffix) {
     printf("Recording to '%s'\n", out_path.c_str());
 }
 
-void load_gb(const char* path, unsigned flags) {
+void load_gb(const char* path, bool dmg_mode) {
+    unsigned flags = dmg_mode ? gameboy.FORCE_DMG : 0;
     if (gameboy.load(path, flags)) {
         fprintf(stderr, "Loading %s failed\n", path);
         exit(1);
@@ -149,9 +150,10 @@ void load_gb(const char* path, unsigned flags) {
     press(0);
 }
 
-void record_gb(int argc, char* argv[], unsigned flags) {
+void record_gb(int argc, char* argv[], bool dmg_mode) {
     make_out_path(argv[optind], ".s");
     writer = new Writer(false);
+    unsigned flags = dmg_mode ? gameboy.FORCE_DMG : 0;
 
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
@@ -168,7 +170,8 @@ void record_gb(int argc, char* argv[], unsigned flags) {
     delete writer;
 }
 
-void record_gbs(int argc, char* argv[], unsigned flags) {
+void record_gbs(int argc, char* argv[], bool dmg_mode) {
+    unsigned flags = dmg_mode ? gameboy.FORCE_DMG : 0;
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
 
@@ -191,8 +194,9 @@ void record_gbs(int argc, char* argv[], unsigned flags) {
     }
 }
 
-void record_dump(int argc, char* argv[], unsigned flags) {
+void record_dump(int argc, char* argv[], bool dmg_mode) {
     writer = new DumpWriter();
+    unsigned flags = dmg_mode ? gameboy.FORCE_DMG : 0;
 
     for (; optind < argc; ++optind) {
         load_gb(argv[optind], flags);
