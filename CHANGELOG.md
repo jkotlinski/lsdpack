@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Make .gbs update at ~358 Hz instead of ~360 Hz.
+
 ### Added
 - lsdpack -d flag to dump raw register writes to text file.
 

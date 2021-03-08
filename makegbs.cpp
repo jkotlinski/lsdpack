@@ -74,7 +74,8 @@ void write_gbs_header(FILE* f) {
     fputc(0xfe, f);
     fputc(0xff, f);
 
-    fputc(0x4a, f); // TMA
+    // Sets timer to 65536 / 183 ~= 358 Hz.
+    fputc(-183, f); // TMA
     fputc(6, f); // TAC
 
     printf("Title: %s\n", title.c_str());
