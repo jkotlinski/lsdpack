@@ -74,7 +74,7 @@ void write_gbs_header(FILE* f) {
     fputc(0xfe, f);
     fputc(0xff, f);
 
-    // Sets timer to 65536 / 183 ~= 358 Hz.
+    // Sets timer to 65536 / 183 ~= 358 Hz, to match 6 * 59.73 Hz (Game Boy screen refresh rate)
     fputc(-183, f); // TMA
     fputc(6, f); // TAC
 
