@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - lsdpack -d flag to dump raw register writes to text file.
+- lsdpack -D flag to record in DMG mode
+- Support ROM images patched with LittleFM
 
 ### Removed
 - lsdpack -r flag.
