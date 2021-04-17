@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Make .gbs update at ~358 Hz instead of ~360 Hz.
+- Inaccurate noise length.
 
 ### Changed
 - boot.s now uses timer instead of LCD interrupt.
