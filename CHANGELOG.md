@@ -8,14 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Make .gbs update at ~358 Hz instead of ~360 Hz.
 - Removed incorrect length counter optimizations.
+- Support RGBDS 0.5.1.
 
 ### Changed
 - boot.s now uses timer instead of LCD interrupt.
 
 ### Added
 - lsdpack -d flag to dump raw register writes to text file.
-- lsdpack -D flag to record in DMG mode
-- Support ROM images patched with LittleFM
+- lsdpack -D flag to record in DMG mode.
+- Support ROM images patched with LittleFM.
 
 ### Removed
 - lsdpack -r flag.

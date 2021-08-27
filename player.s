@@ -418,19 +418,19 @@ LsdjTick::
 
 SECTION "player_ram",WRAM0
 
-Song
+Song:
     ds  1
-CurrentBank
+CurrentBank:
     ds  2
-CurrentPtr
+CurrentPtr:
     ds  2
-SampleBank
+SampleBank:
     ds  1
-SampleAddress
+SampleAddress:
     ds  2
-SamplePitchMsb
+SamplePitchMsb:
     ds  1
-RepeatCmd
+RepeatCmd:
     ds  1
-RepeatCmdCounter
+RepeatCmdCounter:
     ds  1

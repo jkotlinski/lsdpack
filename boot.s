@@ -48,9 +48,9 @@ SECTION "setup",ROM0[$150]
     call LsdjPlaySong
     ei
 
-mainloop
+mainloop:
 
-.wait_button_pressed
+.wait_button_pressed:
     ldh a,[0]
     and $f
     cp  $f
@@ -88,7 +88,7 @@ mainloop
     jr  nz,.delay_loop
     ret
 
-tim_handler
+tim_handler:
     push    af
 
     ld  a,$ff   ; black background
