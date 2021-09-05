@@ -221,7 +221,7 @@ void print_help_and_exit() {
     puts("");
     puts("-g: .gbs conversion");
     puts("-d: raw register dump; optimizations disabled");
-    puts("-D: DMG mode");
+    puts("-D: record using emulated DMG (default: CGB)");
     exit(1);
 }
 
