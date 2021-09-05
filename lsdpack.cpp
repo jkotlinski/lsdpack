@@ -47,7 +47,10 @@ void wait(float seconds) {
 
 void press(unsigned key, float seconds = 0.1f) {
     input.press(key);
-    wait(seconds * (gameboy.isCgb()?1:2));
+    if (!gameboy.isCgb() && seconds > 0.1f) {
+        seconds *= 2; // compensates for slow CPU
+    }
+    wait(seconds);
 }
 
 bool load_song(int position) {
