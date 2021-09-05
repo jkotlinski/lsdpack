@@ -24,8 +24,6 @@ class PitchRule : public Rule {
         unsigned int pu0_msb_state;
         unsigned int pu1_lsb_state;
         unsigned int pu1_msb_state;
-        unsigned int wav_lsb_state;
-        unsigned int wav_msb_state;
 
     public:
         PitchRule();
