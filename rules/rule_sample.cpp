@@ -91,8 +91,8 @@ void SampleRule::transform(std::deque<unsigned int>& bytes) {
         bytes.push_back(sample_location->second.bank);
         bytes.push_back(sample_location->second.ptr & 0xff);
         bytes.push_back(sample_location->second.ptr >> 8);
-        bytes.push_back(new_pitch_lsb);
         bytes.push_back(new_pitch_msb);
+        bytes.push_back(new_pitch_lsb);
     }
 
     pitch_lsb_state = new_pitch_lsb;
