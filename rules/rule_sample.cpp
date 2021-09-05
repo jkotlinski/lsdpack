@@ -57,8 +57,20 @@ void SampleRule::transform(std::deque<unsigned int>& bytes) {
         }
     }
 
-    unsigned int new_pitch_lsb = bytes[39];
-    unsigned int new_pitch_msb = bytes[41];
+    unsigned int new_pitch_lsb;
+    unsigned int new_pitch_msb;
+
+    // Sample pitch update differs between LSDj versions.
+    if (bytes[38] == (0x1d | FLAG_CMD) && bytes[40] == (0x1e | FLAG_CMD)) {
+        new_pitch_lsb = bytes[39];
+        new_pitch_msb = bytes[41];
+    } else if (bytes[38] == (0x1e | FLAG_CMD) && bytes[40] == (0x1d | FLAG_CMD)) {
+        new_pitch_msb = bytes[39];
+        new_pitch_lsb = bytes[41];
+    } else {
+        fprintf(stderr, "Sample pitch not found\n");
+        return;
+    }
     bytes.clear();
 
     if (new_pitch_lsb == pitch_lsb_state && new_pitch_msb == pitch_msb_state &&

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Make .gbs update at ~358 Hz instead of ~360 Hz.
-- Removed incorrect optimizations.
+- Various incorrect optimizations, most of which appeared in 0.0.3.
 - Support RGBDS 0.5.1.
 
 ### Changed
