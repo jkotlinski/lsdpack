@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - boot.s now uses timer instead of LCD interrupt.
 
 ### Added
-- lsdpack -D flag to record in DMG mode.
+- lsdpack -d flag to record using emulated DMG.
 - Support ROM images patched with LittleFM.
 
 ## 0.0.4 - 2021-02-15
