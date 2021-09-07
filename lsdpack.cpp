@@ -220,10 +220,10 @@ void record_dump(int argc, char* argv[], bool dmg_mode) {
 }
 
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [-d] [-D] [lsdj.gb lsdj2.gb ...]");
+    puts("usage: lsdpack [-g] [-r] [-D] [lsdj.gb lsdj2.gb ...]");
     puts("");
     puts("-g: .gbs conversion");
-    puts("-d: raw register dump; optimizations disabled");
+    puts("-r: raw register dump; optimizations disabled");
     puts("-D: record using emulated DMG (default: CGB)");
     exit(1);
 }
@@ -235,14 +235,14 @@ int main(int argc, char* argv[]) {
     unsigned flags = 0;
 
     int c;
-    while ((c = getopt(argc, argv, "gdD")) != -1) {
+    while ((c = getopt(argc, argv, "grD")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
                 gbs_mode = true;
                 break;
-            case 'd':
-                puts("dump mode enabled");
+            case 'r':
+                puts("register dump mode enabled");
                 dump_mode = true;
                 break;
             case 'D':
