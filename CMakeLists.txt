@@ -29,11 +29,11 @@ add_executable(lsdpack
     lsdpack.cpp
     getopt.cpp
     writer.cpp
-    rules/rule_envelope.cpp
-    rules/rule_pitch.cpp
-    rules/rule_sample.cpp
-    rules/rule_interrupted_sample.cpp
-    rules/rule_repeat_command.cpp
+    rules/envelope_rule.cpp
+    rules/pitch_rule.cpp
+    rules/sample_rule.cpp
+    rules/interrupted_sample_rule.cpp
+    rules/repeat_command_rule.cpp
 
     libgambatte/src/bitmap_font.cpp
     libgambatte/src/cpu.cpp

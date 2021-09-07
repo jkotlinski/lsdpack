@@ -26,13 +26,13 @@
 #include <vector>
 
 #include "rules/rule.h"
-#include "rules/rule_redundant_write.h"
-#include "rules/rule_envelope.h"
-#include "rules/rule_pitch.h"
-#include "rules/rule_lyc.h"
-#include "rules/rule_sample.h"
-#include "rules/rule_interrupted_sample.h"
-#include "rules/rule_repeat_command.h"
+#include "rules/redundant_write_rule.h"
+#include "rules/envelope_rule.h"
+#include "rules/pitch_rule.h"
+#include "rules/lyc_rule.h"
+#include "rules/sample_rule.h"
+#include "rules/interrupted_sample_rule.h"
+#include "rules/repeat_command_rule.h"
 
 Writer::Writer(bool gbs_mode) : gbs_mode(gbs_mode) {
     memset(regs, -1, sizeof(regs));

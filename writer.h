@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "iwriter.h"
-#include "rules/rule_sample.h"
+#include "rules/sample_rule.h"
 
 class Rule;
 
