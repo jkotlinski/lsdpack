@@ -77,14 +77,6 @@ void SampleRule::transform(std::deque<unsigned int>& bytes) {
             curr_sample_bank == sample_location->second.bank &&
             curr_sample_address == sample_location->second.ptr - 0x10) {
         bytes.push_back(CMD_SAMPLE_NEXT | FLAG_CMD);
-    } else if (curr_sample_bank == sample_location->second.bank &&
-            curr_sample_address == sample_location->second.ptr) {
-        if (pitch_lsb_state != new_pitch_lsb) {
-            bytes.push_back(0x1d | FLAG_CMD);
-            bytes.push_back(new_pitch_lsb);
-        }
-        bytes.push_back(0x1e | FLAG_CMD);
-        bytes.push_back(new_pitch_msb);
     } else {
         bytes.push_back(CMD_SAMPLE_START | FLAG_CMD);
         assert(sample_location->second.bank < 0x100);

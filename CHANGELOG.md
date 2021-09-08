@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- Make .gbs update at ~358 Hz instead of ~360 Hz.
-- Various incorrect optimizations, most of which appeared in 0.0.3.
-- Support RGBDS 0.5.1.
+- Many incorrect optimizations, most of which appeared in 0.0.3.
+- .gbs tempo was slightly off.
 
 ### Changed
+- Use RGBDS 0.5.1.
 - boot.s now uses timer instead of LCD interrupt.
 
 ### Added
