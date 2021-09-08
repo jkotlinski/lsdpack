@@ -30,14 +30,8 @@ void PitchRule::transform(std::deque<unsigned int>& bytes) {
     unsigned int new_msb = bytes[3];
     bool trig = new_msb & 0x80;
     if (bytes[0] == (0x13 | FLAG_CMD) && bytes[2] == (0x14 | FLAG_CMD)) {
-        if (new_msb == pu0_msb_state && !trig) {
-            // msb is redundant
-            cmd = (new_lsb == pu0_lsb_state)
-                ? 0 // lsb is redundant, too
-                : (0x13 | FLAG_CMD); // only set lsb
-        } else {
-            cmd = CMD_PITCH_PU0 | FLAG_CMD;
-        }
+        // TODO: Redundant write detection that takes sweep into account.
+        cmd = CMD_PITCH_PU0 | FLAG_CMD;
         pu0_msb_state = new_msb;
         pu0_lsb_state = new_lsb;
     } else if (bytes[0] == (0x18 | FLAG_CMD) && bytes[2] == (0x19 | FLAG_CMD)) {
