@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Many incorrect optimizations, most of which appeared in 0.0.3.
-- .gbs tempo was slightly off.
+- Adjusted .gbs timer speed from ~360 to ~358 Hz, to better match screen rate.
 
 ### Changed
 - Use RGBDS 0.5.1.
