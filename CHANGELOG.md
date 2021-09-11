@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## 0.0.5 - 2021-09-12
 ### Fixed
 - Many incorrect optimizations, most of which appeared in 0.0.3.
 - Adjusted .gbs timer speed from ~360 to ~358 Hz, to better match screen rate.
