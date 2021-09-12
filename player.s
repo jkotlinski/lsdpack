@@ -16,6 +16,9 @@
 ; with this program; if not, write to the Free Software Foundation, Inc.,
 ; 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. }}}
 
+if __RGBDS_MAJOR__ != 0 || __RGBDS_MINOR__ != 5 || __RGBDS_PATCH__ != 1
+    warn "Unknown RGBDS version! lsdpack was only tested with RGBDS 0.5.1"
+endc
 
 SECTION "player",ROM0[$3d00]
     ; .gbs player entry points
