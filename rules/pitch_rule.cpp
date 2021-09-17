@@ -43,8 +43,8 @@ void PitchRule::transform(std::deque<unsigned int>& bytes) {
         } else {
             cmd = CMD_PITCH_PU1 | FLAG_CMD;
         }
-        pu1_msb_state = new_lsb;
-        pu1_lsb_state = new_msb;
+        pu1_lsb_state = new_lsb;
+        pu1_msb_state = new_msb;
     } else {
         return;
     }
