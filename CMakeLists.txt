@@ -69,7 +69,7 @@ add_executable(makegbs makegbs.cpp getopt.cpp)
 
 get_directory_property(TARGET_NAMES BUILDSYSTEM_TARGETS)
 
-install(TARGETS ${TARGET_NAMES})
+install(TARGETS ${TARGET_NAMES} DESTINATION .)
 
 foreach(TARGET_NAME ${TARGET_NAMES})
     set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 14)
