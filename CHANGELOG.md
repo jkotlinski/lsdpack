@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Register dump crash.
 - Broken PU2 pitch optimization.
 - CMakeLists.txt fix for Debian.
 

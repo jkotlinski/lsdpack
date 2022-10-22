@@ -23,9 +23,9 @@ class DumpWriter : public IWriter {
         void record_song_start(const char* out_path) override {
             last_cycle = 0;
 
-            if (f == 0) {
+            if (f == nullptr) {
                 f = fopen(out_path, "w");
-                if (f == 0) {
+                if (f == nullptr) {
                     char errormsg[1024];
                     snprintf(errormsg, sizeof(errormsg),
                             "Opening '%s' for write failed",
@@ -46,12 +46,13 @@ class DumpWriter : public IWriter {
 
         void record_song_stop() override {
             fclose(f);
+            f = nullptr;
         }
 
         void record_lcd() override {}
         void write_music_to_disk() override {}
 
     private:
-        FILE* f;
-        unsigned long last_cycle;
+        FILE* f = nullptr;
+        unsigned long last_cycle = 0;
 };
