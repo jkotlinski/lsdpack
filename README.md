@@ -1,6 +1,6 @@
 # lsdpack
 
-Records LSDj songs for .gbs conversion or use in stand-alone Game Boy ROMs. (E.g. your own games, demos, music albums...)
+Records LSDj songs for .gbs conversion or use in stand-alone Game Boy ROMs. (E.g. your own music albums, demos, games...)
 
 ## Building
 Requires CMake, [RGBDS](https://github.com/gbdev/rgbds) and a C++ compiler. Exact build steps are platform dependent - see [Running CMake](https://cmake.org/runningcmake/)
