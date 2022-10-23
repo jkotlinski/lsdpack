@@ -89,16 +89,20 @@ bool sound_enabled;
 void play_song() {
     int seconds_elapsed = 0;
     sound_enabled = false;
-    input.press(START);
     writer->record_song_start(out_path.c_str());
-    do {
+    press(START);
+    if (!sound_enabled) {
+        fputs("Aborted: Song did not start.\n", stderr);
+        exit(1);
+    }
+    while (sound_enabled) {
         wait(1);
 
         if (++seconds_elapsed == 60 * 60) {
             fputs("Aborted: Song still playing after one hour. Please add a HFF command to song end to stop recording.\n", stderr);
             exit(1);
         }
-    } while(sound_enabled);
+    }
 }
 
 void on_ff_write(char p, char data, unsigned long cycle) {
