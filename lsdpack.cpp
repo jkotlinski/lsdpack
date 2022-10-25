@@ -57,14 +57,18 @@ bool load_song(int position) {
     press(SELECT);
     press(SELECT | UP);
     press(0);
-    press(DOWN, 3);
-    press(0);
+    for (int i = 0; i < 16; ++i) {
+        press(DOWN); // go to bottom
+        press(0);
+    }
     press(A);
     press(0);
     press(A);
     press(0);
-    press(UP, 5); // scroll to top
-    press(0);
+    for (int i = 0; i < 32; ++i) {
+        press(UP); // go to top
+        press(0);
+    }
     for (int i = 0; i < position; ++i) {
         press(DOWN);
         press(0);

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check that a song started playing.
 
 ### Fixed
+- Support very slow key settings.
 - Register dump (-r) crash due to uninitialized memory.
 - Broken PU2 pitch optimization.
 - CMakeLists.txt fix for Debian.
