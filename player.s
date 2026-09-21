@@ -16,8 +16,8 @@
 ; with this program; if not, write to the Free Software Foundation, Inc.,
 ; 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. }}}
 
-if __RGBDS_MAJOR__ != 0 || __RGBDS_MINOR__ != 5 || __RGBDS_PATCH__ != 1
-    warn "Unknown RGBDS version {__RGBDS_VERSION__}! lsdpack was tested with RGBDS 0.5.1"
+if __RGBDS_MAJOR__ != 0 || __RGBDS_MINOR__ != 9 || __RGBDS_PATCH__ != 0
+    warn "Unknown RGBDS version {__RGBDS_VERSION__}! lsdpack was tested with RGBDS 0.9.0"
 endc
 
 SECTION "player",ROM0[$3d00]
@@ -60,24 +60,24 @@ LsdjPlaySong::
     ld  [de],a  ; CurrentPtr + 1
 
     xor a
-    ldh [$26],a ; stop sound
+    ldh [$ff26],a ; stop sound
     ld  [RepeatCmdCounter],a
 
     pop hl
     pop de
     ret
 
-CMD_END_TICK        = 0
-CMD_SAMPLE_START    = 1
-CMD_SONG_STOP       = 2
-CMD_NEXT_BANK       = 3
-CMD_AMP_DEC_PU0     = 4
-CMD_AMP_DEC_PU1     = 5
-CMD_AMP_DEC_NOI     = 6
-CMD_PITCH_PU0       = 7
-CMD_PITCH_PU1       = 8
-CMD_PITCH_WAV       = 9
-CMD_SAMPLE_NEXT     = 10
+DEF CMD_END_TICK        = 0
+DEF CMD_SAMPLE_START    = 1
+DEF CMD_SONG_STOP       = 2
+DEF CMD_NEXT_BANK       = 3
+DEF CMD_AMP_DEC_PU0     = 4
+DEF CMD_AMP_DEC_PU1     = 5
+DEF CMD_AMP_DEC_NOI     = 6
+DEF CMD_PITCH_PU0       = 7
+DEF CMD_PITCH_PU1       = 8
+DEF CMD_PITCH_WAV       = 9
+DEF CMD_SAMPLE_NEXT     = 10
 
 ; Call this six times per screen update,
 ; evenly spread out over the screen.
@@ -179,50 +179,50 @@ LsdjTick::
 
 .amp_dec_pu0:
     ld  a,9
-    ldh [$12],a
+    ldh [$ff12],a
     ld  a,$11
-    ldh [$12],a
+    ldh [$ff12],a
     ld  a,$18
-    ldh [$12],a
+    ldh [$ff12],a
     jp  .loop
 
 .amp_dec_pu1:
     ld  a,9
-    ldh [$17],a
+    ldh [$ff17],a
     ld  a,$11
-    ldh [$17],a
+    ldh [$ff17],a
     ld  a,$18
-    ldh [$17],a
+    ldh [$ff17],a
     jp  .loop
 
 .amp_dec_noi:
     ld  a,9
-    ldh [$21],a
+    ldh [$ff21],a
     ld  a,$11
-    ldh [$21],a
+    ldh [$ff21],a
     ld  a,$18
-    ldh [$21],a
+    ldh [$ff21],a
     jp  .loop
 
 .pitch_pu0:
     ld  a,[hl+]
-    ldh [$13],a
+    ldh [$ff13],a
     ld  a,[hl+]
-    ldh [$14],a
+    ldh [$ff14],a
     jp  .loop
 
 .pitch_pu1:
     ld  a,[hl+]
-    ldh [$18],a
+    ldh [$ff18],a
     ld  a,[hl+]
-    ldh [$19],a
+    ldh [$ff19],a
     jp  .loop
 
 .pitch_wav:
     ld  a,[hl+]
-    ldh [$1d],a
+    ldh [$ff1d],a
     ld  a,[hl+]
-    ldh [$1e],a
+    ldh [$ff1e],a
     jp  .loop
 
 .next_bank:
@@ -266,46 +266,46 @@ LsdjTick::
     ld  l,e
 
     ; disable wave channel output
-    ldh a,[$25]
+    ldh a,[$ff25]
     ld  e,a
     and a,~$44
-    ldh [$25],a
+    ldh [$ff25],a
 
     xor a
-    ldh [$1a],a ; mute channel
+    ldh [$ff1a],a ; mute channel
 
     ld  a,[hl+]
-    ldh [$30],a
+    ldh [$ff30],a
     ld  a,[hl+]
-    ldh [$31],a
+    ldh [$ff31],a
     ld  a,[hl+]
-    ldh [$32],a
+    ldh [$ff32],a
     ld  a,[hl+]
-    ldh [$33],a
+    ldh [$ff33],a
     ld  a,[hl+]
-    ldh [$34],a
+    ldh [$ff34],a
     ld  a,[hl+]
-    ldh [$35],a
+    ldh [$ff35],a
     ld  a,[hl+]
-    ldh [$36],a
+    ldh [$ff36],a
     ld  a,[hl+]
-    ldh [$37],a
+    ldh [$ff37],a
     ld  a,[hl+]
-    ldh [$38],a
+    ldh [$ff38],a
     ld  a,[hl+]
-    ldh [$39],a
+    ldh [$ff39],a
     ld  a,[hl+]
-    ldh [$3a],a
+    ldh [$ff3a],a
     ld  a,[hl+]
-    ldh [$3b],a
+    ldh [$ff3b],a
     ld  a,[hl+]
-    ldh [$3c],a
+    ldh [$ff3c],a
     ld  a,[hl+]
-    ldh [$3d],a
+    ldh [$ff3d],a
     ld  a,[hl+]
-    ldh [$3e],a
+    ldh [$ff3e],a
     ld  a,[hl+]
-    ldh [$3f],a
+    ldh [$ff3f],a
 
     ld  a,l
     ld  [SampleAddress],a
@@ -313,7 +313,7 @@ LsdjTick::
     ld  [SampleAddress+1],a
 
     ld  a,$80 ; unmute
-    ldh [$1a],a
+    ldh [$ff1a],a
 
     pop     hl
 
@@ -323,13 +323,13 @@ LsdjTick::
     ld  [$2000],a
 
     ld  a,[hl+]
-    ldh [$1e],a
+    ldh [$ff1e],a
     ld  [SamplePitchMsb],a
     ld  a,[hl+]
-    ldh [$1d],a
+    ldh [$ff1d],a
 
     ld  a,e
-    ldh [$25],a
+    ldh [$ff25],a
 
     pop de
     jp  .loop
@@ -354,55 +354,55 @@ LsdjTick::
     ld  l,e
 
     ; disable wave channel output
-    ldh a,[$25]
+    ldh a,[$ff25]
     ld  e,a
     and a,~$44
-    ldh [$25],a
+    ldh [$ff25],a
 
     xor a
-    ldh [$1a],a ; mute channel
+    ldh [$ff1a],a ; mute channel
 
     ld  a,[hl+]
-    ldh [$30],a
+    ldh [$ff30],a
     ld  a,[hl+]
-    ldh [$31],a
+    ldh [$ff31],a
     ld  a,[hl+]
-    ldh [$32],a
+    ldh [$ff32],a
     ld  a,[hl+]
-    ldh [$33],a
+    ldh [$ff33],a
     ld  a,[hl+]
-    ldh [$34],a
+    ldh [$ff34],a
     ld  a,[hl+]
-    ldh [$35],a
+    ldh [$ff35],a
     ld  a,[hl+]
-    ldh [$36],a
+    ldh [$ff36],a
     ld  a,[hl+]
-    ldh [$37],a
+    ldh [$ff37],a
     ld  a,[hl+]
-    ldh [$38],a
+    ldh [$ff38],a
     ld  a,[hl+]
-    ldh [$39],a
+    ldh [$ff39],a
     ld  a,[hl+]
-    ldh [$3a],a
+    ldh [$ff3a],a
     ld  a,[hl+]
-    ldh [$3b],a
+    ldh [$ff3b],a
     ld  a,[hl+]
-    ldh [$3c],a
+    ldh [$ff3c],a
     ld  a,[hl+]
-    ldh [$3d],a
+    ldh [$ff3d],a
     ld  a,[hl+]
-    ldh [$3e],a
+    ldh [$ff3e],a
     ld  a,[hl+]
-    ldh [$3f],a
+    ldh [$ff3f],a
 
     ld  a,$80 ; unmute
-    ldh [$1a],a
+    ldh [$ff1a],a
 
     ld  a,[SamplePitchMsb]
-    ldh [$1e],a
+    ldh [$ff1e],a
 
     ld  a,e
-    ldh [$25],a
+    ldh [$ff25],a
 
     ld  a,[CurrentBank+1]
     ld  [$3000],a
