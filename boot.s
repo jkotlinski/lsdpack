@@ -16,7 +16,7 @@
 ; with this program; if not, write to the Free Software Foundation, Inc.,
 ; 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. }}}
 
-if __RGBDS_MAJOR__ != 0 || __RGBDS_MINOR__ != 5 || __RGBDS_PATCH__ != 1
+if __RGBDS_MAJOR__ != 0 || __RGBDS_MINOR__ != 9 || __RGBDS_PATCH__ != 0
     warn "Unknown RGBDS version {__RGBDS_VERSION__}! lsdpack was tested with RGBDS 0.5.1"
 endc
 
@@ -35,15 +35,15 @@ SECTION "boot",ROM0[$100]
 SECTION "setup",ROM0[$150]
     ; setup joypad reading
     ld  a,$10
-    ldh [0],a
+    ldh [$ff00],a
 
     ; setup timer
     ld  a,256-183
-    ldh [6],a   ; TMA
+    ldh [$ff06],a   ; TMA
     ld  a,6
-    ldh [7],a   ; TAC
+    ldh [$ff07],a   ; TAC
     ld  a,4
-    ldh [$ff],a ; IE
+    ldh [$ffff],a ; IE
 
     ; play song 0
     xor a
@@ -54,7 +54,7 @@ SECTION "setup",ROM0[$150]
 mainloop:
 
 .wait_button_pressed:
-    ldh a,[0]
+    ldh a,[$ff00]
     and $f
     cp  $f
     jr  z,.wait_button_pressed
@@ -75,7 +75,7 @@ mainloop:
     call    .delay
 
 .wait_button_released
-    ldh a,[0]
+    ldh a,[$ff00]
     and $f
     cp  $f
     jr  nz,.wait_button_released
@@ -95,12 +95,12 @@ tim_handler:
     push    af
 
     ld  a,$ff   ; black background
-    ldh [$47],a
+    ldh [$ff47],a
 
     call LsdjTick
 
     xor a   ; white background
-    ldh [$47],a
+    ldh [$ff47],a
 
     pop af
     reti
