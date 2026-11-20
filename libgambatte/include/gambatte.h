@@ -182,6 +182,7 @@ public:
 
     void setWriteHandler(void (*writeHandler)(char, char, unsigned long));
     void setLcdHandler(void (*lcdHandler)());
+    void setTimerHandler(void (*timerHandler)());
 
     bool isSongEmpty() const;
 

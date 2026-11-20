@@ -7,12 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Check that a song started playing.
+- Support LSDj 9.2.0+, which ticks from the timer interrupt. The LSDj version is detected from the ROM title; `-t`/`-l` override it.
 
 ### Fixed
 - Support very slow key settings.
 - Register dump (-r) crash due to uninitialized memory.
 - Broken PU2 pitch optimization.
 - CMakeLists.txt fix for Debian.
+- Output file name for .gbc ROMs.
 
 ## 0.0.5 - 2021-09-12
 ### Fixed

@@ -10,7 +10,9 @@ Requires CMake, [RGBDS](https://github.com/gbdev/rgbds) and a C++ compiler. Exac
 
 ## Recording Songs
 
-All songs must first be prepared so that they eventually stop with the HFF command. Place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`. To record songs from several .gb files, add them all to the command line, like `./lsdpack.exe 1.gb 2.gb 3.gb`.
+All songs must first be prepared so that they eventually stop with the HFF command. Place your .sav and .gb file in the same directory and run e.g. `./lsdpack.exe lsdj.gb` to record the songs to `lsdj.s`. To record songs from several .gb files, add them all to the command line, like `./lsdpack.exe 1.gb 2.gb 3.gb`. Both .gb and .gbc file names work.
+
+LSDj 9.2.0 and later tick the sound driver from the timer interrupt instead of the LCD interrupt. lsdpack reads the LSDj version from the ROM title and records from the matching interrupt; LSDj 9.2.0+ is always recorded in emulated DMG mode, since the CGB double speed timer would halve the tempo. If the ROM title was changed, choose the mode by hand with `-t` (timer, LSDj 9.2.0+) or `-l` (LCD, older versions).
 
 ## Game Boy Sound System (GBS)
 
