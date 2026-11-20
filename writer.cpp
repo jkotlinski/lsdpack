@@ -114,6 +114,14 @@ void Writer::optimize_music_stream() {
     RedundantWriteRule pu1_pitch_lsb(0x18);
     RedundantWriteRule noi_wave(0x22);
 
+    // Pulse duty/length ($11/$16): bits 7-6 are duty (a plain no-op when
+    // unchanged), bits 5-0 reload the hardware length counter -> only drop pure
+    // duty writes. Pulse-only: nothing else in the stream writes these, so the
+    // shadow is reliable (unlike CH3 $1a/$1b/$1c, which CMD_SAMPLE_* flips
+    // behind our back - a dropped post-sample kill there leaves CH3 droning).
+    RedundantWriteRule pu0_duty(0x11, 0x3f, /*reset_on_song_start=*/true);
+    RedundantWriteRule pu1_duty(0x16, 0x3f, /*reset_on_song_start=*/true);
+
     EnvelopeRule envelope;
     PitchRule pitch;
     LycRule lyc;
@@ -126,6 +134,9 @@ void Writer::optimize_music_stream() {
     optimize_rule(pan);
     optimize_rule(pu0_sweep);
     optimize_rule(noi_wave);
+
+    optimize_rule(pu0_duty);
+    optimize_rule(pu1_duty);
 
     optimize_rule(envelope);
     optimize_rule(pitch);
