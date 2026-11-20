@@ -109,6 +109,7 @@ public:
 	void setGameShark(std::string const &codes) { interrupter_.setGameShark(codes); }
     void setWriteHandler(void (*writeHandler)(char, char, unsigned long)) { writeHandler_ = writeHandler; }
     void setLcdHandler(void (*lcdHandler)()) { lcdHandler_ = lcdHandler; }
+    void setTimerHandler(void (*timerHandler)()) { timerHandler_ = timerHandler; }
 	void updateInput();
     bool isSongEmpty() {
         write(0, 0xa, 0); // enable SRAM
@@ -141,6 +142,7 @@ private:
 	bool blanklcd_;
     void (*writeHandler_)(char, char, unsigned long);
     void (*lcdHandler_)();
+    void (*timerHandler_)();
 
 	void decEventCycles(IntEventId eventId, unsigned long dec);
 	void oamDmaInitSetup();

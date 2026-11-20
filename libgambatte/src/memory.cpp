@@ -36,6 +36,9 @@ Memory::Memory(Interrupter const &interrupter)
 , oamDmaPos_(0xFE)
 , serialCnt_(0)
 , blanklcd_(false)
+, writeHandler_(0)
+, lcdHandler_(0)
+, timerHandler_(0)
 {
 	intreq_.setEventTime<intevent_blit>(144 * 456ul);
 	intreq_.setEventTime<intevent_end>(0);
@@ -296,7 +299,10 @@ unsigned long Memory::event(unsigned long cc) {
 
 			intreq_.ackIrq(n);
             if (address == 0x48) {
-                lcdHandler_();
+                if (lcdHandler_) lcdHandler_();
+            }
+            if (address == 0x50) {
+                if (timerHandler_) timerHandler_();
             }
 			cc = interrupter_.interrupt(address, cc, *this);
 		}

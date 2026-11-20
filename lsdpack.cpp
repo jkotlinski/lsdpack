@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 
 #include "gambatte.h"
 
@@ -32,6 +33,17 @@ Input input;
 std::string out_path;
 
 IWriter* writer;
+
+/* LSDj 9.2.0 moved its sound tick from the LCD (LYC) interrupt to the timer
+ * interrupt. Ticks are recorded from whichever interrupt the loaded ROM uses. */
+enum TickSource {
+    TICK_AUTO_DETECT,
+    TICK_LCD,   // LSDj up to 9.1.x
+    TICK_TIMER, // LSDj 9.2.0+
+};
+
+TickSource tick_source_option = TICK_AUTO_DETECT;
+TickSource tick_source = TICK_LCD;
 
 void run_one_frame() {
     size_t samples = 35112;
@@ -129,9 +141,33 @@ void on_ff_write(char p, char data, unsigned long cycle) {
 }
 
 void on_lcd_interrupt() {
-    if (sound_enabled) {
+    if (sound_enabled && tick_source == TICK_LCD) {
         writer->record_lcd();
     }
+}
+
+void on_timer_interrupt() {
+    if (sound_enabled && tick_source == TICK_TIMER) {
+        writer->record_lcd();
+    }
+}
+
+/* Reads the version from the ROM title, e.g. "LSDj-v9.2.L" or "LSDj-v4.9.4". */
+TickSource detect_tick_source(const char* path) {
+    char title[16] = {0};
+    std::ifstream rom(path, std::ios::binary);
+    rom.seekg(0x134);
+    rom.read(title, 15);
+    const char* v = strstr(title, "v");
+    int major = 0;
+    int minor = 0;
+    if (!v || sscanf(v + 1, "%d.%d", &major, &minor) != 2) {
+        fprintf(stderr, "Could not detect LSDj version of %s, assuming < 9.2.0. "
+                "Use -t or -l to choose the tick source.\n", path);
+        return TICK_LCD;
+    }
+    printf("Detected LSDj v%d.%d\n", major, minor);
+    return (major > 9 || (major == 9 && minor >= 2)) ? TICK_TIMER : TICK_LCD;
 }
 
 void make_out_path(const char* in_path, std::string suffix) {
@@ -140,7 +176,10 @@ void make_out_path(const char* in_path, std::string suffix) {
     }
 
     out_path = in_path;
-    out_path.replace(out_path.end() - 3, out_path.end(), ""); // strip .gb
+    const size_t dot = out_path.rfind('.');
+    if (dot != std::string::npos) {
+        out_path.erase(dot); // strip .gb/.gbc
+    }
     out_path += suffix;
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('/'), "");
     out_path.replace(out_path.begin(), out_path.begin() + 1 + out_path.rfind('\\'), "");
@@ -148,6 +187,17 @@ void make_out_path(const char* in_path, std::string suffix) {
 }
 
 void load_gb(const char* path, bool dmg_mode) {
+    tick_source = tick_source_option == TICK_AUTO_DETECT
+        ? detect_tick_source(path)
+        : tick_source_option;
+    if (tick_source == TICK_TIMER) {
+        /* In CGB double speed mode the timer runs at twice the rate, so the
+         * recorded song would play at half tempo in player.s. */
+        puts("Recording timer interrupts (LSDj 9.2.0+), using emulated DMG");
+        dmg_mode = true;
+    } else {
+        puts("Recording LCD interrupts (LSDj < 9.2.0)");
+    }
     unsigned flags = dmg_mode ? gameboy.FORCE_DMG : 0;
     if (gameboy.load(path, flags)) {
         fprintf(stderr, "Loading %s failed\n", path);
@@ -228,11 +278,13 @@ void record_dump(int argc, char* argv[], bool dmg_mode) {
 }
 
 void print_help_and_exit() {
-    puts("usage: lsdpack [-g] [-r] [-d] [lsdj.gb lsdj2.gb ...]");
+    puts("usage: lsdpack [-g] [-r] [-d] [-t|-l] [lsdj.gb lsdj2.gb ...]");
     puts("");
     puts("-g: .gbs conversion");
     puts("-r: raw register dump; optimizations disabled");
-    puts("-d: record using emulated DMG (default: CGB)");
+    puts("-d: record using emulated DMG (default: CGB; always DMG for LSDj 9.2.0+)");
+    puts("-t: record timer interrupts, as LSDj 9.2.0+ (default: detect from ROM title)");
+    puts("-l: record LCD interrupts, as LSDj < 9.2.0 (default: detect from ROM title)");
     exit(1);
 }
 
@@ -243,7 +295,7 @@ int main(int argc, char* argv[]) {
     unsigned flags = 0;
 
     int c;
-    while ((c = getopt(argc, argv, "grd")) != -1) {
+    while ((c = getopt(argc, argv, "grdtl")) != -1) {
         switch (c) {
             case 'g':
                 puts(".gbs mode enabled");
@@ -257,6 +309,12 @@ int main(int argc, char* argv[]) {
                 puts("recording using emulated DMG");
                 dmg_mode = true;
                 break;
+            case 't':
+                tick_source_option = TICK_TIMER;
+                break;
+            case 'l':
+                tick_source_option = TICK_LCD;
+                break;
             default:
                 print_help_and_exit();
         }
@@ -269,6 +327,7 @@ int main(int argc, char* argv[]) {
     gameboy.setInputGetter(&input);
     gameboy.setWriteHandler(on_ff_write);
     gameboy.setLcdHandler(on_lcd_interrupt);
+    gameboy.setTimerHandler(on_timer_interrupt);
 
     if (dmg_mode) {
         flags |= gameboy.FORCE_DMG;
