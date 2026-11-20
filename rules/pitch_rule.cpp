@@ -25,6 +25,23 @@ PitchRule::PitchRule() :
     pu1_msb_state(-1) {}
 
 void PitchRule::transform(std::deque<unsigned int>& bytes) {
+    // CH3 synth pitch: fold NR33/NR34 ($1d,$1e) into one CMD_PITCH_WAV
+    // (3 bytes instead of 4). Fold only, no redundant-write elimination:
+    // $1d/$1e are shared with sample playback (CMD_SAMPLE_* writes them behind
+    // this rule's back) and LSDj emits them in both orders, so a reliable
+    // shadow is not available. The player's .pitch_wav writes $1d then $1e -
+    // byte-identical APU effect to the two raw writes it replaces. Wave-heavy
+    // tracks emit this every tick, so 4->3 is a big win (e.g. -67 KB / song).
+    if (bytes[0] == (0x1d | FLAG_CMD) && bytes[2] == (0x1e | FLAG_CMD)) {
+        const unsigned int lsb = bytes[1];
+        const unsigned int msb = bytes[3];
+        bytes.clear();
+        bytes.push_back(CMD_PITCH_WAV | FLAG_CMD);
+        bytes.push_back(lsb);
+        bytes.push_back(msb);
+        return;
+    }
+
     int cmd = 0;
     unsigned int new_lsb = bytes[1];
     unsigned int new_msb = bytes[3];
